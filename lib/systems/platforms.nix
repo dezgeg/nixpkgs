@@ -281,6 +281,9 @@ rec {
       # Disable OABI to have seccomp_filter (required for systemd)
       # https://github.com/raspberrypi/firmware/issues/651
       OABI_COMPAT n
+
+      DRM_NOUVEAU m
+      DRM_TEGRA_STAGING y
     '';
     gcc = {
       # Some table about fpu flags:
