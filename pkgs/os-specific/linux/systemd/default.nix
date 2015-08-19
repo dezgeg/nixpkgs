@@ -1,5 +1,5 @@
 { stdenv, fetchurl, pkgconfig, intltool, gperf, libcap, dbus, kmod
-, xz, pam, acl, cryptsetup, libuuid, m4, utillinux
+, zlib, xz, pam, acl, cryptsetup, libuuid, m4, utillinux, libffi
 , glib, kbd, libxslt, coreutils, libgcrypt
 , kexectools, libmicrohttpd, linuxHeaders
 , pythonPackages ? null, pythonSupport ? false
@@ -18,6 +18,11 @@ stdenv.mkDerivation rec {
     sha256 = "163l1y4p2a564d4ynfq3k3xf53j2v5s81blb6cvpn1y7rpxyccd0";
   };
 
+  outputs = [ "out" "libudev" "doc" ]; # TODO: "dev"
+  # note: there are many references to ${systemd}/...
+  outputDev = "out";
+  propagatedOutputs = "libudev";
+
   patches =
     [ # These are all changes between upstream and
       # https://github.com/edolstra/systemd/tree/nixos-v217.
@@ -27,8 +32,9 @@ stdenv.mkDerivation rec {
   buildInputs =
     [ pkgconfig intltool gperf libcap kmod xz pam acl
       /* cryptsetup */ libuuid m4 glib libxslt libgcrypt
-      libmicrohttpd linuxHeaders
+      libmicrohttpd linuxHeaders libffi
     ] ++ stdenv.lib.optionals pythonSupport [pythonPackages.python pythonPackages.lxml];
+
 
   configureFlags =
     [ "--localstatedir=/var"
@@ -69,11 +75,12 @@ stdenv.mkDerivation rec {
       for i in src/remount-fs/remount-fs.c src/core/mount.c src/core/swap.c src/fsck/fsck.c units/emergency.service.in units/rescue.service.in src/journal/cat.c src/core/shutdown.c src/nspawn/nspawn.c; do
         test -e $i
         substituteInPlace $i \
-          --replace /usr/bin/getent ${stdenv.glibc}/bin/getent \
-          --replace /bin/mount ${utillinux}/bin/mount \
-          --replace /bin/umount ${utillinux}/bin/umount \
-          --replace /sbin/swapon ${utillinux}/sbin/swapon \
-          --replace /sbin/swapoff ${utillinux}/sbin/swapoff \
+          --replace /usr/bin/getent ${stdenv.glibc.bin}/bin/getent \
+          --replace /bin/mount ${utillinux.bin}/bin/mount \
+          --replace /bin/umount ${utillinux.bin}/bin/umount \
+          --replace /sbin/swapon ${utillinux.bin}/sbin/swapon \
+          --replace /sbin/swapoff ${utillinux.bin}/sbin/swapoff \
+          --replace /sbin/fsck ${utillinux.bin}/sbin/fsck \
           --replace /bin/echo ${coreutils}/bin/echo \
           --replace /bin/cat ${coreutils}/bin/cat \
           --replace /sbin/sulogin ${utillinux}/sbin/sulogin \
@@ -84,11 +91,19 @@ stdenv.mkDerivation rec {
         --replace /usr/lib/systemd/catalog/ $out/lib/systemd/catalog/
 
       configureFlagsArray+=("--with-ntp-servers=0.nixos.pool.ntp.org 1.nixos.pool.ntp.org 2.nixos.pool.ntp.org 3.nixos.pool.ntp.org")
+      export NIX_CFLAGS_LINK+=" -Wl,-rpath,$libudev/lib"
     '';
+
+  makeFlags = [
+    "udevlibexecdir=$(libudev)/lib/udev"
+    # udev rules refer to $out, and anything but libs should probably go to $out
+    "udevrulesdir=$(out)/lib/udev/rules.d"
+    "udevhwdbdir=$(out)/lib/udev/hwdb.d"
+  ];
 
   # This is needed because systemd uses the gold linker, which doesn't
   # yet have the wrapper script to add rpath flags automatically.
-  NIX_LDFLAGS = "-rpath ${pam}/lib -rpath ${libcap}/lib -rpath ${acl}/lib -rpath ${stdenv.cc.cc}/lib";
+  NIX_LDFLAGS = "-rpath ${pam.out}/lib -rpath ${libcap.out}/lib -rpath ${acl.out}/lib -rpath ${stdenv.cc.cc.lib}/lib";
 
   PYTHON_BINARY = "${coreutils}/bin/env python"; # don't want a build time dependency on Python
 
@@ -106,12 +121,7 @@ stdenv.mkDerivation rec {
       "-USYSTEMD_BINARY_PATH" "-DSYSTEMD_BINARY_PATH=\"/run/current-system/systemd/lib/systemd/systemd\""
     ];
 
-  # Use /var/lib/udev rather than /etc/udev for the generated hardware
-  # database.  Upstream doesn't want this (see commit
-  # 1e1954f53386cb773e2a152748dd31c4d36aa2d8) because using /var is
-  # forbidden in early boot, but in NixOS the initrd guarantees that
-  # /var is mounted.
-  makeFlags = "hwdb_bin=/var/lib/udev/hwdb.bin";
+  enableParallelBuilding = true;
 
   installFlags =
     [ "localstatedir=$(TMPDIR)/var"
@@ -147,9 +157,27 @@ stdenv.mkDerivation rec {
       done
 
       rm -rf $out/etc/rpm
+
+      # Move lib(g)udev to a separate output. TODO: maybe split them up
+      #   to avoid libudev pulling glib
+      mkdir -p "$libudev/lib"
+      mv "$out"/lib/lib{,g}udev* "$libudev/lib/"
+
+      for i in "$libudev"/lib/*.la; do
+        substituteInPlace $i --replace "$out" "$libudev"
+      done
+      for i in "$out"/lib/pkgconfig/{libudev,gudev-1.0}.pc; do
+        substituteInPlace $i --replace "libdir=$out" "libdir=$libudev"
+      done
     ''; # */
 
-  enableParallelBuilding = true;
+  # some libs fail to link to liblzma and/or libffi
+  postFixup = let extraLibs = stdenv.lib.makeLibraryPath [ xz.out libffi.out zlib.out ];
+    in ''
+      for f in "$out"/lib/*.so.0.*; do
+        patchelf --set-rpath `patchelf --print-rpath "$f"`':${extraLibs}' "$f"
+      done
+    '';
 
   # The interface version prevents NixOS from switching to an
   # incompatible systemd at runtime.  (Switching across reboots is
@@ -166,3 +194,5 @@ stdenv.mkDerivation rec {
     maintainers = [ stdenv.lib.maintainers.eelco stdenv.lib.maintainers.simons ];
   };
 }
+
+

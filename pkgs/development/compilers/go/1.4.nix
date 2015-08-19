@@ -3,9 +3,9 @@
 , Security }:
 
 let
-  loader386 = "${glibc}/lib/ld-linux.so.2";
-  loaderAmd64 = "${glibc}/lib/ld-linux-x86-64.so.2";
-  loaderArm = "${glibc}/lib/ld-linux.so.3";
+  loader386 = "${glibc.out}/lib/ld-linux.so.2";
+  loaderAmd64 = "${glibc.out}/lib/ld-linux-x86-64.so.2";
+  loaderArm = "${glibc.out}/lib/ld-linux.so.3";
 in
 
 stdenv.mkDerivation rec {

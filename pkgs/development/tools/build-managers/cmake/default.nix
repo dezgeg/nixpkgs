@@ -1,4 +1,4 @@
-{ stdenv, fetchurl
+{ stdenv, fetchurl, pkgconfig
 , bzip2, curl, expat, libarchive, xz, zlib
 , useNcurses ? false, ncurses, useQt4 ? false, qt4
 , wantPS ? false, ps ? null
@@ -25,8 +25,6 @@ stdenv.mkDerivation rec {
     sha256 = "0y3w83al0vh9ll7fnqm3nx7l8hsl85k8iv9abxb791q36rp4xsdd";
   };
 
-  enableParallelBuilding = true;
-
   patches =
     # Don't search in non-Nix locations such as /usr, but do search in
     # Nixpkgs' Glibc.
@@ -38,18 +36,28 @@ stdenv.mkDerivation rec {
       sha256 = "16acmdr27adma7gs9rs0dxdiqppm15vl3vv3agy7y8s94wyh4ybv";
     }) ++ stdenv.lib.optional stdenv.isCygwin ./3.2.2-cygwin.patch;
 
+  outputs = [ "out" "doc" ];
+  setOutputFlags = false;
+
+  setupHook = ./setup-hook.sh;
+
   buildInputs =
-    [ bzip2 curl expat libarchive xz zlib ]
+    [ setupHook pkgconfig bzip2 curl expat libarchive xz zlib ]
     ++ optional useNcurses ncurses
     ++ optional useQt4 qt4;
 
   propagatedBuildInputs = optional wantPS ps;
 
-  CMAKE_PREFIX_PATH = stdenv.lib.concatStringsSep ":" buildInputs;
-
+  preConfigure = with stdenv; optionalString (stdenv ? glibc)
+    ''
+      fixCmakeFiles .
+      substituteInPlace Modules/Platform/UnixPaths.cmake \
+        --subst-var-by glibc_bin ${glibc.bin or glibc} \
+        --subst-var-by glibc_dev ${glibc.dev or glibc} \
+        --subst-var-by glibc_lib ${glibc.out or glibc}
+    '';
   configureFlags =
     [ "--docdir=/share/doc/${name}"
-      "--mandir=/share/man"
       "--no-system-jsoncpp"
     ]
     ++ optional (!stdenv.isCygwin) "--system-libs"
@@ -57,22 +65,18 @@ stdenv.mkDerivation rec {
     ++ ["--"]
     ++ optional (!useNcurses) "-DBUILD_CursesDialog=OFF";
 
-  setupHook = ./setup-hook.sh;
-
   dontUseCmakeConfigure = true;
 
-  preConfigure = optionalString (stdenv ? glibc)
-    ''
-      source $setupHook
-      fixCmakeFiles .
-      substituteInPlace Modules/Platform/UnixPaths.cmake \
-        --subst-var-by glibc ${stdenv.glibc}
-    '';
+  enableParallelBuilding = true;
 
-  meta = {
+  preInstall = ''mkdir "$doc" '';
+
+  postInstall = ''_moveToOutput "share/cmake-*/Help" "$doc" '';
+
+  meta = with stdenv.lib; {
     homepage = http://www.cmake.org/;
     description = "Cross-Platform Makefile Generator";
-    platforms = if useQt4 then qt4.meta.platforms else stdenv.lib.platforms.all;
-    maintainers = with stdenv.lib.maintainers; [ urkud mornfall ttuegel ];
+    platforms = if useQt4 then qt4.meta.platforms else platforms.all;
+    maintainers = with maintainers; [ urkud mornfall ttuegel ];
   };
 }

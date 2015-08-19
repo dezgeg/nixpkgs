@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, pcre, libiconv }:
+{ stdenv, fetchurl, xz, pcre, libiconv }:
 
 let version = "2.21"; in
 
@@ -12,7 +12,9 @@ stdenv.mkDerivation {
 
   patches = [ ./cve-2015-1345.patch ];
 
-  buildInputs = [ pcre libiconv ];
+  #outputs = [ "out" "doc" ]; ToDo
+
+  buildInputs = [ pcre xz.bin libiconv ];
 
   # cygwin: FAIL: multibyte-white-space
   doCheck = !stdenv.isDarwin && !stdenv.isCygwin;

@@ -10,7 +10,7 @@
 , vaapiSupport  ? false,  libva     ? null # ToDo: it has huge closure
 , vdpauSupport  ? true,   libvdpau  ? null
 , freetypeSupport ? true, freetype  ? null # it's small and almost everywhere
-, SDL # only for avplay in $tools, adds nontrivial closure to it
+, SDL # only for avplay in $bin, adds nontrivial closure to it
 , enableGPL ? true # ToDo: some additional default stuff may need GPL
 , enableUnfree ? faacSupport
 }:
@@ -77,12 +77,12 @@ let
 
     enableParallelBuilding = true;
 
-    outputs = [ "out" "tools" ];
+    outputs = [ "dev" "out" "bin" ]; #TODO: re-check
 
     # move avplay to get rid of the SDL dependency in the main output
     postInstall = ''
-      mkdir -p "$tools/bin"
-      mv "$out/bin/avplay" "$tools/bin"
+      mkdir -p "$bin/bin"
+      mv "$out/bin/avplay" "$bin/bin"
     '';
 
     doInstallCheck = false; # fails randomly

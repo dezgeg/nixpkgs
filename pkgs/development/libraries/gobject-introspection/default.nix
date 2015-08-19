@@ -16,6 +16,8 @@ stdenv.mkDerivation rec {
     sha256 = "1b972qg2yb51sdavfvb6kc19akwc15c1bwnbg81vadxamql2q33g";
   };
 
+  outputs = [ "dev" "out" "doc" ];
+
   buildInputs = [ flex bison pkgconfig python ]
     ++ libintlOrEmpty
     ++ stdenv.lib.optional stdenv.isDarwin otool;
@@ -24,8 +26,6 @@ stdenv.mkDerivation rec {
   # Tests depend on cairo, which is undesirable (it pulls in lots of
   # other dependencies).
   configureFlags = [ "--disable-tests" ];
-
-  postInstall = "rm -rf $out/share/gtk-doc";
 
   setupHook = ./setup-hook.sh;
 

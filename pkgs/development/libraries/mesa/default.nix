@@ -1,6 +1,5 @@
-{ stdenv, fetchurl, fetchpatch, pkgconfig, intltool, flex, bison, autoreconfHook, substituteAll
-, python, libxml2Python, file, expat, makedepend, pythonPackages
-, libdrm, xorg, wayland, udev, llvmPackages, libffi, libomxil-bellagio
+{ stdenv, fetchurl, fetchpatch, pkgconfig, intltool, autoreconfHook, substituteAll
+, file, expat, libdrm, xorg, wayland, udev, llvmPackages, libffi, libomxil-bellagio
 , libvdpau, libelf, libva
 , grsecEnabled
 , enableTextureFloats ? false # Texture floats are patented, see docs/patents.txt
@@ -22,12 +21,13 @@ else
   - libOSMesa is in $osmesa (~4 MB)
 */
 
+with { inherit (stdenv.lib) optional optionalString; };
+
 let
   version = "10.6.2";
   # this is the default search path for DRI drivers
-  driverLink = "/run/opengl-driver" + stdenv.lib.optionalString stdenv.isi686 "-32";
+  driverLink = "/run/opengl-driver" + optionalString stdenv.isi686 "-32";
 in
-with { inherit (stdenv.lib) optional optionals optionalString; };
 
 stdenv.mkDerivation {
   name = "mesa-noglu-${version}";
@@ -49,7 +49,7 @@ stdenv.mkDerivation {
   ] ++ optional stdenv.isLinux
       (substituteAll {
         src = ./dlopen-absolute-paths.diff;
-        inherit udev;
+        inherit (udev) libudev;
       });
 
   postPatch = ''
@@ -57,7 +57,7 @@ stdenv.mkDerivation {
       --replace _EGL_DRIVER_SEARCH_DIR '"${driverLink}"'
   '';
 
-  outputs = ["out" "drivers" "osmesa"];
+  outputs = [ "dev" "out" "drivers" "osmesa" ];
 
   configureFlags = [
     "--sysconfdir=/etc"
@@ -98,13 +98,13 @@ stdenv.mkDerivation {
   ] ++ optional enableTextureFloats "--enable-texture-float"
     ++ optional grsecEnabled "--enable-glx-rts"; # slight performance degradation, enable only for grsec
 
-  nativeBuildInputs = [ pkgconfig python makedepend file flex bison pythonPackages.Mako ];
+  nativeBuildInputs = [ pkgconfig file ];
 
   propagatedBuildInputs = with xorg; [ libXdamage libXxf86vm ]
-    ++ optionals stdenv.isLinux [ libdrm ];
+    ++ optional stdenv.isLinux libdrm;
 
   buildInputs = with xorg; [
-    autoreconfHook intltool expat libxml2Python llvmPackages.llvm
+    autoreconfHook intltool expat llvmPackages.llvm
     glproto dri2proto dri3proto presentproto
     libX11 libXext libxcb libXt libXfixes libxshmfence
     libffi wayland libvdpau libelf libXvMC /* libomxil-bellagio libva */
@@ -123,12 +123,14 @@ stdenv.mkDerivation {
   # ToDo: probably not all .la files are completely fixed, but it shouldn't matter
   postInstall = with stdenv.lib; ''
     mv -t "$drivers/lib/" \
-  '' + optionalString enableExtraFeatures ''
-      `#$out/lib/libXvMC*` \
-      $out/lib/gbm $out/lib/libgbm* \
-  '' + ''
+      $out/lib/libXvMC* \
       $out/lib/vdpau \
+      $out/lib/{bellagio,d3d} \
       $out/lib/libxatracker*
+
+    mv -t "$drivers/lib/dri/" \
+      "$out"/lib/dri/*
+    rmdir "$out/lib/dri"
 
     mkdir -p {$osmesa,$drivers}/lib/pkgconfig
     mv -t $osmesa/lib/ \
@@ -144,29 +146,34 @@ stdenv.mkDerivation {
     sed "/^libdir=/s,$out,$osmesa," -i \
       $osmesa/lib/libOSMesa*.la
 
-  '' + /* work around bug #529, but maybe $drivers should also be patchelf-ed */ ''
-    find $drivers/ $osmesa/ -type f -executable -print0 | xargs -0 strip -S || true
-
-  '' + /* add RPATH so the drivers can find the moved libgallium and libdricore9 */ ''
-    for lib in $drivers/lib/*.so* $drivers/lib/*/*.so*; do
-      if [[ ! -L "$lib" ]]; then
-        patchelf --set-rpath "$(patchelf --print-rpath $lib):$drivers/lib" "$lib"
-      fi
-    done
   '' + /* set the default search path for DRI drivers; used e.g. by X server */ ''
     substituteInPlace "$out/lib/pkgconfig/dri.pc" --replace '$(drivers)' "${driverLink}"
   '' + /* move vdpau drivers to $drivers/lib, so they are found */ ''
     mv "$drivers"/lib/vdpau/* "$drivers"/lib/ && rmdir "$drivers"/lib/vdpau
   '';
-  #ToDo: @vcunat isn't sure if drirc will be found when in $out/etc/, but it doesn't seem important ATM
+  #ToDo: @vcunat isn't sure if drirc will be found when in $out/etc/, but it doesn't seem important ATM */
+
+  postFixup =
+    # add RPATH so the drivers can find the moved libgallium and libdricore9
+    # moved here to avoid problems with stripping patchelfed files
+  ''
+    for lib in $drivers/lib/*.so* $drivers/lib/*/*.so*; do
+      if [[ ! -L "$lib" ]]; then
+        patchelf --set-rpath "$(patchelf --print-rpath $lib):$drivers/lib" "$lib"
+      fi
+    done
+  '';
+  # ToDo + /* check $out doesn't depend on llvm */ ''
+  # builder failures are ignored for some reason
+  #   grep -qv '${llvmPackages.llvm}' -R "$out"
 
   passthru = { inherit libdrm version driverLink; };
 
-  meta = {
+  meta = with stdenv.lib; {
     description = "An open source implementation of OpenGL";
     homepage = http://www.mesa3d.org/;
-    license = "bsd";
-    platforms = stdenv.lib.platforms.mesaPlatforms;
-    maintainers = with stdenv.lib.maintainers; [ eduarrrd simons vcunat ];
+    license = licenses.mit; # X11 variant, in most files
+    platforms = platforms.mesaPlatforms;
+    maintainers = with maintainers; [ eduarrrd simons vcunat ];
   };
 }

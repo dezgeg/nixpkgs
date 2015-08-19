@@ -42,7 +42,7 @@ in stdenv.mkDerivation {
 
   patches = stdenv.lib.optional stdenv.isDarwin ./no-xcode.patch;
 
-  buildInputs = [ python which ]
+  buildInputs = [ python openssl ]
     ++ (optional stdenv.isLinux utillinux)
     ++ optionals stdenv.isDarwin [ pkgconfig openssl libtool ];
   setupHook = ./setup-hook.sh;

@@ -10,6 +10,9 @@ stdenv.mkDerivation rec {
 
   patches = if stdenv.isCygwin then [ ./3.2.1-cygwin.patch ] else null;
 
+  outputs = [ "dev" "out" "doc" ];
+
+
   configureFlags = [
     "--with-gcc-arch=generic" # no detection of -march= or -mtune=
     "--enable-pax_emutramp"
@@ -17,9 +20,15 @@ stdenv.mkDerivation rec {
 
   dontStrip = stdenv ? cross; # Don't run the native `strip' when cross-compiling.
 
-  # Install headers in the right place.
+  # Install headers and libs in the right places.
   postInstall = ''
-    ln -s${if (stdenv.isFreeBSD || stdenv.isOpenBSD || stdenv.isDarwin) then "" else "r"}v "$out/lib/"libffi*/include "$out/include"
+    mv "$out"/lib64/* "$out/lib"
+    rmdir "$out/lib64"
+    ln -s lib "$out/lib64"
+
+    mkdir -p "$dev/"
+    mv "$out/lib/${name}/include" "$dev/include"
+    rmdir "$out/lib/${name}"
   '';
 
   meta = {

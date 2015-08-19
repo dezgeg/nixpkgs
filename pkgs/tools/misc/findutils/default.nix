@@ -1,4 +1,4 @@
-{stdenv, fetchurl, coreutils}:
+{ stdenv, fetchurl, coreutils }:
 
 stdenv.mkDerivation rec {
   name = "findutils-4.4.2";
@@ -11,6 +11,8 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [coreutils];
 
   patches = [ ./findutils-path.patch ./change_echo_path.patch ./disable-test-canonicalize.patch ];
+
+  outputs = [ "out" "info" ];
 
   doCheck = true;
 

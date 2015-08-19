@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, unzip, xlibs, libjpeg }:
+{ stdenv, fetchurl, autoreconfHook, unzip, xlibs, libjpeg }:
 
 stdenv.mkDerivation rec {
   name = "jasper-1.900.1";
@@ -17,11 +17,15 @@ stdenv.mkDerivation rec {
     ./jasper-CVE-2014-9029.diff
   ];
 
-  nativeBuildInputs = [unzip];
+  nativeBuildInputs = [ unzip autoreconfHook ];
   propagatedBuildInputs = [ libjpeg ];
 
   configureFlags = "--enable-shared";
-  
+
+  outputs = [ "dev" "out" "man" "bin" ];
+
+  enableParallelBuilding = true;
+
   meta = {
     homepage = https://www.ece.uvic.ca/~frodo/jasper/;
     description = "JPEG2000 Library";

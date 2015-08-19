@@ -9,6 +9,7 @@ stdenv.mkDerivation rec {
     sha256 = "1i623ygdj7rkizj7985q9d6vj5amwg686aqb5j3ixpkqkyp6xbrx";
   };
 
+  prePatch = "substituteInPlace Makefile --replace /usr/include/ ${glibc.dev}/include/";
   # Fixes bogus warnings that failed libsemanage
   patches = [ ./va_args.patch ];
 

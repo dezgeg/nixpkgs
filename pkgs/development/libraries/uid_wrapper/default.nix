@@ -8,7 +8,7 @@ stdenv.mkDerivation rec {
     sha256 = "18xdyy7rvn0zg6j44ay0sxd4q0bplq64syyki9wi8ixhkrzqn0yn";
   };
 
-  buildInputs = [ cmake pkgconfig ];
+  buildInputs = [ cmake pkgconfig (stdenv.cc.libc.out or null) ];
 
   meta = with stdenv.lib; {
     description = "a wrapper for the user, group and hosts NSS API";

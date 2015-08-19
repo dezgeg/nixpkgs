@@ -2084,6 +2084,21 @@ let
     buildInputs = [pkgconfig dri2proto dri3proto renderproto libdrm openssl libX11 libXau libXaw libxcb xcbutil xcbutilwm xcbutilimage xcbutilkeysyms libXdmcp libXfixes libxkbfile libXmu libXpm libXrender libXres libxshmfence libXt xcbutilrenderutil];
   }) // {inherit dri2proto dri3proto renderproto libdrm openssl libX11 libXau libXaw libxcb xcbutil xcbutilwm xcbutilimage xcbutilkeysyms libXdmcp libXfixes libxkbfile libXmu libXpm libXrender libXres libxshmfence libXt xcbutilrenderutil;};
 
+  # TODO:
+  # With the current state of ./generate-expr-from-tarballs.pl,
+  # this will get overwritten when next invoked.
+  # Could add a special case to ./generate-expr-from-tarballs.pl,
+  # or perhaps there's a cleaner solution.
+  #xquartz = (mkDerivation "xquartz" {
+  #  name = "xorg-server-1.14.6";
+  #  builder = ./builder.sh;
+  #  src = fetchurl {
+  #    url = mirror://xorg/individual/xserver/xorg-server-1.14.6.tar.bz2;
+  #    sha256 = "0c57vp1z0p38dj5gfipkmlw6bvbz1mrr0sb3sbghdxxdyq4kzcz8";
+  #  };
+  #  buildInputs = [pkgconfig renderproto libdrm openssl libX11 libXau libXaw libXdmcp libXfixes libxkbfile libXmu libXpm libXrender libXres libXt libXv ];
+  #}) // {inherit renderproto libdrm openssl libX11 libXau libXaw libXdmcp libXfixes libxkbfile libXmu libXpm libXrender libXres libXt libXv ;};
+
   xorgsgmldoctools = (mkDerivation "xorgsgmldoctools" {
     name = "xorg-sgml-doctools-1.11";
     builder = ./builder.sh;

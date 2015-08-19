@@ -13,7 +13,11 @@ stdenv.mkDerivation rec {
     sha256 = "19ppbycbr87rai93vf2ff8k3ksjqq64s8qysq0mfy9fdjw2ffxha";
   };
 
+  outputs = [ "dev" "out" "bin" "doc" ];
+
   setupHook = ./setup-hook.sh;
+
+  enableParallelBuilding = true;
 
   # !!! We might want to factor out the gdk-pixbuf-xlib subpackage.
   buildInputs = [ libX11 libintlOrEmpty ];
@@ -29,7 +33,11 @@ stdenv.mkDerivation rec {
   # Seems to randomly fail sometimes with a bus error. FIXME
   doCheck = !stdenv.isDarwin;
 
-  postInstall = "rm -rf $out/share/gtk-doc";
+  # propagate the bin output
+  postPhases = "postPostFixup";
+  postPostFixup = ''
+    echo -n " $bin" >> "$dev"/nix-support/propagated-*build-inputs
+  '';
 
   meta = {
     description = "A library for image loading and manipulation";

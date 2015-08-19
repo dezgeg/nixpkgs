@@ -21,6 +21,9 @@ stdenv.mkDerivation rec {
   patches = optional stdenv.isCygwin ./1.0.1-cygwin64.patch
     ++ optional (stdenv.isDarwin || (stdenv ? cross && stdenv.cross.libc == "libSystem")) ./darwin-arch.patch;
 
+  outputs = [ "dev" "out" "man" "bin" ];
+  setOutputFlags = false;
+
   nativeBuildInputs = [ perl ];
   buildInputs = stdenv.lib.optional withCryptodev cryptodevHeaders;
 
@@ -40,9 +43,7 @@ stdenv.mkDerivation rec {
     "-DUSE_CRYPTODEV_DIGESTS"
   ];
 
-  makeFlags = [
-    "MANDIR=$(out)/share/man"
-  ];
+  makeFlags = "MANDIR=$(man)/share/man";
 
   # Parallel building is broken in OpenSSL.
   enableParallelBuilding = false;
@@ -53,6 +54,18 @@ stdenv.mkDerivation rec {
     if [ -n "$(echo $out/lib/*.so $out/lib/*.dylib $out/lib/*.dll)" ]; then
         rm "$out/lib/"*.a
     fi
+
+      mkdir -p $bin
+      mv $out/bin $bin/
+
+      rm -rf $out/etc/ssl/misc
+
+      mkdir $dev
+      mv $out/include $dev/
+
+      # OpenSSL installs readonly files, which otherwise we can't strip.
+      # FIXME: Can remove this after the next stdenv merge.
+      chmod -R +w $out
 
     # remove dependency on Perl at runtime
     rm -r $out/etc/ssl/misc $out/bin/c_rehash

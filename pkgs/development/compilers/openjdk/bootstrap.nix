@@ -40,7 +40,7 @@ let
     LIBDIRS="$(find $out -name \*.so\* -exec dirname {} \; | sort | uniq | tr '\n' ':')"
 
     for i in $out/bin/*; do
-      patchelf --set-interpreter ${glibc}/lib/ld-linux*.so.2 $i || true
+      patchelf --set-interpreter ${glibc.out}/lib/ld-linux*.so.2 $i || true
       patchelf --set-rpath "${glibc}/lib:$LIBDIRS" $i || true
     done
 

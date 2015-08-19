@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, perl, gmp ? null
+{ stdenv, fetchurl, perl, xz, gmp ? null
 , aclSupport ? false, acl ? null
 , selinuxSupport? false, libselinux ? null, libsepol ? null
 , autoconf, automake114x, texinfo
@@ -27,7 +27,9 @@ let
       sed '2i echo Skipping cp sparse test && exit 0' -i ./tests/cp/sparse.sh
     '';
 
-    nativeBuildInputs = [ perl ];
+    outputs = [ "out" "info" ];
+
+    nativeBuildInputs = [ perl xz.bin ];
     buildInputs = [ gmp ]
       ++ optional aclSupport acl
       ++ optionals stdenv.isCygwin [ autoconf automake114x texinfo ]   # due to patch

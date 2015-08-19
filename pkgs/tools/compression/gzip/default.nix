@@ -1,4 +1,4 @@
-{ stdenv, fetchurl }:
+{ stdenv, fetchurl, xz }:
 
 stdenv.mkDerivation rec {
   name = "gzip-1.6";
@@ -9,6 +9,8 @@ stdenv.mkDerivation rec {
   };
 
   enableParallelBuilding = true;
+
+  buildInputs = [ xz.bin ];
 
   preConfigure = if stdenv.isCygwin then ''
     sed -i lib/fpending.h -e 's,include <stdio_ext.h>,,'

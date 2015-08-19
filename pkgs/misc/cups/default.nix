@@ -19,6 +19,10 @@ stdenv.mkDerivation {
   buildInputs = [ pkgconfig zlib libjpeg libpng libtiff libusb gnutls avahi libpaper ]
     ++ optionals stdenv.isLinux [ pam dbus.libs acl xdg_utils ] ;
 
+  # FIXME: Split off the cups client library.
+  outputs = [ "dev" "out" "doc" "man" ];
+
+
   propagatedBuildInputs = [ gmp ];
 
   configureFlags = [
@@ -59,6 +63,9 @@ stdenv.mkDerivation {
       # Delete obsolete stuff that conflicts with cups-filters.
       rm -rf $out/share/cups/banners $out/share/cups/data/testprint
 
+      mkdir $dev/bin
+      mv $out/bin/cups-config $dev/bin/
+      
       # Rename systemd files provided by CUPS
       for f in $out/lib/systemd/system/*; do
         substituteInPlace "$f" \

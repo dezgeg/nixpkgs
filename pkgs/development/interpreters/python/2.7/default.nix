@@ -101,6 +101,11 @@ let
     # <mach-o/dyld.h> which is in our pure bootstrapTools, but not in the system headers.
     ++ optionals (stdenv.isDarwin && !stdenv.cc.nativeLibc) [ CF configd ];
 
+  mkPaths = paths: {
+    C_INCLUDE_PATH = concatStringsSep ":" (map (p: "${p.dev or p}/include") paths);
+    LIBRARY_PATH = concatStringsSep ":" (map (p: "${p.lib or (p.out or p)}/lib") paths);
+  };
+
   # Build the basic Python interpreter without modules that have
   # external dependencies.
   python = stdenv.mkDerivation {
@@ -111,8 +116,7 @@ let
             configureFlags;
 
     LDFLAGS = stdenv.lib.optionalString (!stdenv.isDarwin) "-lgcc_s";
-    C_INCLUDE_PATH = concatStringsSep ":" (map (p: "${p}/include") buildInputs);
-    LIBRARY_PATH = concatStringsSep ":" (map (p: "${p}/lib") buildInputs);
+    inherit (mkPaths buildInputs) C_INCLUDE_PATH LIBRARY_PATH;
 
     NIX_CFLAGS_COMPILE = optionalString stdenv.isDarwin "-msse2";
     DETERMINISTIC_BUILD = 1;
@@ -138,6 +142,8 @@ let
         paxmark E $out/bin/python${majorVersion}
 
         ${ optionalString includeModules "$out/bin/python ./setup.py build_ext"}
+
+        rm "$out"/lib/python*/plat-linux2/regen # refers to glibc.dev
       '';
 
     passthru = rec {
@@ -186,8 +192,7 @@ let
 
       buildInputs = [ python ] ++ deps;
 
-      C_INCLUDE_PATH = concatStringsSep ":" (map (p: "${p}/include") buildInputs);
-      LIBRARY_PATH = concatStringsSep ":" (map (p: "${p}/lib") buildInputs);
+      inherit (mkPaths buildInputs) C_INCLUDE_PATH LIBRARY_PATH;
 
       # non-python gdbm has a libintl dependency on i686-cygwin, not on x86_64-cygwin
       buildPhase = (if (stdenv.system == "i686-cygwin" && moduleName == "gdbm") then ''

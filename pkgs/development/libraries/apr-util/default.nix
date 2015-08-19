@@ -22,11 +22,13 @@ stdenv.mkDerivation rec {
   configureFlags = ''
     --with-apr=${apr} --with-expat=${expat}
     ${optionalString (!stdenv.isCygwin) "--with-crypto"}
-    ${stdenv.lib.optionalString sslSupport "--with-openssl=${openssl}"}
+    ${stdenv.lib.optionalString sslSupport "--with-openssl"}
     ${stdenv.lib.optionalString bdbSupport "--with-berkeley-db=${db}"}
     ${stdenv.lib.optionalString ldapSupport "--with-ldap"}${
       optionalString stdenv.isCygwin "--without-pgsql --without-sqlite2 --without-sqlite3 --without-freetds --without-berkeley-db --without-crypto"}
   '';
+
+  buildInputs = stdenv.lib.optional sslSupport openssl;
 
   propagatedBuildInputs = [ makeWrapper apr expat libiconv ]
     ++ optional sslSupport openssl

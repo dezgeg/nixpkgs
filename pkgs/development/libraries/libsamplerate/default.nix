@@ -17,6 +17,8 @@ stdenv.mkDerivation rec {
   #--disable-fftw          disable usage of FFTW
   #--disable-cpu-clip      disable tricky cpu specific clipper
 
+  outputs = [ "dev" "bin" "out" ];
+
   postConfigure = stdenv.lib.optionalString stdenv.isDarwin
     ''
       # need headers from the Carbon.framework in /System/Library/Frameworks to

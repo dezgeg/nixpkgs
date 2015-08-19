@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, nasm }:
+{ stdenv, fetchurl, nasm, autoreconfHook }:
 
 stdenv.mkDerivation rec {
   name = "libjpeg-turbo-1.4.1";
@@ -8,7 +8,11 @@ stdenv.mkDerivation rec {
     sha256 = "027vz97064bjmwj7gdw2p47y1437w08j54frpgzmnql5rvabmxab";
   };
 
-  buildInputs = [ nasm ];
+  outputs = [ "dev" "out" "doc" "bin" ];
+
+  buildInputs = [ autoreconfHook nasm ];
+
+  enableParallelBuilding = true;
 
   doCheck = true;
   checkTarget = "test";

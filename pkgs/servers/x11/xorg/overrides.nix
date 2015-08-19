@@ -73,6 +73,7 @@ in
   libxcb = attrs : attrs // {
     nativeBuildInputs = [ args.python ];
     configureFlags = "--enable-xkb";
+    outputs = [ "dev" "out" "doc" "man" ];
   };
 
   xcbproto = attrs : attrs // {
@@ -88,6 +89,7 @@ in
   };
 
   libX11 = attrs: attrs // {
+    outputs = [ "dev" "out" "man" ];
     preConfigure = setMalloc0ReturnsNullCrossCompiling + ''
       sed 's,^as_dummy.*,as_dummy="\$PATH",' -i configure
     '';
@@ -97,6 +99,14 @@ in
         rm -rf $out/share/doc
       '';
     CPP = stdenv.lib.optionalString stdenv.isDarwin "clang -E -";
+  };
+
+  libXau = attrs: attrs // {
+    outputs = [ "dev" "out" "man" ];
+  };
+
+  libXdmcp = attrs: attrs // {
+    outputs = [ "dev" "out" "doc" ];
   };
 
   libXfont = attrs: attrs // {
@@ -109,12 +119,8 @@ in
 
 
   libXxf86vm = attrs: attrs // {
+    outputs = [ "dev" "out" "man" ];
     preConfigure = setMalloc0ReturnsNullCrossCompiling;
-  };
-
-  libXrandr = attrs: attrs // {
-    preConfigure = setMalloc0ReturnsNullCrossCompiling;
-    propagatedBuildInputs = [xorg.libXrender];
   };
 
   # Propagate some build inputs because of header file dependencies.
@@ -139,6 +145,7 @@ in
   };
 
   libXcomposite = attrs: attrs // {
+    outputs = [ "dev" "out" "man" ];
     propagatedBuildInputs = [ xorg.libXfixes ];
   };
 
@@ -146,7 +153,16 @@ in
     propagatedBuildInputs = [ xorg.libXmu ];
   };
 
+  libXcursor = attrs: attrs // {
+    outputs = [ "dev" "out" "man" ];
+  };
+
+  libXdamage = attrs: attrs // {
+    outputs = [ "dev" "out" ];
+  };
+
   libXft = attrs: attrs // {
+    outputs = [ "dev" "out" "man" ];
     propagatedBuildInputs = [ xorg.libXrender args.freetype args.fontconfig ];
     preConfigure = setMalloc0ReturnsNullCrossCompiling;
     # the include files need ft2build.h, and Requires.private isn't enough for us
@@ -156,15 +172,36 @@ in
   };
 
   libXext = attrs: attrs // {
+    outputs = [ "dev" "out" "man" "doc" ];
     propagatedBuildInputs = [ xorg.xproto xorg.libXau ];
     preConfigure = setMalloc0ReturnsNullCrossCompiling;
+  };
+
+  libXfixes = attrs: attrs // {
+    outputs = [ "dev" "out" "man" ];
+  };
+
+  libXi = attrs: attrs // {
+    outputs = [ "dev" "out" "man" "doc" ];
+  };
+
+  libXinerama = attrs: attrs // {
+    outputs = [ "dev" "out" "man" ];
+  };
+
+  libXrandr = attrs: attrs // {
+    outputs = [ "dev" "out" "man" ];
+    preConfigure = setMalloc0ReturnsNullCrossCompiling;
+    propagatedBuildInputs = [xorg.libXrender];
   };
 
   libSM = attrs: attrs
     // { propagatedBuildInputs = [ xorg.libICE ]; };
 
-  libXrender = attrs: attrs
-    // { preConfigure = setMalloc0ReturnsNullCrossCompiling; };
+  libXrender = attrs: attrs // {
+    outputs = [ "dev" "out" "doc" ];
+    preConfigure = setMalloc0ReturnsNullCrossCompiling;
+  };
 
   libXvMC = attrs: attrs
     // { buildInputs = attrs.buildInputs ++ [xorg.renderproto]; };

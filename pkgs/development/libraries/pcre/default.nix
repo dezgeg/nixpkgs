@@ -12,6 +12,8 @@ stdenv.mkDerivation rec {
     sha256 = "17bqykp604p7376wj3q2nmjdhrb6v1ny8q08zdwi7qvc02l9wrsi";
   };
 
+  outputs = [ "dev" "out" "bin" "doc" "man" ];
+
   configureFlags = ''
     --enable-jit
     ${if unicodeSupport then "--enable-unicode-properties" else ""}
@@ -25,6 +27,12 @@ stdenv.mkDerivation rec {
   crossAttrs = optionalAttrs (stdenv.cross.libc == "msvcrt") {
     buildInputs = [ windows.mingw_w64_pthreads.crossDrv ];
   };
+
+  postInstall =
+    ''
+      mkdir $dev/bin
+      mv $bin/bin/pcre-config $dev/bin/
+    '';
 
   meta = {
     homepage = "http://www.pcre.org/";

@@ -26,16 +26,16 @@ if [ -n "@cc@" ]; then
     addToSearchPath PATH @cc@/bin
 fi
 
-if [ -n "@binutils@" ]; then
-    addToSearchPath PATH @binutils@/bin
+if [ -n "@binutils_bin@" ]; then
+    addToSearchPath PATH @binutils_bin@/bin
 fi
 
-if [ -n "@libc@" ]; then
-    addToSearchPath PATH @libc@/bin
+if [ -n "@libc_bin@" ]; then
+    addToSearchPath PATH @libc_bin@/bin
 fi
 
-if [ -n "@coreutils@" ]; then
-    addToSearchPath PATH @coreutils@/bin
+if [ -n "@coreutils_bin@" ]; then
+    addToSearchPath PATH @coreutils_bin@/bin
 fi
 
 if [ -z "$crossConfig" ]; then

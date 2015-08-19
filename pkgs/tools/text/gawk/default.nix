@@ -1,6 +1,9 @@
-{ stdenv, fetchurl, libsigsegv, readline, readlineSupport ? false
+{ stdenv, fetchurl, libsigsegv, readline, interactive ? false
 , locale ? null }:
 
+let
+  inherit (stdenv.lib) optional;
+in
 stdenv.mkDerivation rec {
   name = "gawk-4.1.3";
 
@@ -14,18 +17,19 @@ stdenv.mkDerivation rec {
     || stdenv.isDarwin # XXX: `locale' segfaults
   );
 
+  # When we do build separate interactive version, it makes sense to always include docs.
+  outputs = [ "out" ] ++ stdenv.lib.optional (!interactive) "doc"; #ToDo
+
   buildInputs = stdenv.lib.optional (stdenv.system != "x86_64-cygwin") libsigsegv
-    ++ stdenv.lib.optional readlineSupport readline
-    ++ stdenv.lib.optional stdenv.isDarwin locale;
+    ++ optional interactive readline
+    ++ optional stdenv.isDarwin locale;
 
   configureFlags = stdenv.lib.optional (stdenv.system != "x86_64-cygwin") "--with-libsigsegv-prefix=${libsigsegv}"
-    ++ stdenv.lib.optional readlineSupport "--with-readline=${readline}"
-      # only darwin where reported, seems OK on non-chrooted Fedora (don't rebuild stdenv)
-    ++ stdenv.lib.optional (!readlineSupport && stdenv.isDarwin) "--without-readline";
+    ++ [(if interactive then "--with-readline=${readline}" else "--without-readline")];
 
   postInstall = "rm $out/bin/gawk-*";
 
-  meta = {
+  meta = with stdenv.lib; {
     homepage = http://www.gnu.org/software/gawk/;
     description = "GNU implementation of the Awk programming language";
 
@@ -43,8 +47,11 @@ stdenv.mkDerivation rec {
       lines of code.
     '';
 
-    license = stdenv.lib.licenses.gpl3Plus;
+    license = licenses.gpl3Plus;
+
+    platforms = platforms.unix;
 
     maintainers = [ ];
   };
 }
+

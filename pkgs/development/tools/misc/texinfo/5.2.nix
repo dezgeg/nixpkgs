@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, ncurses, perl, xz, interactive ? false }:
+{ stdenv, fetchurl, xz, ncurses, perl, interactive ? false }:
 
 stdenv.mkDerivation rec {
   name = "texinfo-5.2";
@@ -8,7 +8,7 @@ stdenv.mkDerivation rec {
     sha256 = "1njfwh2z34r2c4r0iqa7v24wmjzvsfyz4vplzry8ln3479lfywal";
   };
 
-  buildInputs = [ perl xz ]
+  buildInputs = [ perl xz.bin ]
     ++ stdenv.lib.optional interactive ncurses;
 
   preInstall = ''

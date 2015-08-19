@@ -66,8 +66,8 @@ stdenv.mkDerivation {
       # Work around Spotify referring to a specific minor version of
       # OpenSSL.
 
-      ln -s ${openssl}/lib/libssl.so $libdir/libssl.so.1.0.0
-      ln -s ${openssl}/lib/libcrypto.so $libdir/libcrypto.so.1.0.0
+      ln -s ${openssl.out}/lib/libssl.so $libdir/libssl.so.1.0.0
+      ln -s ${openssl.out}/lib/libcrypto.so $libdir/libcrypto.so.1.0.0
       ln -s ${nspr}/lib/libnspr4.so $libdir/libnspr4.so
       ln -s ${nspr}/lib/libplc4.so $libdir/libplc4.so
 

@@ -34,6 +34,8 @@ stdenv.mkDerivation rec {
     ./pt-pax-flags-20121023.patch
   ];
 
+  outputs = [ "dev" "out" "info" ];
+
   nativeBuildInputs = optional gold bison;
   buildInputs = [ zlib ];
 
@@ -66,6 +68,8 @@ stdenv.mkDerivation rec {
     ++ optional (stdenv.system == "i686-linux") "--enable-targets=x86_64-linux-gnu";
 
   enableParallelBuilding = true;
+
+  postFixup = "ln -s $out/bin $dev/bin"; # tools needed for development
 
   meta = {
     description = "Tools for manipulating binaries (linker, assembler, etc.)";

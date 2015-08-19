@@ -53,18 +53,21 @@ stdenv.mkDerivation rec {
 
   patches = optional stdenv.isDarwin ./darwin-compilation.patch ++ optional doCheck ./skip-timer-test.patch;
 
+  outputs = [ "dev" "out" "doc" ];
+  outputBin = "dev";
+
   setupHook = ./setup-hook.sh;
 
-  buildInputs = [ libelf ]
+  buildInputs = [ libelf setupHook/*get the gtk-doc hook*/ ]
     ++ optionals doCheck [ tzdata libxml2 desktop_file_utils shared_mime_info ];
 
   nativeBuildInputs = [ pkgconfig gettext perl python ];
 
-  propagatedBuildInputs = [ pcre zlib libffi libiconv ]
+  propagatedBuildInputs = [ zlib libffi libiconv /*pcre*/ ]
     ++ libintlOrEmpty;
 
-  configureFlags =
-    optional stdenv.isDarwin "--disable-compile-warnings"
+  configureFlags = [ ] # [ "--with-pcre=system" ] # internal pcre only adds <200kB
+    ++ optional stdenv.isDarwin "--disable-compile-warnings"
     ++ optional stdenv.isSunOS "--disable-modular-tests";
 
   NIX_CFLAGS_COMPILE = optionalString stdenv.isDarwin " -lintl"
@@ -77,6 +80,11 @@ stdenv.mkDerivation rec {
 
   enableParallelBuilding = true;
   DETERMINISTIC_BUILD = 1;
+
+  postInstall = ''
+    _moveToOutput "share/glib-2.0" "$dev"
+    substituteInPlace "$dev/bin/gdbus-codegen" --replace "$out" "$dev"
+  '';
 
   inherit doCheck;
   preCheck = optionalString doCheck
@@ -98,8 +106,6 @@ stdenv.mkDerivation rec {
        # Needed because of libtool wrappers
        sed -e '/g_subprocess_launcher_set_environ (launcher, envp);/a g_subprocess_launcher_setenv (launcher, "PATH", g_getenv("PATH"), TRUE);' -i gio/tests/gsubprocess.c
     '';
-
-  postInstall = ''rm -rvf $out/share/gtk-doc'';
 
   passthru = {
      gioModuleDir = "lib/gio/modules";

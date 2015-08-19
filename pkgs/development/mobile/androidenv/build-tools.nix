@@ -26,7 +26,7 @@ stdenv.mkDerivation rec {
         # Patch the interpreter
         for i in aapt aidl dexdump llvm-rs-cc
         do
-            patchelf --set-interpreter ${stdenv_32bit.cc.libc}/lib/ld-linux.so.2 $i
+            patchelf --set-interpreter ${stdenv_32bit.cc.libc.out}/lib/ld-linux.so.2 $i
         done
         
         # These binaries need to find libstdc++ and libgcc_s
@@ -44,7 +44,7 @@ stdenv.mkDerivation rec {
         # These binaries also need zlib in addition to libstdc++
         for i in zipalign
         do
-            patchelf --set-interpreter ${stdenv_32bit.cc.libc}/lib/ld-linux.so.2 $i
+            patchelf --set-interpreter ${stdenv_32bit.cc.libc.out}/lib/ld-linux.so.2 $i
             patchelf --set-rpath ${stdenv_32bit.cc.cc}/lib:${zlib_32bit}/lib $i
         done
         
