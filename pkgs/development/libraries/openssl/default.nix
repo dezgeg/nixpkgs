@@ -55,25 +55,19 @@ stdenv.mkDerivation rec {
         rm "$out/lib/"*.a
     fi
 
-      mkdir -p $bin
-      mv $out/bin $bin/
-
-      rm -rf $out/etc/ssl/misc
-
-      mkdir $dev
-      mv $out/include $dev/
-
-      # OpenSSL installs readonly files, which otherwise we can't strip.
-      # FIXME: Can remove this after the next stdenv merge.
-      chmod -R +w $out
+    mkdir -p $bin
+    mv $out/bin $bin/
 
     # remove dependency on Perl at runtime
-    rm -r $out/etc/ssl/misc $out/bin/c_rehash
+    rm -r $out/etc/ssl/misc $bin/bin/c_rehash
+
+    mkdir $dev
+    mv $out/include $dev/
   '';
 
   postFixup = ''
     # Check to make sure we don't depend on perl
-    if grep -r '${perl}' $out; then
+    if grep -r '${perl}' $out $dev $bin; then
       echo "Found an erroneous dependency on perl ^^^" >&2
       exit 1
     fi
