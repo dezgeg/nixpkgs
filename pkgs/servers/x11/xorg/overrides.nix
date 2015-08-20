@@ -159,7 +159,7 @@ in
     preConfigure = setMalloc0ReturnsNullCrossCompiling;
     # the include files need ft2build.h, and Requires.private isn't enough for us
     postInstall = ''
-      sed "/^Requires:/s/$/, freetype2/" -i "$out/lib/pkgconfig/xft.pc"
+      sed "/^Requires:/s/$/, freetype2/" -i "$dev/lib/pkgconfig/xft.pc"
     '';
   };
 
