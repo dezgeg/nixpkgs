@@ -124,32 +124,27 @@ stdenv.mkDerivation {
     mv -t "$drivers/lib/" \
       $out/lib/libXvMC* \
       $out/lib/d3d \
-      $out/lib/vdpau \
-      $out/lib/{bellagio,d3d} \
-      $out/lib/libxatracker*
-
-    mv -t "$drivers/lib/dri/" \
-      "$out"/lib/dri/*
-    rmdir "$out/lib/dri"
+      $out/lib/libgbm* \
+      $out/lib/libxatracker* \
+      $out/lib/vdpau/*
+    rmdir $out/lib/vdpau
 
     mkdir -p {$osmesa,$drivers}/lib/pkgconfig
     mv -t $osmesa/lib/ \
       $out/lib/libOSMesa*
 
     mv -t $drivers/lib/pkgconfig/ \
-      $out/lib/pkgconfig/xatracker.pc
+      $dev/lib/pkgconfig/xatracker.pc
 
     mv -t $osmesa/lib/pkgconfig/ \
-      $out/lib/pkgconfig/osmesa.pc
+      $dev/lib/pkgconfig/osmesa.pc
 
   '' + /* now fix references in .la files */ ''
     sed "/^libdir=/s,$out,$osmesa," -i \
       $osmesa/lib/libOSMesa*.la
 
   '' + /* set the default search path for DRI drivers; used e.g. by X server */ ''
-    substituteInPlace "$out/lib/pkgconfig/dri.pc" --replace '$(drivers)' "${driverLink}"
-  '' + /* move vdpau drivers to $drivers/lib, so they are found */ ''
-    mv "$drivers"/lib/vdpau/* "$drivers"/lib/ && rmdir "$drivers"/lib/vdpau
+    substituteInPlace "$dev/lib/pkgconfig/dri.pc" --replace '$(drivers)' "${driverLink}"
   '';
   #ToDo: @vcunat isn't sure if drirc will be found when in $out/etc/, but it doesn't seem important ATM */
 
