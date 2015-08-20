@@ -497,7 +497,6 @@ stdenv.mkDerivation ({
     { inherit langC langCC langObjC langObjCpp langAda langFortran langVhdl langGo version; isGNU = true; };
 
   inherit enableParallelBuilding enableMultilib;
-  NIX_CC_WRAPPER_EXEC_HOOK = ./massive-hack.sh;
 
   inherit (stdenv) is64bit;
 

@@ -266,7 +266,6 @@ postInstall() {
     paxmark r $out/libexec/gcc/*/*/{cc1,cc1plus}
 
     eval "$postInstallGhdl"
-    false
 }
 
 genericBuild
