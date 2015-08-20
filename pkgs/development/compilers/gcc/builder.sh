@@ -8,6 +8,8 @@ mkdir $NIX_FIXINC_DUMMY
 if test "$staticCompiler" = "1"; then
     EXTRA_LDFLAGS="-static"
 else
+    mkdir -p $lib/lib
+    echo adding "-Wl,-rpath,$lib/lib" to EXTRA_LDFLAGS
     EXTRA_LDFLAGS="-Wl,-rpath,$lib/lib"
 fi
 
@@ -210,6 +212,7 @@ preInstall() {
 
 
 postInstall() {
+    set -x
     # Move runtime libraries to $lib.
     mkdir -p $lib/lib
     ln -s lib $lib/lib64
