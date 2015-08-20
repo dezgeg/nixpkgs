@@ -258,6 +258,7 @@ in
 
     systemd.services.systemd-udevd =
       { environment.MODULE_DIR = "/run/booted-system/kernel-modules/lib/modules";
+        serviceConfig.ExecStart = "\nExecStart=${pkgs.systemd}/lib/systemd/systemd-udevd --debug";
       };
 
   };
