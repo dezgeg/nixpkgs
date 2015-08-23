@@ -28,7 +28,12 @@ stdenv.mkDerivation rec {
     sha256 = "0g5bl8sdpzx9gx2g5jq3py4bj07z2ylk7s1qn0fvsss2yl3hhs8c";
   };
 
+  # TODO: Add a "dev" output containing the header files.
   outputs = [ "out" "man" ];
+
+  setOutputFlags = false;
+
+  setOutputConfigureFlags = false;
 
   patches =
     [ # Do not look in /usr etc. for dependencies.
@@ -48,8 +53,8 @@ stdenv.mkDerivation rec {
       "-Uinstallusrbinperl"
       "-Dinstallstyle=lib/perl5"
       "-Duseshrplib"
-      "-Dlocincpth=${libc}/include"
-      "-Dloclibpth=${libc}/lib"
+      "-Dlocincpth=${libc.dev or libc}/include"
+      "-Dloclibpth=${libc.out or libc}/lib"
     ]
     ++ optional enableThreading "-Dusethreads";
 
@@ -97,6 +102,17 @@ stdenv.mkDerivation rec {
   postCheck = ''
     unset LD_LIBRARY_PATH
   '';
+
+  postInstall =
+    ''
+      # Remove dependency between "out" and "man" outputs.
+      rm $out/lib/perl5/*/*/.packlist
+
+      # Remove dependencies on glibc.dev and coreutils.
+      substituteInPlace $out/lib/perl5/*/*/Config_heavy.pl \
+        --replace ${stdenv.glibc.dev or "/blabla"} /no-such-path \
+        --replace $man /no-such-path
+    ''; # */
 
   meta = {
     homepage = https://www.perl.org/;

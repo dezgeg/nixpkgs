@@ -28,7 +28,12 @@ stdenv.mkDerivation rec {
     sha256 = "17cvplgpxbm1hshxlkra2fldn4da1iap1lsnb04hdm8ply93k95i";
   };
 
+  # TODO: Add a "dev" output containing the header files.
   outputs = [ "out" "man" ];
+
+  setOutputFlags = false;
+
+  setOutputConfigureFlags = false;
 
   patches =
     [ # Do not look in /usr etc. for dependencies.
@@ -88,6 +93,17 @@ stdenv.mkDerivation rec {
       # Make Cwd work on NixOS (where we don't have a /bin/pwd).
       substituteInPlace dist/PathTools/Cwd.pm --replace "'/bin/pwd'" "'$(type -tP pwd)'"
     '';
+
+  postInstall =
+    ''
+      # Remove dependency between "out" and "man" outputs.
+      rm $out/lib/perl5/*/*/.packlist
+
+      # Remove dependencies on glibc.dev and coreutils.
+      substituteInPlace $out/lib/perl5/*/*/Config_heavy.pl \
+        --replace ${stdenv.glibc.dev or "/blabla"} /no-such-path \
+        --replace $man /no-such-path
+    ''; # */
 
   setupHook = ./setup-hook.sh;
 
