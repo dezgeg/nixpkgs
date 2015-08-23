@@ -133,7 +133,7 @@ _multioutPropagateDev() {
     done
 
     # Default value: propagate binaries, includes and libraries
-    if [[ ! -v "$propagatedOutputs" ]]; then
+    if [ -z "${propagatedOutputs+1}" ]; then
         local po_dirty="$outputBin $outputInclude $outputLib"
         set +o pipefail
         propagatedOutputs=`echo "$po_dirty" \
