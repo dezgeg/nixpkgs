@@ -14,7 +14,7 @@ stdenv.mkDerivation rec {
 
   preConfigure =
     ''
-      configureFlagsArray+=("--with-installbuilddir=$dev/share/build")
+      configureFlagsArray+=("--with-installbuilddir=$dev/share/build" "--bindir=$dev/bin")
     '';
 
   configureFlags =
@@ -26,8 +26,7 @@ stdenv.mkDerivation rec {
 
   postInstall =
     ''
-      mkdir $dev/bin $dev/lib
-      mv $out/bin/apr-1-config $dev/bin
+      mkdir $dev/lib
       mv $out/lib/pkgconfig $dev/lib
     '';
 
