@@ -21,3 +21,4 @@ _moveToShare() {
     done
 }
 
+    _moveToOutput share/gtk-doc "$doc"

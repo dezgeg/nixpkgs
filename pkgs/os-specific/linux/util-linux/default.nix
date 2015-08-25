@@ -62,5 +62,6 @@ stdenv.mkDerivation rec {
     description = "A set of system utilities for Linux";
     license = licenses.gpl2; # also contains parts under more permissive licenses
     platforms = platforms.linux;
+    priority = 6; # lower priority than coreutils ("kill") and shadow ("login" etc.) packages
   };
 }
