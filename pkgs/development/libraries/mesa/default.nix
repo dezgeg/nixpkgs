@@ -124,7 +124,6 @@ stdenv.mkDerivation {
     mv -t "$drivers/lib/" \
       $out/lib/libXvMC* \
       $out/lib/d3d \
-      $out/lib/libgbm* \
       $out/lib/libxatracker* \
       $out/lib/vdpau/*
     rmdir $out/lib/vdpau
