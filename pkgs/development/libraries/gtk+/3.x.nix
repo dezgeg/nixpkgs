@@ -34,7 +34,7 @@ stdenv.mkDerivation rec {
     ++ optional cupsSupport cups;
   #TODO: colord?
 
-  NIX_LDFLAGS = if stdenv.isDarwin then "-lintl" else null;
+  NIX_LDFLAGS = stdenv.lib.optionalString stdenv.isDarwin "-lintl";
 
   # demos fail to install, no idea where's the problem
   preConfigure = "sed '/^SRC_SUBDIRS /s/demos//' -i Makefile.in";
@@ -50,7 +50,7 @@ stdenv.mkDerivation rec {
     ''; # workaround for bug of nix-mode for Emacs */ '';
   };
 
-  meta = {
+  meta = with stdenv.lib; {
     description = "A multi-platform toolkit for creating graphical user interfaces";
 
     longDescription = ''
@@ -66,9 +66,9 @@ stdenv.mkDerivation rec {
 
     homepage = http://www.gtk.org/;
 
-    license = stdenv.lib.licenses.lgpl2Plus;
+    license = licenses.lgpl2Plus;
 
-    maintainers = with stdenv.lib.maintainers; [ urkud raskin vcunat lethalman ];
-    platforms = stdenv.lib.platforms.all;
+    maintainers = with maintainers; [ urkud raskin vcunat lethalman ];
+    platforms = platforms.all;
   };
 }
