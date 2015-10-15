@@ -17,4 +17,6 @@ in stdenv.mkDerivation rec {
     url = "mirror://sourceforge/project/modplug-xmms/libmodplug/${version}/${name}.tar.gz";
     sha256 = "1bfsladg7h6vnii47dd66f5vh1ir7qv12mfb8n36qiwrxq92sikp";
   };
+
+  outputs = [ "dev" "out" ];
 }

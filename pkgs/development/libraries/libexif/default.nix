@@ -8,6 +8,8 @@ stdenv.mkDerivation rec {
     sha256 = "06nlsibr3ylfwp28w8f5466l6drgrnydgxrm4jmxzrmk5svaxk8n";
   };
 
+  outputs = [ "dev" "out" "doc" ];
+
   buildInputs = [ gettext ];
 
   meta = {

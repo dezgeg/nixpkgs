@@ -12,6 +12,8 @@ stdenv.mkDerivation rec {
     sha256 = "148lw51dm6pgw8vc6v0fpvm7p233wr11nspdzmvq7bjp2cd7vbhf";
   };
 
+  outputs = [ "dev" "out" "doc" ]; # TODO: dev-doc only
+
   buildInputs =
     [ pkgconfig glib gstreamer gst_plugins_base libdvdnav libdvdread orc ];
 

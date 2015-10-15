@@ -25,11 +25,13 @@ in
 
 stdenv.mkDerivation rec {
   name = "openjpeg-${version}";
-  
+
   src = fetchurl {
     url = "mirror://sourceforge/openjpeg.mirror/${version}/openjpeg-${version}.tar.gz";
     inherit sha256;
   };
+
+  outputs = [ "dev" "out" "bin" ];
 
   cmakeFlags = [
     "-DCMAKE_INSTALL_NAME_DIR=\${CMAKE_INSTALL_PREFIX}/lib"
@@ -55,6 +57,8 @@ stdenv.mkDerivation rec {
     ++ optional (openjpegJarSupport || jpipLibSupport) jdk;
 
   propagatedBuildInputs = [ libpng libtiff lcms2 ];
+
+  postInstall = ''_moveToOutput bin "$bin" '';
 
   passthru = {
     incDir = "openjpeg-${branch}";

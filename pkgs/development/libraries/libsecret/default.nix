@@ -11,6 +11,8 @@ stdenv.mkDerivation rec {
     sha256 = "1qq29c01xxjyx5sl6y5h22w8r0ff4c73bph3gfx3h7mx5mvalwqc";
   };
 
+  outputs = [ "dev" "out" "doc" ]; # TODO: it's dev-doc only
+
   propagatedBuildInputs = [ glib ];
   nativeBuildInputs = [ pkgconfig intltool libxslt docbook_xsl ];
   buildInputs = [ libgcrypt gobjectIntrospection ];

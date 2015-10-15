@@ -12,6 +12,8 @@ stdenv.mkDerivation rec {
     sha256 = "1zq8jm1rc7n7amqa9xz1v93w2jnczg6942gyijsdpgllfiq8b4rm";
   };
 
+  outputs = [ "out" "doc" ]; # just dev-doc
+
   preConfigure = ''
     substituteInPlace tools/glib-mkenums --replace /usr/bin/perl ${perl}/bin/perl
     substituteInPlace src/ppp-manager/nm-ppp-manager.c --replace /sbin/modprobe /run/current-system/sw/sbin/modprobe

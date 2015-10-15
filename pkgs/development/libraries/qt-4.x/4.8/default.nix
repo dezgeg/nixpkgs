@@ -131,7 +131,7 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [ perl pkgconfig which ];
 
-  enableParallelBuilding = false;
+  enableParallelBuilding = true;
 
   NIX_CFLAGS_COMPILE = optionalString stdenv.isDarwin
     "-I${glib.dev}/include/glib-2.0 -I${glib.out}/lib/glib-2.0/include";

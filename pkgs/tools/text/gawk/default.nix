@@ -13,7 +13,7 @@ stdenv.mkDerivation rec {
   };
 
   # When we do build separate interactive version, it makes sense to always include docs.
-  outputs = [ "out" ] ++ stdenv.lib.optional (!interactive) "doc"; #ToDo
+  outputs = [ "out" ] ++ stdenv.lib.optional (!interactive) "doc";
 
   doCheck = !(
        stdenv.isCygwin # XXX: `test-dup2' segfaults on Cygwin 6.1

@@ -7430,6 +7430,7 @@ let
   });
 
   libva = callPackage ../development/libraries/libva { };
+  libva-big = libva.override { minimal = false; };
 
   libvdpau = callPackage ../development/libraries/libvdpau { };
 

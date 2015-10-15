@@ -32,6 +32,8 @@ stdenv.mkDerivation rec {
     sha256 = "1a2213l7x6sgqg2hq3yhnpvvvqyskhsmx8j3z0jgjsqwz9xa3wbr";
   };
 
+  outputs = [ "dev" "out" ];
+
   nativeBuildInputs = [ pkgconfig python makeWrapper ];
   buildInputs = [
     python

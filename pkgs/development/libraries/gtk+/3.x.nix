@@ -1,11 +1,10 @@
 { stdenv, fetchurl, pkgconfig, gettext, perl
 , expat, glib, cairo, pango, gdk_pixbuf, atk, at_spi2_atk, gobjectIntrospection
-, xlibs, x11, wayland, libxkbcommon, epoxy
+, xorg, wayland, epoxy, json_glib, libxkbcommon
 , xineramaSupport ? stdenv.isLinux
 , cupsSupport ? stdenv.isLinux, cups ? null
 }:
 
-assert xineramaSupport -> xlibs.libXinerama != null;
 assert cupsSupport -> cups != null;
 
 let
@@ -26,12 +25,14 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [ pkgconfig gettext gobjectIntrospection perl ];
 
-  buildInputs = [ libxkbcommon epoxy ];
-  propagatedBuildInputs = with xlibs; with stdenv.lib;
-    [ expat glib cairo pango gdk_pixbuf atk at_spi2_atk libXrandr libXrender libXcomposite libXi libXcursor ]
+  buildInputs = [ libxkbcommon epoxy json_glib ];
+  propagatedBuildInputs = with xorg; with stdenv.lib;
+    [ expat glib cairo pango gdk_pixbuf atk at_spi2_atk
+      libXrandr libXrender libXcomposite libXi libXcursor libSM libICE ]
     ++ optionals stdenv.isLinux [ wayland ]
     ++ optional xineramaSupport libXinerama
     ++ optional cupsSupport cups;
+  #TODO: colord?
 
   NIX_LDFLAGS = if stdenv.isDarwin then "-lintl" else null;
 

@@ -10,6 +10,8 @@ stdenv.mkDerivation rec {
     sha256 = "1bwsfmf0vrx3rwl4xmi5jhhy3v1qx1xj0m7p9hb0fvcw9f09m3kz";
   };
 
+  outputs = [ "dev" "out" "info" ]; #TODO: fix references, maybe port to gmp5
+
   nativeBuildInputs = [ m4 ];
 
   configureFlags =
