@@ -2,7 +2,7 @@
 
 with { inherit (stdenv.lib) optional optionalString; };
 
-stdenv.mkDerivation rec {
+let self = stdenv.mkDerivation rec {
   name = "gmp-6.0.0a";
 
   src = fetchurl { # we need to use bz2, others aren't in bootstrapping stdenv
@@ -11,6 +11,7 @@ stdenv.mkDerivation rec {
   };
 
   outputs = [ "dev" "out" "info" ]; #TODO: fix references, maybe port to gmp5
+  passthru.static = self.out;
 
   nativeBuildInputs = [ m4 ];
 
@@ -71,4 +72,5 @@ stdenv.mkDerivation rec {
     platforms = platforms.all;
     maintainers = [ maintainers.simons ];
   };
-}
+};
+  in self
