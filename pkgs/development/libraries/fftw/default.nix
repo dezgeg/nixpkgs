@@ -14,7 +14,7 @@ stdenv.mkDerivation rec {
     sha256 = "10h9mzjxnwlsjziah4lri85scc05rlajz39nqf3mbh4vja8dw34g";
   };
 
-  outputs = [ "dev" "out" "doc" ]; # it's dev-doc only
+  outputs = [ "dev" "out" "doc" ];
   outputBin = "dev"; # fftw-wisdom
 
   buildInputs = [ (stdenv.cc.cc.lib or null) ];
