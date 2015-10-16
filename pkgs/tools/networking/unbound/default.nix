@@ -26,7 +26,7 @@ stdenv.mkDerivation rec {
   # get rid of runtime dependencies on $dev outputs
   postInstall = ''substituteInPlace "$lib/lib/libunbound.la"''
     + stdenv.lib.concatMapStrings
-      (pkg: "--replace '-L${pkg.dev}/lib' '-L${pkg.out}/lib'")
+      (pkg: " --replace '-L${pkg.dev}/lib' '-L${pkg.out}/lib'")
       [ openssl expat libevent ];
 
   meta = with stdenv.lib; {
