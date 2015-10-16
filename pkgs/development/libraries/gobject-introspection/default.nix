@@ -35,9 +35,6 @@ stdenv.mkDerivation rec {
     "--disable-tests"
   ];
 
-  # seems useless
-  postInstall = ''rm -r "$out"/share/gobject-introspection-1.0/tests'';
-
   setupHook = ./setup-hook.sh;
 
   meta = with stdenv.lib; {
