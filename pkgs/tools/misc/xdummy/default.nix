@@ -75,7 +75,7 @@ let
 in writeScriptBin "xdummy" ''
   #!${stdenv.shell}
   export XKB_BINDIR="${xorg.xkbcomp}/bin"
-  exec ${xorg.xorgserver}/bin/Xorg \
+  exec ${xorg.xorgserver.out}/bin/Xorg \
     -noreset \
     -logfile /dev/null \
     "$@" \
