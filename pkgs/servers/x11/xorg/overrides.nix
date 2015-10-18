@@ -396,6 +396,10 @@ in
           args.udev
         ];
         patches = commonPatches;
+        postPatch = ''
+          # assert() keeps runtime reference xorgserver-dev in xf86-video-intel and others
+          sed -e 's|assert(\(.*\))|if (!(\1)) abort()|' -i include/privates.h
+        '';
         configureFlags = [
           "--enable-kdrive"             # not built by default
           "--enable-xephyr"
