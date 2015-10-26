@@ -796,6 +796,8 @@ let
 
   cpulimit = callPackage ../tools/misc/cpulimit { };
 
+  crash = callPackage ../tools/system/crash { };
+
   crawlTiles = callPackage ../games/crawl { };
 
   crawl = callPackage ../games/crawl {
