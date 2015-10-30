@@ -153,7 +153,7 @@ in
             chown ${bindUser} /var/run/named
           '';
 
-        exec = "${pkgs.bind}/sbin/named -u ${bindUser} ${optionalString cfg.ipv4Only "-4"} -c ${cfg.configFile} -f";
+        exec = "${pkgs.bind.bin}/sbin/named -u ${bindUser} ${optionalString cfg.ipv4Only "-4"} -c ${cfg.configFile} -f";
       };
 
   };
