@@ -42,6 +42,7 @@ in
   };
 
   glamoregl = attrs: attrs // {
+    outputs = [ "dev" "out" ];
     installFlags = "sdkdir=\${out}/include/xorg configdir=\${out}/share/X11/xorg.conf.d";
   };
 
