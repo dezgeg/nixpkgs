@@ -11,6 +11,8 @@ stdenv.mkDerivation rec {
     sha256 = "f0fea447e0374a73df45b498fd1701393f8e6acb39746119f8a292fb4a0cb528";
   };
 
+  outputs = [ "dev" "out" "bin" "man" "docdev" ];
+
   nativeBuildInputs = [ pkgconfig intltool ];
 
   buildInputs = [ gettext bzip2 zlib python ]
