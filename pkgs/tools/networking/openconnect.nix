@@ -16,6 +16,8 @@ stdenv.mkDerivation rec {
     sha256 = "1wkhmgfxkdkhy2p9w9idrgipxmxij2z4f88flfk3fifwd19nkkzs";
   };
 
+  outputs = [ "dev" "out" "bin" "man" ];
+
   preConfigure = ''
       export PKG_CONFIG=${pkgconfig}/bin/pkg-config
       export LIBXML2_CFLAGS="-I ${libxml2.dev}/include/libxml2"
