@@ -17,6 +17,8 @@ stdenv.mkDerivation rec {
     cp src/.libs/mod_dnssd.so $out/modules
   '';
 
+  stripDebugList = "modules";
+
   meta = with stdenv.lib; {
     homepage = http://0pointer.de/lennart/projects/mod_dnssd;
     description = "Provide Zeroconf support via DNS-SD using Avahi";
