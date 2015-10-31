@@ -32,7 +32,7 @@ with lib;
 
     environment.systemPackages = [ pkgs.at_spi2_core ];
 
-    services.dbus.packages = [ pkgs.at_spi2_core ];
+    services.dbus.packages = [ pkgs.at_spi2_core.out ];
 
   };
 
