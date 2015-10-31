@@ -12,6 +12,8 @@ in stdenv.mkDerivation rec {
     sha256 = "1xg1xha3x3hzlmvdq2zm90hc61pj7pnf9yxxvgq4ynl5af6bp8qm";
   };
 
+  outputs = [ "dev" "out" "man" ];
+
   buildInputs = with gnome3; [
     dbus libgcrypt pam python gtk3 gconf libgnome_keyring
     pango gcr gdk_pixbuf atk p11_kit makeWrapper
@@ -29,9 +31,9 @@ in stdenv.mkDerivation rec {
 
   preFixup = ''
     wrapProgram "$out/bin/gnome-keyring" \
-      --prefix XDG_DATA_DIRS : "${glib}/share:$out/share:$GSETTINGS_SCHEMAS_PATH"
+      --prefix XDG_DATA_DIRS : "${glib.out}/share:$out/share:$GSETTINGS_SCHEMAS_PATH"
     wrapProgram "$out/bin/gnome-keyring-daemon" \
-      --prefix XDG_DATA_DIRS : "${glib}/share:$out/share:$GSETTINGS_SCHEMAS_PATH"
+      --prefix XDG_DATA_DIRS : "${glib.out}/share:$out/share:$GSETTINGS_SCHEMAS_PATH"
   '';
 
   meta = with stdenv.lib; {
