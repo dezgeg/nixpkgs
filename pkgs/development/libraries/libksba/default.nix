@@ -8,6 +8,9 @@ stdenv.mkDerivation rec {
     sha256 = "11kp3h9l3b8ikydkcdkwgx45r662zi30m26ra5llyhfh6kz5yzqc";
   };
 
+  outputs = [ "dev" "out" ];
+  outputBin = "dev";
+
   propagatedBuildInputs = [ libgpgerror ];
 
   meta = with stdenv.lib; {
