@@ -10,13 +10,16 @@ stdenv.mkDerivation rec {
     sha256 = "77ffb940ba77c4a6426d09d41004c75d92652dcbde86c84ac1c847dbd9ad59bd";
   };
 
+  outputs = [ "dev" "out" "docdev" ];
+  outputBin = "dev";
+
   nativeBuildInputs = [ pkgconfig ];
   propagatedBuildInputs = [ glib gssdp libsoup libxml2 libuuid ];
 
   postInstall = ''
-    ln -sv ${libsoup}/include/*/libsoup $out/include
-    ln -sv ${libxml2.dev}/include/*/libxml $out/include
-    ln -sv ${gssdp}/include/*/libgssdp $out/include
+    ln -sv ${libsoup}/include/*/libsoup $dev/include
+    ln -sv ${libxml2.dev}/include/*/libxml $dev/include
+    ln -sv ${gssdp}/include/*/libgssdp $dev/include
   '';
 
   meta = {
