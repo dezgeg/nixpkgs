@@ -9,6 +9,8 @@ stdenv.mkDerivation rec {
     sha256 = "030v7x1dmx5blqi9jcknsjd91jppbpl7f4z69k8c8kklr939i7k6";
   };
 
+  outputs = [ "dev" "out" "docdev" ];
+
   propagatedBuildInputs = [ gtk3 ];
 
   buildInputs = [ pkgconfig atk cairo glib pango
