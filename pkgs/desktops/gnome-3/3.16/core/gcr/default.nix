@@ -10,6 +10,8 @@ stdenv.mkDerivation rec {
     sha256 = "0xfhi0w358lvca1jjx24x2gm67mif33dsnmi9cv5i0f83ks8vzpc";
   };
 
+  outputs = [ "dev" "out" "docdev" ];
+
   buildInputs = [
     pkgconfig intltool gnupg glib gobjectIntrospection libxslt
     libgcrypt libtasn1 dbus_glib gtk pango gdk_pixbuf atk makeWrapper vala
