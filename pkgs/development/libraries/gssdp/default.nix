@@ -8,6 +8,8 @@ stdenv.mkDerivation {
     sha256 = "0njkqr2y7c6linnw4wkc4y2vq5dfkpryqcinbzn0pzhr46psxxbv";
   };
 
+  outputs = [ "dev" "out" "docdev" ];
+
   nativeBuildInputs = [ pkgconfig ];
   buildInputs = [ libsoup ];
   propagatedBuildInputs = [ glib ];
