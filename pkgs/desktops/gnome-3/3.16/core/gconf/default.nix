@@ -18,6 +18,8 @@ stdenv.mkDerivation rec {
     sha256 = "0k3q9nh53yhc9qxf1zaicz4sk8p3kzq4ndjdsgpaa2db0ccbj4hr";
   };
 
+  outputs = [ "dev" "out" "man" "docdev" ];
+
   buildInputs = [ libxml2 polkit orbit ] ++ stdenv.lib.optional withGtk gnome3.gtk;
   propagatedBuildInputs = [ glib dbus_glib  ];
   nativeBuildInputs = [ pkgconfig intltool ];
