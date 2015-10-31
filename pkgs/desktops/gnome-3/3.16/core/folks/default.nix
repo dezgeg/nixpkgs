@@ -15,6 +15,8 @@ stdenv.mkDerivation rec {
     sha256 = "0q9hny6a38zn0gamv0ji0pn3jw6bpn2i0fr6vbzkhm9h9ws0cqvz";
   };
 
+  outputs = [ "dev" "out" ];
+
   propagatedBuildInputs = [ glib gnome3.libgee sqlite ];
   # dbus_daemon needed for tests
   buildInputs = [ dbus_glib telepathy_glib evolution_data_server dbus_libs
@@ -27,8 +29,6 @@ stdenv.mkDerivation rec {
                         "-I${dbus_glib.dev}/include/dbus-1.0" "-I${dbus_libs.dev}/include/dbus-1.0"];
 
   enableParallelBuilding = true;
-
-  postBuild = "rm -rf $out/share/gtk-doc";
 
   meta = {
     description = "Folks";
