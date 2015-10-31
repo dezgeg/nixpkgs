@@ -8,11 +8,16 @@ stdenv.mkDerivation rec {
     sha256 = "0w453f3nnkbkrly7spx5lx5pf6mwynzmd5qhszprq8amij2invpa";
   };
 
-  outputs = [ "out" "docdev" ];
+  outputs = [ "dev" "out" "docdev" ];
+
+  buildInputs = [ pkgconfig libxml2 glib ];
 
   configureFlags = stdenv.lib.optional stdenv.isDarwin "--disable-Bsymbolic";
 
-  buildInputs = [ pkgconfig libxml2 glib ];
+  postInstall = ''
+    mkdir -p $dev/bin
+    mv $out/bin/croco-0.6-config $dev/bin/
+  '';
 
   meta = with stdenv.lib; {
     platforms = platforms.unix;
