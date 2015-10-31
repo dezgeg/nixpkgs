@@ -10,6 +10,8 @@ stdenv.mkDerivation rec {
     sha256 = "38c4a6d7718d17eac17df95a3a8c337677eda77e58978129ad3182d769c38e44";
   };
 
+  outputs = [ "dev" "out" "docdev" ];
+
   nativeBuildInputs = [ pkgconfig ];
   propagatedBuildInputs = [ glib gupnp ];
 
