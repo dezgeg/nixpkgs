@@ -12,6 +12,8 @@ stdenv.mkDerivation rec {
     sha256 = "0l1ikx56ddgayvny3s2xv8hs3p23xsclw4zljs3cczv4b89dzymf";
   };
 
+  outputs = [ "dev" "out" ];
+
   buildInputs = with gnome3;
     [ glib pkgconfig gtk clutter at_spi2_core dbus pythonPackages.python automake114x
       pythonPackages.pygobject3 libxml2 libXtst gtk2 intltool libxslt autoconf ];
