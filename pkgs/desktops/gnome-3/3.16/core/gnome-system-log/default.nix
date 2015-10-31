@@ -10,6 +10,8 @@ stdenv.mkDerivation rec {
     sha256 = "9eeb51982d347aa7b33703031e2c1d8084201374665425cd62199649b29a5411";
   };
 
+  outputs = [ "dev" "out" ];
+
   doCheck = true;
 
   NIX_CFLAGS_COMPILE = "-I${gnome3.glib.dev}/include/gio-unix-2.0";
