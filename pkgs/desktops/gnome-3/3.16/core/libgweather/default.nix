@@ -9,6 +9,8 @@ stdenv.mkDerivation rec {
     sha256 = "1zadscn3i86fy7xpqiyw14pvz4f5cdw50ir77wd0zfr72hk5a2fv";
   };
 
+  outputs = [ "dev" "out" "docdev" ];
+
   makeFlags = "INTROSPECTION_GIRDIR=$(out)/share/gir-1.0/ INTROSPECTION_TYPELIBDIR=$(out)/lib/girepository-1.0";
 
   configureFlags = [ "--with-zoneinfo-dir=${tzdata}/share/zoneinfo" ];
