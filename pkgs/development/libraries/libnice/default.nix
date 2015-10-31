@@ -8,6 +8,8 @@ stdenv.mkDerivation rec {
     sha256 = "1q8rhklbz1zla67r4mw0f7v3m5b32maj0prnr0kshcz97fgjs4b1";
   };
 
+  outputs = [ "dev" "out" "docdev" ];
+
   nativeBuildInputs = [ pkgconfig ];
   buildInputs = [ gst_all_1.gstreamer gst_all_1.gst-plugins-base ];
   propagatedBuildInputs = [ glib gupnp_igd ];
