@@ -10,6 +10,8 @@ stdenv.mkDerivation rec {
     sha256 = "0ia8nldxxan1cvplr62aicjhfcrm27s3qyk0x46c8q0fmqvnzlm3";
   };
 
+  outputs = [ "dev" "out" "docdev" ];
+
   buildInputs = [ gst_plugins_base gst_python pygobject ];
 
   propagatedBuildInputs = [ dbus_glib telepathy_glib gstreamer farstream ];
