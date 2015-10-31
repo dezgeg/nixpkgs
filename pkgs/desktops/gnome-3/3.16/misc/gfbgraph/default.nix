@@ -9,6 +9,8 @@ stdenv.mkDerivation rec {
     sha256 = "66c7b1c951863565c179d0b4b5207f27b3b36f80afed9f6a9acfc5fc3ae775d4";
   };
 
+  outputs = [ "dev" "out" "docdev" ];
+
   buildInputs = [ pkgconfig glib gnome3.gnome_online_accounts ];
   propagatedBuildInputs = [ libsoup json_glib gnome3.rest ];
 
