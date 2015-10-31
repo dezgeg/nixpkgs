@@ -9,12 +9,19 @@ stdenv.mkDerivation rec {
     sha256 = "0l3mhpyym9m5iz09fz0rgiqxl2ym6kpkwpsp1xrr4aa80nlh1jam";
   };
 
+  outputs = [ "dev" "out" "docdev" ];
+
   preBuild = ''
     sed 's/-DG_DISABLE_DEPRECATED//' -i linc2/src/Makefile
   '';
 
   nativeBuildInputs = [ pkgconfig ];
   propagatedBuildInputs = [ glib libIDL ] ++ libintlOrEmpty;
+
+  postInstall = ''
+    mkdir -p $dev/bin
+    mv $out/bin/orbit2-config $dev/bin/
+  '';
 
   meta = with stdenv.lib; {
     homepage    = https://projects.gnome.org/ORBit2/;
