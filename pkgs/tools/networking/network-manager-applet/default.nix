@@ -17,6 +17,8 @@ stdenv.mkDerivation rec {
     sha256 = "1afri2zln5p59660hqzbwm2r8phx9inrm2bgp5scynzs8ddzh2kn";
   };
 
+  outputs = [ "dev" "out" "man" ];
+
   configureFlags = [ "--sysconfdir=/etc" ];
 
   buildInputs = [
@@ -26,7 +28,7 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [ intltool pkgconfig ];
 
-  propagatedUserEnvPkgs = [ gnome3.gconf gnome3.gnome_keyring hicolor_icon_theme ];
+  propagatedUserEnvPkgs = [ gnome3.gconf.out gnome3.gnome_keyring.out hicolor_icon_theme ];
 
   makeFlags = [
     ''CFLAGS=-DMOBILE_BROADBAND_PROVIDER_INFO=\"${mobile_broadband_provider_info}/share/mobile-broadband-provider-info/serviceproviders.xml\"''
@@ -39,12 +41,12 @@ stdenv.mkDerivation rec {
 
   preFixup = ''
     wrapProgram "$out/bin/nm-applet" \
-      --prefix GIO_EXTRA_MODULES : "${glib_networking.out}/lib/gio/modules:${gnome3.dconf}/lib/gio/modules" \
-      --prefix XDG_DATA_DIRS : "${gnome3.gtk}/share:$out/share:$GSETTINGS_SCHEMAS_PATH" \
+      --prefix GIO_EXTRA_MODULES : "${glib_networking.out}/lib/gio/modules:${gnome3.dconf.out}/lib/gio/modules" \
+      --prefix XDG_DATA_DIRS : "${gnome3.gtk.out}/share:$out/share:$GSETTINGS_SCHEMAS_PATH" \
       --set GCONF_CONFIG_SOURCE "xml::~/.gconf" \
-      --prefix PATH ":" "${gnome3.gconf}/bin"
+      --prefix PATH ":" "${gnome3.gconf.out}/bin"
     wrapProgram "$out/bin/nm-connection-editor" \
-      --prefix XDG_DATA_DIRS : "${gnome3.gtk}/share:$out/share:$GSETTINGS_SCHEMAS_PATH"
+      --prefix XDG_DATA_DIRS : "${gnome3.gtk.out}/share:$out/share:$GSETTINGS_SCHEMAS_PATH"
   '';
 
   meta = with stdenv.lib; {
