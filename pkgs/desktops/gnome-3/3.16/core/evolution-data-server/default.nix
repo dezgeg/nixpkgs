@@ -11,6 +11,8 @@ stdenv.mkDerivation rec {
     sha256 = "19dcvhlqh25pkkd29hhm9yik8xxfy01hcakikrai0x1a04aa2s7f";
   };
 
+  outputs = [ "dev" "out" ];
+
   buildInputs = with gnome3;
     [ pkgconfig glib python intltool libsoup libxml2 gtk gnome_online_accounts
       gcr p11_kit libgweather libgdata gperf makeWrapper icu sqlite gsettings_desktop_schemas ]
