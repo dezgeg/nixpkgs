@@ -24,8 +24,13 @@ stdenv.mkDerivation rec {
     mv -v $out/share/virtuoso/doc $out/share/doc/${name}
     echo Removing jars and empty directories
     find $out -name "*.a" -delete -o -name "*.jar" -delete -o -type d -empty -delete
-    '';
-  
+
+    for f in $out/lib/*.la; do
+      substituteInPlace $f --replace '${readline.dev}' '${readline.out}'
+      substituteInPlace $f --replace '${openssl.dev}' '${openssl.out}'
+    done
+  '';
+
   meta = with stdenv.lib; {
     description = "SQL/RDF database used by, e.g., KDE-nepomuk";
     homepage = http://virtuoso.openlinksw.com/dataspace/dav/wiki/Main/;
