@@ -240,8 +240,8 @@ in {
 
     security.polkit.extraConfig = polkitConf;
 
-    services.dbus.packages = cfg.packages;
+    services.dbus.packages = map (p: p.out or p) cfg.packages;
 
-    services.udev.packages = cfg.packages;
+    services.udev.packages = map (p: p.out or p) cfg.packages;
   };
 }
