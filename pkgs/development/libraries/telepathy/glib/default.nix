@@ -9,6 +9,8 @@ stdenv.mkDerivation rec {
     sha256 = "ae0002134991217f42e503c43dea7817853afc18863b913744d51ffa029818cf";
   };
 
+  outputs = [ "dev" "out" "docdev" ];
+
   configureFlags = stdenv.lib.optional valaSupport "--enable-vala-bindings";
 
   propagatedBuildInputs = [dbus_glib glib python gobjectIntrospection];
