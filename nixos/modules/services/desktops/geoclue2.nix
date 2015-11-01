@@ -32,9 +32,9 @@ with lib;
 
     environment.systemPackages = [ pkgs.geoclue2 ];
 
-    services.dbus.packages = [ pkgs.geoclue2 ];
+    services.dbus.packages = [ pkgs.geoclue2.out ];
 
-    systemd.packages = [ pkgs.geoclue2 ];
+    systemd.packages = [ pkgs.geoclue2.out ];
 
   };
 

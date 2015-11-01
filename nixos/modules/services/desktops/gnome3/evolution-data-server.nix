@@ -35,7 +35,7 @@ in
 
     environment.systemPackages = [ gnome3.evolution_data_server ];
 
-    services.dbus.packages = [ gnome3.evolution_data_server ];
+    services.dbus.packages = [ gnome3.evolution_data_server.out ];
 
   };
 
