@@ -8,7 +8,7 @@ stdenv.mkDerivation rec {
     sha256 = "0mbrc021dk0ayyglk4qyf9328cayrlz2q94lh8sh9l9r6g79fvcs";
   };
 
-  outputs = [ "out" "doc" ];
+  outputs = [ "dev" "out" "doc" ];
 
   buildInputs = [ intltool pkgconfig ];
   propagatedBuildInputs = [ cln libxml2 glib ];
