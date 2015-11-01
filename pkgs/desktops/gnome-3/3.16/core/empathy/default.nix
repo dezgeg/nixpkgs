@@ -21,6 +21,8 @@ stdenv.mkDerivation rec {
     sha256 = "10z6ksia6yx7vg0wsdbk4w6vjgfg3cg3n04jf9bj2vr7kr5zvs7w";
   };
 
+  outputs = [ "dev" "out" "man" ];
+
   propagatedUserEnvPkgs = [ gnome3.gnome_themes_standard
                             gnome_online_accounts shared_mime_info ];
   propagatedBuildInputs = [ folks telepathy_logger evolution_data_server
