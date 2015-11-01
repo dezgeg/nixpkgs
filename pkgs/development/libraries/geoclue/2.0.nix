@@ -10,6 +10,8 @@ stdenv.mkDerivation rec {
     sha256 = "0s0ws2bx5g1cbjamxmm448r4n4crha2fwpzm8zbx6cq6qslygmzi";
   };
 
+  outputs = [ "dev" "out" ];
+
   buildInputs =
    [ intltool pkgconfig glib json_glib libsoup geoip
      dbus dbus_glib networkmanager modemmanager
