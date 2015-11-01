@@ -9,6 +9,8 @@ stdenv.mkDerivation rec {
     sha256 = "887bd192da8f5edc53b490ec51bf3ffebd958a671f5963e4f3af32c22e35660a";
   };
 
+  outputs = [ "dev" "out" "bin" "docdev" ];
+
   configureflags= "--with-introspection";
 
   propagatedBuildInputs = [ glib gobjectIntrospection ];
