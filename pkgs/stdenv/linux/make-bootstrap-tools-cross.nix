@@ -21,9 +21,9 @@ let
 
   raspberrypiCrossSystem = {
     crossSystem = rec {
-      config = "armv6l-unknown-linux-gnueabi";
+      config = "armv6l-unknown-linux-gnueabihf";
       bigEndian = false;
-      arch = "arm";
+      arch = "armv6";
       float = "hard";
       fpu = "vfp";
       withTLS = true;
@@ -36,11 +36,11 @@ let
 
   armv7l-hf-multiplatform-crossSystem = {
     crossSystem = rec {
-      config = "armv7l-unknown-linux-gnueabi";
+      config = "armv7l-unknown-linux-gnueabihf";
       bigEndian = false;
-      arch = "arm";
+      arch = "armv7-a";
       float = "hard";
-      fpu = "vfpv3-d16";
+      fpu = "neon";
       withTLS = true;
       libc = "glibc";
       platform = pkgsNoParams.platforms.armv7l-hf-multiplatform;
