@@ -74,15 +74,14 @@ let
   gcc = pkgs.gcc.cc.crossDrv;
   gmpxx = pkgs.gmpxx.crossDrv;
   mpfr = pkgs.mpfr.crossDrv;
-  ppl = pkgs.ppl.crossDrv;
-  cloogppl = pkgs.cloogppl.crossDrv;
-  cloog = pkgs.cloog.crossDrv;
   zlib = pkgs.zlib.crossDrv;
-  isl = pkgs.isl.crossDrv;
   libmpc = pkgs.libmpc.crossDrv;
   binutils = pkgs.binutils.crossDrv;
   libelf = pkgs.libelf.crossDrv;
 
+  # Keep these versions in sync with the versions used in the current GCC!
+  cloog = pkgs.cloog_0_18_0.crossDrv;
+  isl = pkgs.isl_0_11.crossDrv;
 in
 
 rec {
@@ -204,10 +203,14 @@ rec {
         cp -d ${zlib}/lib/libz.so* $out/lib
         cp -d ${libelf}/lib/libelf.so* $out/lib
 
-        # TBD: Why are these needed for cross but not native tools?
-        cp -d ${cloogppl}/lib/libcloog*.so* $out/lib
+        # These needed for cross but not native tools because the stdenv
+        # GCC has certain things built in statically. See
+        # pkgs/stdenv/linux/default.nix for the details.
         cp -d ${cloog}/lib/libcloog*.so* $out/lib
         cp -d ${isl}/lib/libisl*.so* $out/lib
+        # Also this is needed since bzip2 uses a custom build system
+        # for native builds but autoconf (via a patch) for cross builds
+        cp -d ${bzip2}/lib/libbz2.so* $out/lib
 
         # Copy binutils.
         for i in as ld ar ranlib nm strip readelf objdump; do
