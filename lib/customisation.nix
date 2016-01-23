@@ -123,13 +123,13 @@ rec {
 
       outputToAttrListElement = outputName:
         { name = outputName;
-          value = commonAttrs // {
+          value = (builtins.removeAttrs commonAttrs outputs) // {
             inherit (drv.${outputName}) outPath drvPath type outputName;
           };
         };
 
       outputsList = map outputToAttrListElement outputs;
-  in commonAttrs.${drv.outputName};
+  in commonAttrs;
 
 
   /* Strip a derivation of all non-essential attributes, returning
