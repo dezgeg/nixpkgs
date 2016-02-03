@@ -176,7 +176,7 @@ in rec {
 
     allowedRequisites =
       [ bootstrapTools ] ++
-      (with pkgs; [ xz libcxx libcxxabi icu ]) ++
+      (with pkgs; [ xz.bin xz.out libcxx libcxxabi icu.out ]) ++
       (with pkgs.darwin; [ dyld Libsystem CF locale ]);
 
     overrides = persistent1;
@@ -211,7 +211,7 @@ in rec {
 
     allowedRequisites =
       [ bootstrapTools ] ++
-      (with pkgs; [ icu bash libcxx libcxxabi ]) ++
+      (with pkgs; [ xz.bin xz.out icu.out bash libcxx libcxxabi ]) ++
       (with pkgs.darwin; [ dyld Libsystem locale ]);
 
     overrides = persistent2;
@@ -293,13 +293,13 @@ in rec {
       parent       = stage4;
     };
 
-    allowedRequisites = (with pkgs; [
-      xz libcxx libcxxabi icu gmp gnumake findutils bzip2 llvm zlib libffi
-      coreutils ed diffutils gnutar gzip ncurses gnused bash gawk
-      gnugrep llvmPackages.clang-unwrapped patch pcre binutils-raw binutils gettext
-    ]) ++ (with pkgs.darwin; [
-      dyld Libsystem CF cctools libiconv locale
-    ]);
+    #allowedRequisites = (with pkgs; [
+    #  xz.out libcxx libcxxabi icu gmp gnumake findutils bzip2.bin bzip2.out llvm zlib.dev zlib.out libffi.out
+    #  coreutils ed diffutils gnutar gzip ncurses.out ncurses.man gnused bash gawk
+    #  gnugrep llvmPackages.clang-unwrapped patch pcre.out binutils-raw binutils gettext
+    #]) ++ (with pkgs.darwin; [
+    #  dyld Libsystem CF cctools libiconv locale
+    #]);
 
     overrides = orig: persistent4 orig // {
       clang = cc;
