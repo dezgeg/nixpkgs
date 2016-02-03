@@ -37,7 +37,7 @@ in stdenv.mkDerivation {
     postInstall = "";
   };
 
-  outputs = [ "dev" "bin" "static" ] ++ stdenv.lib.optional sharedLibrary "out";
+  outputs = [ "dev" "bin" "out" "static" ];
 
   preBuild = stdenv.lib.optionalString sharedLibrary ''
     make -f Makefile-libbz2_so
@@ -61,6 +61,8 @@ in stdenv.mkDerivation {
 
     mkdir "$static"
     mv "$bin/lib" "$static/"
+    mkdir -p "$out"
+    cp -r "$static"/* "$out"/
   '';
 
   patchPhase = ''
