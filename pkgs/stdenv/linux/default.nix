@@ -20,6 +20,7 @@ rec {
     else if system == "armv6l-linux" then import ./bootstrap/armv6l.nix
     else if system == "armv7l-linux" then import ./bootstrap/armv7l.nix
     else if system == "mips64el-linux" then import ./bootstrap/loongson2f.nix
+    else if system == "aarch64-linux" then import ./bootstrap/aarch64.nix
     else abort "unsupported platform for the pure Linux stdenv";
 
 
