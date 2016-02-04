@@ -8,6 +8,13 @@ stdenv.mkDerivation rec {
     sha256 = "13d9cqa5rzhbjq0xf0b2dyxag7pqa72xj9dhsa03m8ccr1a4npq9";
   };
 
+  crossAttrs = {
+    postPatch = ''
+      cp ${../../../../config.guess} config.guess
+      cp ${../../../../config.sub} config.sub
+    '';
+  };
+
   buildInputs = [ gmp ];
   patches = [ ./fix-gcc-build.diff ];
 
