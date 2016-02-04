@@ -423,4 +423,20 @@ rec {
     };
   };
 
+  aarch64-multiplatform = {
+    name = "aarch64-multiplatform";
+    kernelMajor = "2.6"; # Using "2.6" enables 2.6 kernel syscalls in glibc.
+    kernelHeadersBaseConfig = "defconfig";
+    kernelBaseConfig = "defconfig";
+    kernelArch = "arm64";
+    kernelDTB = true;
+    kernelAutoModules = false;
+    kernelExtraConfig = "";
+    uboot = null;
+    kernelTarget = "zImage";
+    gcc = {
+      arch = "armv8-a";
+    };
+  };
+
 }
