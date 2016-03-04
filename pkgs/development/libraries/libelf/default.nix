@@ -12,10 +12,10 @@ stdenv.mkDerivation (rec {
   
   # For cross-compiling, native glibc is needed for the "gencat" program.
   crossAttrs = {
-    nativeBuildInputs = [ glibc ];
+    nativeBuildInputs = [ glibc gettext ];
   };
 
-  buildInputs = [ gettext ];
+  buildInputs = if stdenv ? cross then [ ] else [ gettext ];
 
   meta = {
     description = "ELF object file access library";
