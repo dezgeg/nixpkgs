@@ -15,11 +15,8 @@ stdenv.mkDerivation rec {
   doCheck = true;
 
   crossAttrs = {
-    src = fetchurl {
-      url = "mirror://gnu/findutils/findutils-4.6.0.tar.gz";
-      sha256 = "178nn4dl7wbcw499czikirnkniwnx36argdnqgz4ik9i6zvwkm6y";
-    };
-    patches = [];
+    # http://osdir.com/ml/bug-findutils-gnu/2009-08/msg00026.html
+    configureFlags = [ "gl_cv_func_wcwidth_works=yes" ];
   };
 
   preConfigure = if stdenv.isCygwin then ''
