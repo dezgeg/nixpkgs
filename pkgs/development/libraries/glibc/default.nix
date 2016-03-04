@@ -17,7 +17,7 @@ in
     inherit lib stdenv fetchurl linuxHeaders installLocales
       profilingLibraries gccCross withGd gd libpng;
 
-    builder = ./builder.sh;
+    builder = if cross == null then ./builder.sh else ./cross-builder.sh;
 
     # When building glibc from bootstrap-tools, we need libgcc_s at RPATH for
     # any program we run, because the gcc will have been placed at a new
@@ -35,7 +35,7 @@ in
       fi
     '';
 
-    separateDebugInfo = true;
+    separateDebugInfo = cross == null;
 
     meta.description = "The GNU C Library";
   }
