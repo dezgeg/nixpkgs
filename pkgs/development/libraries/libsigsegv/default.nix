@@ -11,11 +11,13 @@ stdenv.mkDerivation rec {
   # https://github.com/NixOS/nixpkgs/issues/6028
   doCheck = false;
 
-  postPatch = if stdenv.isAarch64 then ''
-    substituteInPlace configure --replace a29k aarch64
-    cp ${../../../../config.guess} build-aux/config.guess
-    cp ${../../../../config.sub} build-aux/config.sub
-  '' else null;
+  crossAttrs = {
+    postPatch = ''
+      substituteInPlace configure --replace a29k aarch64
+      cp ${../../../../config.guess} build-aux/config.guess
+      cp ${../../../../config.sub} build-aux/config.sub
+    '';
+  };
 
   meta = {
     homepage = http://www.gnu.org/software/libsigsegv/;
