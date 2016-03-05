@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, fetchpatch, libxml2, findXMLCatalogs }:
+{ stdenv, fetchurl, fetchpatch, libxml2, findXMLCatalogs, updateAutoconfGnuConfigScriptsHook }:
 
 stdenv.mkDerivation rec {
   name = "libxslt-1.1.28";
@@ -19,6 +19,7 @@ stdenv.mkDerivation rec {
 
   outputs = [ "out" "doc" ];
 
+  nativeBuildInputs = stdenv.lib.optional stdenv.isAarch64 updateAutoconfGnuConfigScriptsHook;
   buildInputs = [ libxml2 ];
 
   propagatedBuildInputs = [ findXMLCatalogs ];
