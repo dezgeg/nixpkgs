@@ -215,7 +215,8 @@ rec {
         isl = isl_0_14;
       };
     };
-    extraBuildInputs = [ stage2.pkgs.patchelf stage2.pkgs.paxctl ];
+    extraBuildInputs = [ stage2.pkgs.patchelf stage2.pkgs.paxctl ] ++
+      lib.optional (system == "aarch64-linux") stage2.pkgs.updateAutotoolsGnuConfigScriptsHook;
   };
 
 
@@ -246,7 +247,8 @@ rec {
         shell = stage4.pkgs.bash + "/bin/bash";
       };
     };
-    extraBuildInputs = [ stage3.pkgs.patchelf stage3.pkgs.xz ];
+    extraBuildInputs = [ stage3.pkgs.patchelf stage3.pkgs.xz ] ++
+      lib.optional (system == "aarch64-linux") stage3.pkgs.updateAutotoolsGnuConfigScriptsHook;
   };
 
 
@@ -271,7 +273,8 @@ rec {
     initialPath =
       ((import ../common-path.nix) {pkgs = stage4.pkgs;});
 
-    extraBuildInputs = [ stage4.pkgs.patchelf stage4.pkgs.paxctl ];
+    extraBuildInputs = [ stage4.pkgs.patchelf stage4.pkgs.paxctl ] ++
+      lib.optional (system == "aarch64-linux") stage4.pkgs.updateAutotoolsGnuConfigScriptsHook;
 
     cc = stage4.pkgs.gcc;
 
@@ -290,7 +293,7 @@ rec {
       [ gzip bzip2 xz bash binutils coreutils diffutils findutils gawk
         glibc gnumake gnused gnutar gnugrep gnupatch patchelf attr acl
         paxctl zlib pcre linuxHeaders ed gcc gcc.cc libsigsegv
-      ];
+      ] ++ lib.optional (system == "aarch64-linux") stage4.pkgs.gnu-config;
       */
 
     overrides = pkgs: {
