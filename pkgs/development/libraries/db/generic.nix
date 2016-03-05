@@ -1,4 +1,4 @@
-{ stdenv, fetchurl
+{ stdenv, fetchurl, updateAutoconfGnuConfigScriptsHook
 , cxxSupport ? true
 , compat185 ? true
 
@@ -16,6 +16,8 @@ stdenv.mkDerivation rec {
     url = "http://download.oracle.com/berkeley-db/${name}.tar.gz";
     sha256 = sha256;
   };
+
+  nativeBuildInputs = stdenv.lib.optional stdenv.isAarch64 updateAutoconfGnuConfigScriptsHook;
 
   patches = extraPatches;
 
