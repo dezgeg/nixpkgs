@@ -1,18 +1,12 @@
 { stdenv, fetchurl, gettext, coreutils }:
 
 stdenv.mkDerivation rec {
-  name = "sharutils-4.11.1";
+  name = "sharutils-4.15.2";
 
   src = fetchurl {
-    url = "mirror://gnu/sharutils/${name}.tar.bz2";
-    sha256 = "1mallg1gprimlggdisfzdmh1xi676jsfdlfyvanlcw72ny8fsj3g";
+    url = "mirror://gnu/sharutils/${name}.tar.xz";
+    sha256 = "16isapn8f39lnffc3dp4dan05b7x6mnc76v6q5nn8ysxvvvwy19b";
   };
-
-  preConfigure = ''
-     # Fix for building on Glibc 2.16.  Won't be needed once the
-     # gnulib in sharutils is updated.
-     sed -i ${stdenv.lib.optionalString (stdenv.isOpenBSD && stdenv.cc.nativeTools) "''"} '/gets is a security hole/d' lib/stdio.in.h
-  '';
 
   # GNU Gettext is needed on non-GNU platforms.
   buildInputs = [ gettext coreutils ];
