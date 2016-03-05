@@ -1,4 +1,4 @@
-{ lib, stdenv, fetchurl
+{ lib, stdenv, fetchurl, updateAutoconfGnuConfigScriptsHook
 
 , mouseSupport ? false
 , unicode ? true
@@ -30,7 +30,9 @@ stdenv.mkDerivation rec {
   # Only the C compiler, and explicitly not C++ compiler needs this flag on solaris:
   CFLAGS = lib.optionalString stdenv.isSunOS "-D_XOPEN_SOURCE_EXTENDED";
 
-  buildInputs = lib.optional (mouseSupport && stdenv.isLinux) gpm;
+  buildInputs = []
+    ++ lib.optional (mouseSupport && stdenv.isLinux) gpm
+    ++ lib.optional stdenv.isAarch64 updateAutoconfGnuConfigScriptsHook;
 
   preConfigure = ''
     configureFlagsArray+=("--includedir=$out/include")
