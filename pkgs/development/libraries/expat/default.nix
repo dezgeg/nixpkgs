@@ -1,4 +1,4 @@
-{ stdenv, fetchurl }:
+{ stdenv, lib, fetchurl, updateAutoconfGnuConfigScriptsHook }:
 
 stdenv.mkDerivation rec {
   name = "expat-2.1.0";
@@ -7,6 +7,8 @@ stdenv.mkDerivation rec {
     url = "mirror://sourceforge/expat/${name}.tar.gz";
     sha256 = "11pblz61zyxh68s5pdcbhc30ha1b2vfjd83aiwfg4vc15x3hadw2";
   };
+
+  nativeBuildInputs = lib.optional stdenv.isAarch64 updateAutoconfGnuConfigScriptsHook;
 
   patches = [ ./CVE-2015-1283.patch ];
 
