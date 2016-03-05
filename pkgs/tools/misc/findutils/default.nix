@@ -1,4 +1,4 @@
-{stdenv, fetchurl, coreutils}:
+{stdenv, lib, fetchurl, coreutils, updateAutoconfGnuConfigScriptsHook }:
 
 stdenv.mkDerivation rec {
   name = "findutils-4.4.2";
@@ -8,7 +8,7 @@ stdenv.mkDerivation rec {
     sha256 = "0amn0bbwqvsvvsh6drfwz20ydc2czk374lzw5kksbh6bf78k4ks3";
   };
 
-  nativeBuildInputs = [coreutils];
+  nativeBuildInputs = [ coreutils ] ++ lib.optional stdenv.isAarch64 updateAutoconfGnuConfigScriptsHook;
 
   patches = [ ./findutils-path.patch ./change_echo_path.patch ./disable-test-canonicalize.patch ];
 
