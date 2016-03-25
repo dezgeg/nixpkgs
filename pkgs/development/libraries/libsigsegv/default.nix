@@ -8,6 +8,15 @@ stdenv.mkDerivation rec {
     sha256 = "16hrs8k3nmc7a8jam5j1fpspd6sdpkamskvsdpcw6m29vnis8q44";
   };
 
+  # Based on https://github.com/davidgfnet/buildroot-Os/blob/69fe6065b9dd1cb4dcc0a4b554e42cc2e5bd0d60/package/libsigsegv/libsigsegv-0002-fix-aarch64-build.patch
+  # but applied directly to configure since we can't use autoreconf while bootstrapping.
+  patches = if stdenv.isAarch64 || stdenv.cross.arch or "" == "aarch64"
+    then [(fetchurl {
+        url = http://nixos-arm.dezgeg.me/libsigsegv-aarch64-support.patch;
+        sha256 = "01hrw3cmdrkhsmip0qfysqjrfd06w4za1djgldrq69k5i33v3j3x";
+      })]
+    else null;
+
   # https://github.com/NixOS/nixpkgs/issues/6028
   doCheck = false;
 
