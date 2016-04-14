@@ -4098,6 +4098,8 @@ in
     openssl = null;
   };
 
+  ding-libs = callPackage ../tools/misc/ding-libs { };
+
   vtun = callPackage ../tools/networking/vtun { };
 
   wakatime = callPackage ../tools/misc/wakatime { };
