@@ -12,7 +12,7 @@ stdenv.mkDerivation rec {
   buildInputs = [ pkgconfig mesa xlibsWrapper imagemagick libtiff bzip2 ];
 
   NIX_CFLAGS_COMPILE = "-I${imagemagick}/include/ImageMagick";
-  NIX_LDFLAGS= "-rpath ${libXext}/lib";
+  NIX_LDFLAGS= "-rpath ${libXext.dev}/lib";
 
   meta = {
     description = "Really Slick Screensavers Port to GLX";

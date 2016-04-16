@@ -33,7 +33,7 @@ stdenv.mkDerivation {
       $out/bin/rescuetime
 
     wrapProgram $out/bin/rescuetime \
-      --prefix LD_PRELOAD : ${qt4}/lib/libQtGui.so.4:${qt4}/lib/libQtCore.so.4:${libXtst}/lib/libXtst.so.6:${libXext}/lib/libXext.so.6:${libX11.dev}/lib/libX11.so.6:${libXScrnSaver}/lib/libXss.so.1
+      --prefix LD_PRELOAD : ${qt4}/lib/libQtGui.so.4:${qt4}/lib/libQtCore.so.4:${libXtst}/lib/libXtst.so.6:${libXext.dev}/lib/libXext.so.6:${libX11.dev}/lib/libX11.so.6:${libXScrnSaver}/lib/libXss.so.1
   '';
   meta = with lib; {
     description = "Helps you understand your daily habits so you can focus and be more productive";
