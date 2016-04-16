@@ -22,10 +22,10 @@ stdenv.mkDerivation rec {
    cp -r linux/work/* $out/${name}/
    makeWrapper $out/${name}/processing $out/bin/processing \
      --prefix PATH : "${jdk}/bin:${which}/bin" \
-     --prefix LD_LIBRARY_PATH : ${libXxf86vm}/lib
+     --prefix LD_LIBRARY_PATH : ${libXxf86vm.dev}/lib
    makeWrapper $out/${name}/processing-java $out/bin/processing-java \
      --prefix PATH : "${jdk}/bin:${which}/bin" \
-     --prefix LD_LIBRARY_PATH : ${libXxf86vm}/lib
+     --prefix LD_LIBRARY_PATH : ${libXxf86vm.dev}/lib
    ln -s ${jdk} $out/${name}/java
   '';
 

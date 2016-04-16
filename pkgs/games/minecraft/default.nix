@@ -40,7 +40,7 @@ in stdenv.mkDerivation {
     #!${stdenv.shell}
 
     # wrapper for minecraft
-    export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:${libX11.dev}/lib/:${libXext.dev}/lib/:${libXcursor.dev}/lib/:${libXrandr.dev}/lib/:${libXxf86vm}/lib/:${mesa}/lib/:${openal}/lib/
+    export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:${libX11.dev}/lib/:${libXext.dev}/lib/:${libXcursor.dev}/lib/:${libXrandr.dev}/lib/:${libXxf86vm.dev}/lib/:${mesa}/lib/:${openal}/lib/
     ${if useAlsa then "${alsaOss}/bin/aoss" else "" } \
       ${jre}/bin/java -jar $out/minecraft.jar
     EOF
