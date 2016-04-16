@@ -723,7 +723,7 @@ to the `stack.yaml` like the following:
       enable: true
 	  packages: [ zlib ]
 
-Stack's Nix support knows to add `${zlib}/lib` and `${zlib}/include` as an
+Stack's Nix support knows to add `${zlib.dev}/lib` and `${zlib.dev}/include` as an
 `--extra-lib-dirs` and `extra-include-dirs`, respectively. Alternatively, you
 can achieve the same effect by hand. First of all, run
 
