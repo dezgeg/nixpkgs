@@ -24,7 +24,7 @@ buildPythonApplication rec {
   '';
 
   postInstall = stdenv.lib.optionalString (ffmpeg != null)
-    ''wrapProgram $out/bin/download_toggle_video2.py --prefix PATH : "${ffmpeg}/bin"'';
+    ''wrapProgram $out/bin/download_toggle_video2.py --prefix PATH : "${ffmpeg.dev}/bin"'';
 
   meta = with stdenv.lib; {
     homepage = "https://github.com/0x776b7364/toggle.sg-download";
