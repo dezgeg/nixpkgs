@@ -39,7 +39,7 @@ stdenv.mkDerivation {
     -I${xextproto}/include
     ${if openglSupport then "-dlopen-opengl
       -L${mesa}/lib -I${mesa}/include
-      -L${libXmu}/lib -I${libXmu}/include" else ""}
+      -L${libXmu.dev}/lib -I${libXmu.dev}/include" else ""}
     ${if threadSupport then "-thread" else "-no-thread"}
     ${if xrenderSupport then "-xrender -L${libXrender}/lib -I${libXrender}/include" else "-no-xrender"}
     ${if xrandrSupport then "-xrandr
