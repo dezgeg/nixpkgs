@@ -104,7 +104,7 @@ in stdenv.mkDerivation {
   installPhase = ''
     cp -rT ${xorg.xinit} $out
     chmod -R u+w $out
-    cp -rT ${xorg.xorgserver} $out
+    cp -rT ${xorg.xorgserver.dev} $out
     chmod -R u+w $out
 
     cp ${installer} $out/bin/xquartz-install
