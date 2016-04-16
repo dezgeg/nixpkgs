@@ -14,7 +14,7 @@ stdenv.mkDerivation {
     make install PREFIX=$out
     wrapProgram "$out/bin/gvolicon" \
       --set GDK_PIXBUF_MODULE_FILE "$GDK_PIXBUF_MODULE_FILE" \
-      --prefix XDG_DATA_DIRS : "${gnome3.gtk}/share:${gnome3.gnome_themes_standard}/share:${gnome3.gsettings_desktop_schemas}/share:$out/share:$out/share/gvolicon:$XDG_ICON_DIRS"
+      --prefix XDG_DATA_DIRS : "${gnome3.gtk.dev}/share:${gnome3.gnome_themes_standard}/share:${gnome3.gsettings_desktop_schemas}/share:$out/share:$out/share/gvolicon:$XDG_ICON_DIRS"
     '';
 
   meta = {
