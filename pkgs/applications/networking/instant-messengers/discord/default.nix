@@ -35,7 +35,7 @@ stdenv.mkDerivation {
         ln -s $out/DiscordCanary $out/bin/
 
         # Putting udev in the path won't work :(
-        ln -s ${libudev}/lib/libudev.so.1 $out
+        ln -s ${libudev.dev}/lib/libudev.so.1 $out
         '';
 
     meta = with stdenv.lib; {
