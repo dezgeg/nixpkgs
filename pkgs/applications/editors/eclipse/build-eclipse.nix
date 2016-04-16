@@ -36,7 +36,7 @@ stdenv.mkDerivation rec {
 
     makeWrapper $out/eclipse/eclipse $out/bin/eclipse \
       --prefix PATH : ${jdk}/bin \
-      --prefix LD_LIBRARY_PATH : ${glib}/lib:${gtk}/lib:${libXtst}/lib${stdenv.lib.optionalString (webkitgtk2 != null) ":${webkitgtk2}/lib"} \
+      --prefix LD_LIBRARY_PATH : ${glib.dev}/lib:${gtk}/lib:${libXtst}/lib${stdenv.lib.optionalString (webkitgtk2 != null) ":${webkitgtk2}/lib"} \
       --add-flags "-configuration \$HOME/.eclipse/''${productId}_$productVersion/configuration"
 
     # Create desktop item.

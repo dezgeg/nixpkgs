@@ -33,7 +33,7 @@ stdenv.mkDerivation rec {
       --add-flags "$out/lib/pdfmod/PdfMod.exe" \
       --prefix MONO_GAC_PREFIX : ${gtk-sharp} \
       --prefix MONO_GAC_PREFIX : ${gnome-sharp} \
-      --prefix LD_LIBRARY_PATH : ${glib}/lib \
+      --prefix LD_LIBRARY_PATH : ${glib.dev}/lib \
       --prefix LD_LIBRARY_PATH : ${gtk-sharp}/lib \
       --prefix LD_LIBRARY_PATH : ${gnome-sharp}/lib \
       --prefix LD_LIBRARY_PATH : ${gtk-sharp.gtk}/lib \
