@@ -32,7 +32,7 @@ stdenv.mkDerivation {
       done
     fi
 
-    bbin=${binutils}/bin
+    bbin=${binutils.dev}/bin
     if [ -f $bbin/as ]; then
       ln -s $bbin/as $out/bin
     else

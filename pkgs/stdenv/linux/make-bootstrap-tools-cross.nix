@@ -211,7 +211,7 @@ rec {
         
         # Copy binutils.
         for i in as ld ar ranlib nm strip readelf objdump; do
-          cp ${binutils}/bin/$i $out/bin
+          cp ${binutils.dev}/bin/$i $out/bin
         done
         cp -d ${binutils.out}/lib/lib*.so* $out/lib
 

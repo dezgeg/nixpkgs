@@ -16,7 +16,7 @@ stdenv.mkDerivation rec {
 
   # Paths so the opa compiler code generation will use the same programs as were
   # used to build opa.
-  codeGeneratorPaths = "${ocamlPackages.ocaml}/bin:${gcc}/bin:${binutils}/bin:${gnumake}/bin:${nodejs}/bin";
+  codeGeneratorPaths = "${ocamlPackages.ocaml}/bin:${gcc}/bin:${binutils.dev}/bin:${gnumake}/bin:${nodejs}/bin";
 
   preConfigure = ''
     patchShebangs .
