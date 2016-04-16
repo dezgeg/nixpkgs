@@ -13,8 +13,8 @@ mkDerivation rec {
   buildInputs = [ openssl ];
   patches = [ ./dlopen.patch ];
   postPatch = ''
-    substituteInPlace src/libssl.cc    --subst-var-by openssl ${openssl}
-    substituteInPlace src/libcrypto.cc --subst-var-by openssl ${openssl}
+    substituteInPlace src/libssl.cc    --subst-var-by openssl ${openssl.dev}
+    substituteInPlace src/libcrypto.cc --subst-var-by openssl ${openssl.dev}
   '';
   configureFlags = "--with-openssl=${openssl}";
   installPhase = ''
