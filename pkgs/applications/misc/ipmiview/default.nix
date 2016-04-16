@@ -16,7 +16,7 @@ stdenv.mkDerivation rec {
    buildPhase = with xorg; ''
      patchelf --set-rpath "${libX11.dev}/lib:${libXext}/lib:${libXrender}/lib:${libXtst}/lib:${libXi}/lib" ./jre/lib/amd64/xawt/libmawt.so
      patchelf --set-rpath "${gcc.cc}/lib" ./libiKVM64.so
-     patchelf --set-rpath "${libXcursor}/lib:${libX11.dev}/lib:${libXext}/lib:${libXrender}/lib:${libXtst}/lib:${libXi}/lib" --set-interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" ./jre/bin/javaws
+     patchelf --set-rpath "${libXcursor.dev}/lib:${libX11.dev}/lib:${libXext}/lib:${libXrender}/lib:${libXtst}/lib:${libXi}/lib" --set-interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" ./jre/bin/javaws
      patchelf --set-rpath "${gcc.cc}/lib:$out/jre/lib/amd64/jli" --set-interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" ./jre/bin/java
    '';
 
