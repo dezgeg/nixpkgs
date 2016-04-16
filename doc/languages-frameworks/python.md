@@ -293,8 +293,8 @@ pyfftw = buildPythonPackage rec {
   # Tests cannot import pyfftw. pyfftw works fine though.
   doCheck = false;
 
-  LDFLAGS="-L${pkgs.fftw.dev}/lib -L${pkgs.fftwFloat.dev}/lib -L${pkgs.fftwLongDouble}/lib"
-  CFLAGS="-I${pkgs.fftw.dev}/include -I${pkgs.fftwFloat.dev}/include -I${pkgs.fftwLongDouble}/include"
+  LDFLAGS="-L${pkgs.fftw.dev}/lib -L${pkgs.fftwFloat.dev}/lib -L${pkgs.fftwLongDouble.dev}/lib"
+  CFLAGS="-I${pkgs.fftw.dev}/include -I${pkgs.fftwFloat.dev}/include -I${pkgs.fftwLongDouble.dev}/include"
   '';
 
   meta = {
