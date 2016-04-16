@@ -26,7 +26,7 @@ stdenv.mkDerivation rec {
     interpreter=$(echo ${stdenv.glibc}/lib/ld-linux*.so.2)
     libCairo=$out/eclipse/libcairo-swt.so
     patchelf --set-interpreter $interpreter $out/eclipse/eclipse
-    [ -f $libCairo ] && patchelf --set-rpath ${freetype}/lib:${fontconfig}/lib:${libX11}/lib:${libXrender}/lib:${zlib}/lib $libCairo
+    [ -f $libCairo ] && patchelf --set-rpath ${freetype}/lib:${fontconfig.dev}/lib:${libX11}/lib:${libXrender}/lib:${zlib}/lib $libCairo
 
     # Create wrapper script.  Pass -configuration to store
     # settings in ~/.eclipse/org.eclipse.platform_<version> rather
