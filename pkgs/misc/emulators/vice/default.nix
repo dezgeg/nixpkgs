@@ -28,7 +28,7 @@ stdenv.mkDerivation rec {
     sed -i -e "s|install: install-data-am|install-no: install-data-am|" data/fonts/Makefile.am
   '';
 
-  NIX_LDFLAGS = "-lX11 -L${libX11}/lib";
+  NIX_LDFLAGS = "-lX11 -L${libX11.dev}/lib";
 
   postInstall = ''
     mkdir -p $out/share/applications

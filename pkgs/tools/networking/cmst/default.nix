@@ -41,7 +41,7 @@ stdenv.mkDerivation rec {
 
   postInstall = ''
     wrapProgram $out/bin/cmst \
-      --prefix "QTCOMPOSE" ":" "${libX11}/share/X11/locale"
+      --prefix "QTCOMPOSE" ":" "${libX11.dev}/share/X11/locale"
   '';
 
   meta = {

@@ -14,7 +14,7 @@ stdenv.mkDerivation rec {
   prePatch = ''
     sed -i -e '/^ *set headerPath *{/a ${tcl}/include ${tk}/include' \
            -e '/^ *set libraryPath *{/a ${tcl}/lib ${tk}/lib' \
-           -e '/^ *set x11Path *{/a ${libX11}/lib/' \
+           -e '/^ *set x11Path *{/a ${libX11.dev}/lib/' \
            configure
 
     sed -i -e '/^ *set scidShareDir/s|\[file.*|"'"$out/share"'"|' \

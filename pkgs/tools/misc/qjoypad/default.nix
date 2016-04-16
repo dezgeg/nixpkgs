@@ -10,7 +10,7 @@ stdenv.mkDerivation rec {
     cd src
     substituteInPlace config --replace /bin/bash /bin/sh
     mkdir -p $out
-    export NIX_LDFLAGS="$NIX_LDFLAGS -rpath ${libX11}/lib"
+    export NIX_LDFLAGS="$NIX_LDFLAGS -rpath ${libX11.dev}/lib"
   '';
   meta = {
     description = "A program that lets you use gaming devices anywhere";
