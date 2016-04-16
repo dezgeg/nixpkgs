@@ -43,7 +43,7 @@ stdenv.mkDerivation {
     ${if threadSupport then "-thread" else "-no-thread"}
     ${if xrenderSupport then "-xrender -L${libXrender}/lib -I${libXrender}/include" else "-no-xrender"}
     ${if xrandrSupport then "-xrandr
-      -L${libXrandr}/lib -I${libXrandr}/include
+      -L${libXrandr.dev}/lib -I${libXrandr.dev}/include
       -I${randrproto}/include" else "-no-xrandr"}
     ${if xineramaSupport then "-xinerama -L${libXinerama.dev}/lib -I${libXinerama.dev}/include" else "-no-xinerama"}
     ${if cursorSupport then "-L${libXcursor.dev}/lib -I${libXcursor.dev}/include" else ""}
