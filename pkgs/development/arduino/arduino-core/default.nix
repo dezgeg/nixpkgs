@@ -32,7 +32,7 @@ stdenv.mkDerivation rec {
     ${stdenv.lib.optionalString withGui ''
       mkdir -p "$out/bin"
       sed -i -e "s|^java|${jdk}/bin/java|" "$out/share/arduino/arduino"
-      sed -i -e "s|^LD_LIBRARY_PATH=|LD_LIBRARY_PATH=${gtk2}/lib:|" "$out/share/arduino/arduino"
+      sed -i -e "s|^LD_LIBRARY_PATH=|LD_LIBRARY_PATH=${gtk2.dev}/lib:|" "$out/share/arduino/arduino"
       ln -sr "$out/share/arduino/arduino" "$out/bin/arduino"
     ''}
 

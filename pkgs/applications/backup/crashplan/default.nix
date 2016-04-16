@@ -81,6 +81,6 @@ in stdenv.mkDerivation rec {
       --replace crashplan/skin skin \
       --replace bin/CrashPlanDesktop CrashPlanDesktop
 
-    wrapProgram $out/bin/CrashPlanDesktop --prefix LD_LIBRARY_PATH ":" "${gtk2}/lib:${glib.dev}/lib:${libXtst}/lib"
+    wrapProgram $out/bin/CrashPlanDesktop --prefix LD_LIBRARY_PATH ":" "${gtk2.dev}/lib:${glib.dev}/lib:${libXtst}/lib"
   '';
 }
