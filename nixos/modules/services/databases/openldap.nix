@@ -53,10 +53,10 @@ in
           sldapd.conf configuration
         ";
         example = ''
-            include ''${pkgs.openldap}/etc/openldap/schema/core.schema
-            include ''${pkgs.openldap}/etc/openldap/schema/cosine.schema
-            include ''${pkgs.openldap}/etc/openldap/schema/inetorgperson.schema
-            include ''${pkgs.openldap}/etc/openldap/schema/nis.schema
+            include ''${pkgs.openldap.dev}/etc/openldap/schema/core.schema
+            include ''${pkgs.openldap.dev}/etc/openldap/schema/cosine.schema
+            include ''${pkgs.openldap.dev}/etc/openldap/schema/inetorgperson.schema
+            include ''${pkgs.openldap.dev}/etc/openldap/schema/nis.schema
 
             database bdb 
             suffix dc=example,dc=org 
