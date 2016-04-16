@@ -14,7 +14,7 @@ python3Packages.buildPythonApplication rec {
   propagatedBuildInputs = with python3Packages; [ keyring colour netifaces praw psutil basiciw ] ++
     [ libpulseaudio ] ++ extraLibs;
 
-  ldWrapperSuffix = "--suffix LD_LIBRARY_PATH : \"${libpulseaudio}/lib\"";
+  ldWrapperSuffix = "--suffix LD_LIBRARY_PATH : \"${libpulseaudio.dev}/lib\"";
   makeWrapperArgs = [ ldWrapperSuffix ]; # libpulseaudio.so is loaded manually
 
   postInstall = ''
