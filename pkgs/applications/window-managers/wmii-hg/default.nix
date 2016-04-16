@@ -14,7 +14,7 @@ stdenv.mkDerivation rec {
 
   # for dlopen-ing
   patchPhase = ''
-    substituteInPlace lib/libstuff/x11/xft.c --replace "libXft.so" "${libXft}/lib/libXft.so"
+    substituteInPlace lib/libstuff/x11/xft.c --replace "libXft.so" "${libXft.dev}/lib/libXft.so"
   '';
 
   configurePhase = ''
