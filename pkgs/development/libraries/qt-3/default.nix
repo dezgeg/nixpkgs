@@ -41,7 +41,7 @@ stdenv.mkDerivation {
       -L${mesa}/lib -I${mesa}/include
       -L${libXmu.dev}/lib -I${libXmu.dev}/include" else ""}
     ${if threadSupport then "-thread" else "-no-thread"}
-    ${if xrenderSupport then "-xrender -L${libXrender}/lib -I${libXrender}/include" else "-no-xrender"}
+    ${if xrenderSupport then "-xrender -L${libXrender.dev}/lib -I${libXrender.dev}/include" else "-no-xrender"}
     ${if xrandrSupport then "-xrandr
       -L${libXrandr.dev}/lib -I${libXrandr.dev}/include
       -I${randrproto}/include" else "-no-xrandr"}
