@@ -64,11 +64,11 @@ stdenv.mkDerivation rec {
     
       wrapProgram `pwd`/uiautomatorviewer \
         --prefix PATH : ${jdk}/bin \
-        --prefix LD_LIBRARY_PATH : ${glib.dev}/lib:${gtk}/lib:${libXtst}/lib
+        --prefix LD_LIBRARY_PATH : ${glib.dev}/lib:${gtk.dev}/lib:${libXtst}/lib
     
       wrapProgram `pwd`/hierarchyviewer \
         --prefix PATH : ${jdk}/bin \
-        --prefix LD_LIBRARY_PATH : ${glib.dev}/lib:${gtk}/lib:${libXtst}/lib
+        --prefix LD_LIBRARY_PATH : ${glib.dev}/lib:${gtk.dev}/lib:${libXtst}/lib
       
       # The emulators need additional libraries, which are dynamically loaded => let's wrap them
     

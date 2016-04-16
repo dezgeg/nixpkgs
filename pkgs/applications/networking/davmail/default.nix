@@ -20,6 +20,6 @@ stdenv.mkDerivation rec {
   installPhase = ''
   mkdir -p $out/bin
   cp ./* $out/bin/ -R
-  wrapProgram $out/bin/davmail.sh --prefix PATH : ${jre}/bin --prefix LD_LIBRARY_PATH : ${glib.dev}/lib:${gtk}/lib:${libXtst}/lib
+  wrapProgram $out/bin/davmail.sh --prefix PATH : ${jre}/bin --prefix LD_LIBRARY_PATH : ${glib.dev}/lib:${gtk.dev}/lib:${libXtst}/lib
    '';
 }
