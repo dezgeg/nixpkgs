@@ -11340,6 +11340,8 @@ in
     ubootJetsonTK1
     ubootPcduino3Nano
     ubootRaspberryPi
+    ubootRaspberryPi2
+    ubootRaspberryPi3
     ubootVersatileExpressCA9
     ubootWandboard
     ;
