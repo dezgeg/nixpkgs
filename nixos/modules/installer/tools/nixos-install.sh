@@ -11,11 +11,13 @@
 umask 0022
 
 # Re-exec ourselves in a private mount namespace so that our bind
-# mounts get cleaned up automatically.
+# mounts get cleaned up automatically. While at it, start with a clean
+# environment since they can cause unexpected things in the chroot.
+# (For some examples: NIX_BUILD_HOOK NIX_REMOTE LANG LC_ALL TMPDIR XDG_RUNTIME_DIR all can be problematic)
 if [ "$(id -u)" = 0 ]; then
     if [ -z "$NIXOS_INSTALL_REEXEC" ]; then
-        export NIXOS_INSTALL_REEXEC=1
-        exec unshare --mount --uts -- "$0" "$@"
+        exec env -i PATH=@path@ NIX_PATH="$NIX_PATH" NIXOS_CONFIG="$NIXOS_CONFIG" NIXOS_INSTALL_REEXEC=1 \
+            unshare --mount --uts -- "$0" "$@"
     else
         mount --make-rprivate /
     fi
@@ -99,12 +101,15 @@ if [ -e "$SSL_CERT_FILE" ]; then
 fi
 
 if [ -n "$runChroot" ]; then
+    export HOME=/root
     if ! [ -L $mountPoint/nix/var/nix/profiles/system ]; then
         echo "$0: installation not finished; cannot chroot into installation directory"
         exit 1
     fi
     ln -s /nix/var/nix/profiles/system $mountPoint/run/current-system
     exec chroot $mountPoint "${chrootCommand[@]}"
+else
+    export HOME=/homeless-shelter
 fi
 
 
@@ -134,16 +139,6 @@ mkdir -m 1775 -p $mountPoint/nix/store
 chown root:nixbld $mountPoint/nix/store
 
 
-# There is no daemon in the chroot.
-unset NIX_REMOTE
-
-
-# We don't have locale-archive in the chroot, so clear $LANG.
-export LANG=
-export LC_ALL=
-export LC_TIME=
-
-
 # Create a temporary Nix config file that causes the nixbld users to
 # be used.
 echo "build-users-group = nixbld" > $mountPoint/tmp/nix.conf # FIXME: remove in Nix 1.8
@@ -159,7 +154,7 @@ mount --bind -o ro /etc/group $mountPoint/etc/group
 
 
 # Copy Nix to the Nix store on the target device, unless it's already there.
-if ! NIX_DB_DIR=$mountPoint/nix/var/nix/db nix-store --check-validity @nix@ 2> /dev/null; then
+if ! NIX_DB_DIR=$mountPoint/nix/var/nix/db @nix@/bin/nix-store --check-validity @nix@ 2> /dev/null; then
     echo "copying Nix to $mountPoint...."
     for i in $(@perl@/bin/perl @pathsFromGraph@ @nixClosure@); do
         echo "  $i"
@@ -183,9 +178,6 @@ mkdir -m 0755 -p $mountPoint/bin
 ln -sf @shell@ $mountPoint/bin/sh
 
 
-# Build hooks likely won't function correctly in the minimal chroot; just disable them.
-unset NIX_BUILD_HOOK
-
 # Make the build below copy paths from the CD if possible.  Note that
 # /tmp/root in the chroot is the root of the CD.
 export NIX_OTHER_STORES=/tmp/root/nix:$NIX_OTHER_STORES
@@ -203,7 +195,7 @@ done
 
 
 # Get the absolute path to the NixOS/Nixpkgs sources.
-nixpkgs="$(readlink -f $(nix-instantiate --find-file nixpkgs))"
+nixpkgs="$(readlink -f $(@nix@/bin/nix-instantiate --find-file nixpkgs))"
 
 
 # Build the specified Nix expression in the target store and install
@@ -219,7 +211,7 @@ NIX_PATH="nixpkgs=/tmp/root/$nixpkgs:nixos-config=$NIXOS_CONFIG" NIXOS_CONFIG= \
 mkdir -m 0755 -p $mountPoint/nix/var/nix/profiles
 mkdir -m 1777 -p $mountPoint/nix/var/nix/profiles/per-user
 mkdir -m 0755 -p $mountPoint/nix/var/nix/profiles/per-user/root
-srcs=$(nix-env "${extraBuildFlags[@]}" -p /nix/var/nix/profiles/per-user/root/channels -q nixos --no-name --out-path 2>/dev/null || echo -n "")
+srcs=$(@nix@/bin/nix-env "${extraBuildFlags[@]}" -p /nix/var/nix/profiles/per-user/root/channels -q nixos --no-name --out-path 2>/dev/null || echo -n "")
 if test -n "$srcs"; then
     echo "copying NixOS/Nixpkgs sources..."
     chroot $mountPoint @nix@/bin/nix-env \

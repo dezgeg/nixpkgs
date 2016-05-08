@@ -21,6 +21,7 @@ let
     name = "nixos-install";
     src = ./nixos-install.sh;
 
+    path = pkgs.lib.makeBinPath (with pkgs; [ coreutils rsync utillinux ]);
     inherit (pkgs) perl pathsFromGraph;
     nix = config.nix.package.out;
 
