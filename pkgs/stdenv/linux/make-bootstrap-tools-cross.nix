@@ -91,8 +91,7 @@ rec {
   })).crossDrv;
 
   busyboxMinimal = (pkgs.busybox.override {
-    # TBD: uClibc is broken.
-    # useUclibc = true;
+    useMusl = true;
     enableStatic = true;
     enableMinimal = true;
     extraConfig = ''
