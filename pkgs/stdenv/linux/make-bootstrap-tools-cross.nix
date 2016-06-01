@@ -8,9 +8,9 @@ let
 
   sheevaplugCrossSystem = {
     crossSystem = rec {
-      config = "arm-linux-gnueabihf";
+      config = "armv5tel-unknown-linux-gnueabi";
       bigEndian = false;
-      arch = "armv5te";
+      arch = "arm";
       float = "soft";
       withTLS = true;
       libc = "glibc";
@@ -21,9 +21,9 @@ let
 
   raspberrypiCrossSystem = {
     crossSystem = rec {
-      config = "arm-linux-gnueabihf";
+      config = "armv6l-unknown-linux-gnueabi";
       bigEndian = false;
-      arch = "armv6";
+      arch = "arm";
       float = "hard";
       fpu = "vfp";
       withTLS = true;
@@ -36,9 +36,9 @@ let
 
   armv7l-hf-multiplatform-crossSystem = {
     crossSystem = rec {
-      config = "arm-linux-gnueabihf";
+      config = "armv7l-unknown-linux-gnueabi";
       bigEndian = false;
-      arch = "armv7-a";
+      arch = "arm";
       float = "hard";
       fpu = "vfpv3-d16";
       withTLS = true;

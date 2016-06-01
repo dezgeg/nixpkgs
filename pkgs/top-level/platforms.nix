@@ -129,10 +129,6 @@ rec {
     # Only for uboot = uboot :
     ubootConfig = "sheevaplug_config";
     kernelDTB = true; # Beyond 3.10
-    gcc = {
-      arch = "armv5te";
-      float = "soft";
-    };
   };
 
   raspberrypi = {
@@ -414,12 +410,11 @@ rec {
       # Cortex-A15: -mfpu=neon-vfpv4
 
       # More about FPU:
-      # https://wiki.debian.org/ArmHardFloatPort/VfpComparison
+       #https://wiki.debian.org/ArmHardFloatPort/VfpComparison
 
-      # vfpv3-d16 is what Debian uses and seems to be the best compromise: NEON is not supported in e.g. Scaleway or Tegra 2,
-      # and the above page suggests NEON is only an improvement with hand-written assembly.
+      # We try to be compatible with beaglebone by now
       arch = "armv7-a";
-      fpu = "vfpv3-d16";
+      fpu = "neon";
       float = "hard";
 
       # For Raspberry Pi the 2 the best would be:
