@@ -61,7 +61,11 @@ stdenv.mkDerivation rec {
     EOF
 
     make oldconfig
-  '' + stdenv.lib.optionalString useMusl ''
+
+    runHook postConfigure
+  '';
+
+  postConfigure = stdenv.lib.optionalString useMusl ''
     makeFlagsArray+=("CC=gcc -isystem ${musl}/include -B${musl}/lib -L${musl}/lib")
   '';
 
@@ -72,6 +76,9 @@ stdenv.mkDerivation rec {
       (if stdenv.cross.platform.kernelMajor == "2.4" then ''
         CONFIG_IONICE n
       '' else "");
+    postConfigure = stdenv.lib.optionalString useMusl ''
+      makeFlagsArray+=("CC=$crossConfig-gcc -isystem ${musl.crossDrv}/include -B${musl.crossDrv}/lib -L${musl.crossDrv}/lib")
+    '';
   };
 
   enableParallelBuilding = true;
