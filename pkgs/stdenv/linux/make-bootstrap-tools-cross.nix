@@ -118,7 +118,7 @@ rec {
       crossConfig = stdenv.cross.config;
 
       buildCommand = ''
-	set -x
+	      set -x
         mkdir -p $out/bin $out/lib $out/libexec
 
         # Copy what we need of Glibc.
