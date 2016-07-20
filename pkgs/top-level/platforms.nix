@@ -402,6 +402,7 @@ rec {
     kernelTarget = "zImage";
     kernelExtraConfig = ''
       AHCI_IMX y
+      RTL8192CU m
     '';
     gcc = {
       # Some table about fpu flags:
