@@ -1,12 +1,12 @@
 {
   busybox = import <nix/fetchurl.nix> {
-    url = http://nixos-arm.dezgeg.me/bootstrap-2016-07-20-33a1d8/armv5tel/busybox;
-    sha256 = "03i90dwkly1j2a7i12qixkybjz2b24ixjrl7zsr17s1sv6m27zba";
+    url = http://nixos-arm.dezgeg.me/bootstrap-2016-08-28-1409bc/armv5tel/busybox;
+    sha256 = "1bn4higchnrlqxjg1ivkhlin4xr9zdychgx332h2cfq9zxginanv";
     executable = true;
   };
 
   bootstrapTools = import <nix/fetchurl.nix> {
-    url = http://nixos-arm.dezgeg.me/bootstrap-2016-07-20-33a1d8/armv5tel/bootstrap-tools.tar.xz;
-    sha256 = "1sikiydjlbv8v35fgjvr5swgvj6bc83gmrbjrhpi0hyzyfcinxbn";
+    url = http://nixos-arm.dezgeg.me/bootstrap-2016-08-28-1409bc/armv5tel/bootstrap-tools.tar.xz;
+    sha256 = "145jrqyxl75iv5i1f7d5h01y2hj3pbc3gvxyjng9hdyks71jz81i";
   };
 }
