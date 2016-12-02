@@ -2,62 +2,116 @@
   libunistring, nss, samba, libnfsidmap, doxygen, python, python3,
   pam, popt, talloc, tdb, tevent, pkgconfig, ldb, openldap, pcre, kerberos,
   cifs_utils, glib, keyutils, dbus, fakeroot, libxslt, libxml2,
-  docbook_xml_xslt, ldap, systemd, nspr, check, cmocka,
+  docbook_xml_xslt, ldap, systemd, nspr, check, cmocka, http-parser, jansson,
   uid_wrapper, nss_wrapper, docbook_xml_dtd_44, ncurses, Po4a }:
 
-let
-  name = "sssd";
-  version = "1.13.3";
-in stdenv.mkDerivation {
-  inherit name;
-  inherit version;
+stdenv.mkDerivation rec {
+  name = "sssd-${version}";
+  version = "1.14.2";
 
   src = fetchurl {
-    url = "https://fedorahosted.org/released/${name}/${name}-${version}.tar.gz";
-    sha256 = "3fd8fe8e6ee9f50b33eecd1bcccfaa44791f30d4e5f3113ba91457ba5f411f85";
+    url = "https://fedorahosted.org/released/sssd/${name}.tar.gz";
+    sha256 = "0vbjsz6r81w0d8rigd37dq1x9z8bc2fnp6w8lk0f0f7mrpnn11l6";
   };
 
-  preConfigure = ''
-    cd "$NIX_BUILD_TOP/$name-$version"
-    for f in "''${source[@]}"; do
-      if [[ $f == *.patch ]]; then
-        patch -p1 < "$NIX_BUILD_TOP/$name-$version/$f"
-      fi
-    done
+  outputs = [ "out" "dev" "man" ];
 
-    export SGML_CATALOG_FILES="${pkgs.docbook_xml_xslt}/share/xml/docbook-xsl/catalog.xml:${pkgs.docbook_xml_dtd_44}/xml/dtd/docbook/catalog.xml"
-    export PYTHONPATH=${ldap}/lib/python2.7/site-packages
-    export PATH=$PATH:${pkgs.openldap}/libexec
-    export CPATH=${pkgs.libxml2}/include/libxml2
+  # TODO:
+  #  - get tests to pass (memberof.so ldb module can't find libtalloc.so.2)
+  #  - get python stuff to work (sss_obfuscate isn't wrapped correctly)
 
-    configureFlags="--prefix=$out --sysconfdir=/etc --localstatedir=/var --enable-pammoddir=$out/lib/security --with-os=fedora --with-pid-path=/run --with-python2-bindings --with-python3-bindings --with-syslog=journald --without-selinux --without-semanage --with-xml-catalog-path=''${SGML_CATALOG_FILES%%:*} --with-ldb-lib-dir=$out/modules/ldb"
+  buildInputs = [
+    augeas
+    bind
+    c-ares
+    cifs_utils
+    cyrus_sasl
+    dbus
+    ding-libs
+    fakeroot
+    glib
+    http-parser
+    jansson
+    kerberos
+    keyutils
+    ldb
+    libnfsidmap
+    libnl
+    libunistring
+    libxml2
+    libxslt
+    ncurses
+    nspr
+    nss
+    nss_wrapper
+    openldap
+    pam
+    pcre
+    pkgconfig
+    Po4a
+    popt
+    /* python python3 */
+    samba
+    systemd
+    talloc
+    tdb
+    tevent
+    uid_wrapper
+  ] ++ stdenv.lib.optionals doCheck [ check cmocka ];
+
+  patchPhase = ''
+    patchShebangs src/tests
   '';
+
+  preConfigure = ''
+    export SGML_CATALOG_FILES="${pkgs.docbook_xml_xslt}/share/xml/docbook-xsl/catalog.xml:${pkgs.docbook_xml_dtd_44}/xml/dtd/docbook/catalog.xml"
+
+    makeFlagsArray+=("SGML_CATALOG_FILES=$SGML_CATALOG_FILES")
+    configureFlagsArray+=(
+      "--enable-pammoddir=$out/lib/security"
+      "--with-xml-catalog-path=''${SGML_CATALOG_FILES%%:*}"
+      "--with-ldb-lib-dir=$out/modules/ldb"
+    )
+  '';
+
+  configureFlags = [
+    "--sysconfdir=/etc"
+    "--localstatedir=/var"
+    "--with-os=fedora"
+    "--with-pid-path=/run"
+    "--without-python2-bindings"
+    "--without-python3-bindings"
+    "--with-syslog=journald"
+    "--without-selinux"
+    "--without-semanage"
+  ];
 
   enableParallelBuilding = true;
-  buildInputs = [ augeas bind c-ares cyrus_sasl ding-libs libnl libunistring nss
-                  samba libnfsidmap doxygen python python3 popt
-                  talloc tdb tevent pkgconfig ldb pam openldap pcre kerberos
-                  cifs_utils glib keyutils dbus fakeroot libxslt libxml2
-                  ldap systemd nspr check cmocka uid_wrapper
-                  nss_wrapper ncurses Po4a ];
 
-  buildPhase = ''
-    cd "$NIX_BUILD_TOP/$name-$version"
-    substituteInPlace config.h --replace "<HAVE_KRB5_SET_TRACE_CALLBACK>" ""
-    make SGML_CATALOG_FILES="$SGML_CATALOG_FILES"
-  '';
+  # Something is looking for <libxml/foo.h> instead of <libxml2/libxml/foo.h>
+  NIX_CFLAGS_COMPILE = "-I${libxml2.dev}/include/libxml2";
+
+  doCheck = false;
 
   installPhase = ''
-    cd "$NIX_BUILD_TOP/$name-$version"
-    make SGML_CATALOG_FILES="$SGML_CATALOG_FILES" sysconfdir="$out/etc" localstatedir="$out/var" pidpath="$out/run" sss_statedir="$out/var/lib/sss" logpath="$out/var/log/sssd" pubconfpath="$out/var/lib/sss/pubconf" dbpath="$out/var/lib/sss/db" mcpath="$out/var/lib/sss/mc" pipepath="$out/var/lib/sss/pipes" gpocachepath="$out/var/lib/sss/gpo_cache" initdir="$out/rc.d/init.d" install
-    rm -rf "$out"/run
-    rm -rf "$out"/rc.d
-    rm -f "$out"/modules/ldb/memberof.la
+    make install \
+      sysconfdir="$out/etc" \
+      localstatedir="$TMPDIR" \
+      pidpath="$TMPDIR" \
+      sss_statedir="$TMPDIR" \
+      logpath="$TMPDIR" \
+      pubconfpath="$TMPDIR" \
+      dbpath="$TMPDIR" \
+      mcpath="$TMPDIR" \
+      pipepath="$TMPDIR" \
+      gpocachepath="$TMPDIR" \
+      initdir="$TMPDIR" \
+      secdbpath="$TMPDIR"
+
     find "$out" -depth -type d -exec rmdir --ignore-fail-on-non-empty {} \;
   '';
 
   meta = {
-    inherit version;
     description = "System Security Services Daemon";
     homepage = https://fedorahosted.org/sssd/;
     license = stdenv.lib.licenses.gpl3;
