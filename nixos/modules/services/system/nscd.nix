@@ -29,7 +29,6 @@ in
 
       config = mkOption {
         type = types.lines;
-        default = builtins.readFile ./nscd.conf;
         description = "Configuration to use for Name Service Cache Daemon.";
       };
 
@@ -41,6 +40,37 @@ in
   ###### implementation
 
   config = mkIf cfg.enable {
+
+    services.nscd.config = mkDefault ''
+      server-user             nscd
+      threads                 1
+      paranoia                no
+      debug-level             0
+
+      enable-cache            passwd          yes
+      positive-time-to-live   passwd          600
+      negative-time-to-live   passwd          20
+      suggested-size          passwd          211
+      check-files             passwd          yes
+      persistent              passwd          no
+      shared                  passwd          yes
+
+      enable-cache            group           yes
+      positive-time-to-live   group           3600
+      negative-time-to-live   group           60
+      suggested-size          group           211
+      check-files             group           yes
+      persistent              group           no
+      shared                  group           yes
+
+      enable-cache            hosts           yes
+      positive-time-to-live   hosts           600
+      negative-time-to-live   hosts           5
+      suggested-size          hosts           211
+      check-files             hosts           yes
+      persistent              hosts           no
+      shared                  hosts           yes
+    '';
 
     users.extraUsers.nscd =
       { isSystemUser = true;
