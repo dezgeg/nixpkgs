@@ -27,6 +27,12 @@ in
         description = "Whether to enable the Name Service Cache Daemon.";
       };
 
+      cacheUsers = mkOption {
+        type = types.bool;
+        default = true;
+        description = "Whether to enable caching of the <literal>passwd</literal> and <literal>group</literal> databases.";
+      };
+
       config = mkOption {
         type = types.lines;
         description = "Configuration to use for Name Service Cache Daemon.";
@@ -48,16 +54,16 @@ in
       debug-level             0
 
       enable-cache            passwd          yes
-      positive-time-to-live   passwd          600
-      negative-time-to-live   passwd          20
+      positive-time-to-live   passwd          ${if cfg.cacheUsers then "600" else "0"}
+      negative-time-to-live   passwd          ${if cfg.cacheUsers then "20" else "0"}
       suggested-size          passwd          211
       check-files             passwd          yes
       persistent              passwd          no
       shared                  passwd          yes
 
       enable-cache            group           yes
-      positive-time-to-live   group           3600
-      negative-time-to-live   group           60
+      positive-time-to-live   group           ${if cfg.cacheUsers then "3600" else "0"}
+      negative-time-to-live   group           ${if cfg.cacheUsers then "60" else "0"}
       suggested-size          group           211
       check-files             group           yes
       persistent              group           no
