@@ -309,7 +309,7 @@ let
                 if config.boot.isContainer then "optional" else "required"
               } pam_loginuid.so"}
           ${optionalString cfg.makeHomeDir
-              "session required ${pkgs.pam}/lib/security/pam_mkhomedir.so silent skel=/etc/skel umask=0022"}
+              "session required ${pkgs.pam}/lib/security/pam_mkhomedir.so silent skel=${config.security.pam.makeHomeDir.skelDirectory} umask=0022"}
           ${optionalString cfg.updateWtmp
               "session required ${pkgs.pam}/lib/security/pam_lastlog.so silent"}
           ${optionalString config.security.pam.enableEcryptfs
@@ -403,6 +403,16 @@ in
           Each attribute of this set defines a PAM service, with the attribute name
           defining the name of the service.
         '';
+    };
+
+    security.pam.makeHomeDir.skelDirectory = mkOption {
+      type = types.str;
+      default = "/var/empty";
+      example =  "/etc/skel";
+      description = ''
+        Path to skeleton directory whose contents are copied to home
+        directories newly created by <literal>pam_mkhomedir</literal>.
+      '';
     };
 
     security.pam.enableSSHAgentAuth = mkOption {
