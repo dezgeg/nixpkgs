@@ -15,6 +15,7 @@ let
   efiSystems = {
     "i686-linux".target = "i386";
     "x86_64-linux".target = "x86_64";
+    "aarch64-linux".target = "aarch64";
   };
 
   canEfi = any (system: stdenv.system == system) (mapAttrsToList (name: _: name) efiSystems);
