@@ -3,13 +3,13 @@
 
 stdenv.mkDerivation rec {
   name = "tp_smapi-${version}-${kernel.version}";
-  version = "0.42";
+  version = "0.41";
 
   src = fetchFromGitHub {
     owner = "evgeni";
     repo = "tp_smapi";
     rev = "tp-smapi/${version}";
-    sha256 = "12lnig90lrmkmqwl386q7ssqs9p0jikqhwl2wsmcmii1gn92hzfy";
+    sha256 = "03lvbz9zxjfdwmksc3snl5psj9h9f1il1czgz76qj96lf5f8p0dc";
     name = "tp-smapi-${version}";
   };
 
