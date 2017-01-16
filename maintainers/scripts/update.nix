@@ -8,16 +8,18 @@ let
 
   pkgs = import ./../../default.nix { };
 
-  packagesWith = cond: return: set:
+  packagesWith = cond: return: set: builtins.listToAttrs (packagesWith_ "" cond return set);
+  packagesWith_ = attrPath: cond: return: set:
     pkgs.lib.flatten
       (pkgs.lib.mapAttrsToList
         (name: pkg:
           let
+            fullName = "${attrPath}${name}";
             result = builtins.tryEval (
-              if pkgs.lib.isDerivation pkg && cond name pkg
-                then [(return name pkg)]
+              if pkgs.lib.isDerivation pkg && cond fullName pkg
+                then [(pkgs.lib.nameValuePair fullName (return fullName pkg))]
               else if pkg.recurseForDerivations or false || pkg.recurseForRelease or false
-                then packagesWith cond return pkg
+                then packagesWith_ "${fullName}." cond return pkg
               else []
             );
           in
@@ -60,7 +62,7 @@ let
 
   packages =
     if package != null then
-      [ (packageByName package) ]
+      { ${package} = packageByName package; }
     else if maintainer != null then
       packagesWithUpdateScriptAndMaintainer maintainer
     else
@@ -79,23 +81,23 @@ let
     to run update script for specific package.
   '';
 
-  runUpdateScript = package: ''
-    echo -ne " - ${package.name}: UPDATING ..."\\r
-    ${package.updateScript} &> ${(builtins.parseDrvName package.name).name}.log
+  runUpdateScript = name: package: ''
+    echo -ne " - ${name}: UPDATING ..."\\r
+    ${package.updateScript} &> ${name}.log
     CODE=$?
     if [ "$CODE" != "0" ]; then
-      echo " - ${package.name}: ERROR       "
+      echo " - ${name}: ERROR       "
       echo ""
-      echo "--- SHOWING ERROR LOG FOR ${package.name} ----------------------"
+      echo "--- SHOWING ERROR LOG FOR ${name} ----------------------"
       echo ""
-      cat ${(builtins.parseDrvName package.name).name}.log
+      cat ${name}.log
       echo ""
-      echo "--- SHOWING ERROR LOG FOR ${package.name} ----------------------"
+      echo "--- SHOWING ERROR LOG FOR ${name} ----------------------"
       exit $CODE
     else
-      rm ${(builtins.parseDrvName package.name).name}.log
+      rm ${name}.log
     fi
-    echo " - ${package.name}: DONE.       "
+    echo " - ${name}: DONE.       "
   '';
 
 in pkgs.stdenv.mkDerivation {
@@ -113,13 +115,13 @@ in pkgs.stdenv.mkDerivation {
   shellHook = ''
     echo ""
     echo "Going to be running update for following packages:"
-    echo "${builtins.concatStringsSep "\n" (map (x: " - ${x.name}") packages)}"
+    echo "${builtins.concatStringsSep "\n" (pkgs.lib.mapAttrsToList (name: pkg: " - ${name}") packages)}"
     echo ""
     read -n1 -r -p "Press space to continue..." confirm
     if [ "$confirm" = "" ]; then
       echo ""
       echo "Running update for:"
-      ${builtins.concatStringsSep "\n" (map runUpdateScript packages)}
+      ${builtins.concatStringsSep "\n" (pkgs.lib.mapAttrsToList runUpdateScript packages)}
       echo ""
       echo "Packages updated!"
       exit 0
