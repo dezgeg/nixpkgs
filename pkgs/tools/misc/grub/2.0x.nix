@@ -18,6 +18,13 @@ let
     "aarch64-linux".target = "aarch64";
   };
 
+  # For some braindamaged reason.
+  efiInstallSystems = {
+    "i686-linux".target = "i386";
+    "x86_64-linux".target = "x86_64";
+    "aarch64-linux".target = "arm64";
+  };
+
   canEfi = any (system: stdenv.system == system) (mapAttrsToList (name: _: name) efiSystems);
   inPCSystems = any (system: stdenv.system == system) (mapAttrsToList (name: _: name) pcSystems);
 
@@ -94,7 +101,7 @@ stdenv.mkDerivation rec {
 
   # save target that grub is compiled for
   grubTarget = if efiSupport
-               then "${efiSystems.${stdenv.system}.target}-efi"
+               then "${efiInstallSystems.${stdenv.system}.target}-efi"
                else if inPCSystems
                     then "${pcSystems.${stdenv.system}.target}-pc"
                     else "";

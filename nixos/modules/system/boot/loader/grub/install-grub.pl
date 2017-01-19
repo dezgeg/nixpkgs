@@ -267,42 +267,45 @@ else {
           set timeout=$timeout
         fi
 
-        # Setup the graphics stack for bios and efi systems
-        if [ \"\${grub_platform}\" = \"efi\" ]; then
-          insmod efi_gop
-          insmod efi_uga
-        else
-          insmod vbe
-        fi
-        insmod font
-        if loadfont " . $grubBoot->path . "/grub/fonts/unicode.pf2; then
-          insmod gfxterm
-          if [ \"\${grub_platform}\" = \"efi\" ]; then
-            set gfxmode=$gfxmodeEfi
-            set gfxpayload=keep
-          else
-            set gfxmode=$gfxmodeBios
-            set gfxpayload=text
-          fi
-          terminal_output gfxterm
-        fi
+        # # Setup the graphics stack for bios and efi systems
+        # if [ \"\${grub_platform}\" = \"efi\" ]; then
+        #   insmod efi_gop
+        # else
+        #   insmod vbe
+        # fi
+        # insmod font
+        # if loadfont " . $grubBoot->path . "/grub/fonts/unicode.pf2; then
+        #   insmod gfxterm
+        #   if [ \"\${grub_platform}\" = \"efi\" ]; then
+        #     set gfxmode=$gfxmodeEfi
+        #     set gfxpayload=keep
+        #   else
+        #     set gfxmode=$gfxmodeBios
+        #     set gfxpayload=text
+        #   fi
+        #   terminal_output gfxterm
+        # fi
+
+        serial
+        terminal_input serial console
+        terminal_output serial console
     ";
 
-    if ($splashImage) {
-        # FIXME: GRUB 1.97 doesn't resize the background image if it
-        # doesn't match the video resolution.
-        copy $splashImage, "$bootPath/background.png" or die "cannot copy $splashImage to $bootPath\n";
-        $conf .= "
-            insmod png
-            if background_image " . $grubBoot->path . "/background.png; then
-              set color_normal=white/black
-              set color_highlight=black/white
-            else
-              set menu_color_normal=cyan/blue
-              set menu_color_highlight=white/blue
-            fi
-        ";
-    }
+    #if ($splashImage) {
+    #    # FIXME: GRUB 1.97 doesn't resize the background image if it
+    #    # doesn't match the video resolution.
+    #    copy $splashImage, "$bootPath/background.png" or die "cannot copy $splashImage to $bootPath\n";
+    #    $conf .= "
+    #        insmod png
+    #        if background_image " . $grubBoot->path . "/background.png; then
+    #          set color_normal=white/black
+    #          set color_highlight=black/white
+    #        else
+    #          set menu_color_normal=cyan/blue
+    #          set menu_color_highlight=white/blue
+    #        fi
+    #    ";
+    #}
 }
 
 $conf .= "$extraConfig\n";
