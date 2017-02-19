@@ -1,0 +1,126 @@
+#!/usr/bin/env bash
+set -e
+
+####################################################################################################
+# Helper functions
+####################################################################################################
+
+die() {
+    echo "$0: error: $1" >&2
+    exit 1
+}
+
+# Get version of a package
+getVersion() {
+    nix-instantiate --eval -E "with import ./. {}; $1.version or (builtins.parseDrvName $1.name).version" | tr -d '"'
+}
+
+# Figure out the pattern from a git tag or a filename:
+#    guessVersionPattern "fio-2.12" "2.12" -> "fio-([0-9].*)"
+#    guessVersionPattern "read-edid-3.0.2.tar.gz" "3.0.2" -> "read-edid-([0-9].*)\.tar\.gz"
+guessVersionPattern() {
+    local escapedVersion=$(echo "$2" | sed -re 's|\.|\\.|g')
+    local ret=$(echo "$1" | sed -re "s|$escapedVersion|([0-9].*)|")
+    if [ "$ret" = "$1" ]; then
+        die "guessVersionPattern(): couldn't figure out version pattern from tag/filename '$1' and version '$2'"
+    fi
+    echo "$ret"
+}
+
+####################################################################################################
+# Functions for listing available upstream versions
+#
+# Variables in scope at this point:
+#  - attr: attribute path of the package to list versions for
+#  - url: url of the src attribute of the package
+#  - oldVersion: old version of the package in question
+#
+# The implementation should fetch the available upstream versions from the Internet
+# and print them to stdout, one version number per line.
+####################################################################################################
+listVersionsGitTag() {
+    local gitUrl="$1"
+    rev=$(nix-instantiate --eval -A "$attr.src.rev" | tr -d '"' | sed -re 's|refs/tags/||')
+
+    versionPattern=$(guessVersionPattern "$rev" "$oldVersion")
+
+    git ls-remote -t --refs "$gitUrl" | sed -re 's|.*refs/tags/||' | grep -E "^$versionPattern$" | sed -re "s|$versionPattern|\1|"
+}
+
+listVersionsHttp() {
+    # Resolve mirror:// URLs if needed
+    if [[ $url =~ mirror://([^/]+)/(.*) ]]; then
+        mirror="${BASH_REMATCH[1]}"
+        rest="${BASH_REMATCH[2]}"
+        base=$(nix-instantiate --eval ./pkgs/build-support/fetchurl/mirrors.nix -A "$mirror.0" | tr -d '"')
+        url="$base$rest"
+    fi
+
+    # Make a guess for the download page: simply remove the filename part of the URL.
+    # Often works for Apache directory listings, for example.
+    local downloadPage="${url%/*}"
+    local fileName="${url##*/}"
+
+    versionPattern=$(guessVersionPattern "$fileName" "$oldVersion")
+
+    if [[ $url =~ ^ftp:// ]]; then
+        curl -sSL "$downloadPage/" -l
+    else
+        curl -sSL "$downloadPage" | xidel -q --extract "//a/@href" -
+    fi | grep -E "^$versionPattern$" | sed -re "s|$versionPattern|\1|" 
+}
+
+listVersionsSourceforge() {
+    local project="$1"
+    local fileName="${url##*/}"
+
+    versionPattern=$(guessVersionPattern "$fileName" "$oldVersion")
+
+    curl -sSL "https://sourceforge.net/projects/$project/rss" | xidel -q --extract '//rss/channel/item/link' - \
+        | sed -re 's|.*/([^/]+)/download$|\1|' \
+        | grep -E "^$versionPattern$" | sed -re "s|$versionPattern|\1|"
+}
+####################################################################################################
+# Main code
+####################################################################################################
+# Usage: list-upstream-versions <attr>
+attr=$1
+
+url=$(nix-instantiate --eval -E "with import ./. {}; $attr.src.url or (builtins.head $attr.src.urls)" | tr -d '"')
+if [ -z "$url" ]; then
+    die "couldn't evaluate URL of the source attribute of '$attr'!"
+fi
+
+oldVersion=$(getVersion "$attr")
+
+if [[ $url =~ mirror://sourceforge/([^/]+)/ ]]; then
+    project="${BASH_REMATCH[1]}"
+
+    lister="listVersionsSourceforge $project"
+elif [[ $url =~ https?://github\.com/([^/]+)/([^/]+)/archive/(.*)\.(zip|tar\.gz|tar\.bz2|tar\.xz) ]]; then
+    owner="${BASH_REMATCH[1]}"
+    repo="${BASH_REMATCH[2]}"
+
+   lister="listVersionsGitTag https://github.com/$owner/$repo.git"
+# FIXME: hacky way of detecting fetchgit
+elif [ "$(nix-instantiate --eval -E "with import ./. {}; builtins.hasAttr \"fetchSubmodules\" $attr.src")" = true ]; then
+   lister="listVersionsGitTag $url"
+else
+   lister=listVersionsHttp
+fi
+
+readarray -t allVersions < <(eval "$lister")
+if [ "${#allVersions[@]}" = 0 ]; then
+    die "Version lister didn't find any versions for '$attr'!"
+fi
+
+foundCurrent=
+for ver in "${allVersions[@]}"; do
+    echo "$ver"
+    if [ "$ver" = "$oldVersion" ]; then
+        foundCurrent=1
+    fi
+done
+if [ -z "$foundCurrent" ]; then
+    die "Version lister didn't find the current version ($oldVersion) for '$attr'!"
+fi
