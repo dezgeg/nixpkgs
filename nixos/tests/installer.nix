@@ -5,6 +5,12 @@ with import ../lib/qemu-flags.nix;
 with pkgs.lib;
 
 let
+  hack = pkgs.stdenv.mkDerivation {
+    name = "hack";
+    buildCommand = ''
+      g++ ${../../doit.cpp} -o $out
+    '';
+  };
 
   # The configuration to install.
   makeConfig = { bootLoader, grubVersion, grubDevice, grubIdentifier
@@ -67,6 +73,8 @@ let
       #$machine->waitForUnit('getty@tty2');
       $machine->waitForUnit("rogue");
       $machine->waitForUnit("nixos-manual");
+
+      $machine->fail('sleep 1; cd $(readlink -f $(nix-instantiate --find-file nixpkgs)) && ${hack} . >&2');
 
       # Wait for hard disks to appear in /dev
       $machine->succeed("udevadm settle");
