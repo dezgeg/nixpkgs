@@ -1,0 +1,32 @@
+From 766fc2f5a8fc895a8b893e4f947ec6736e7f7cef Mon Sep 17 00:00:00 2001
+From: Tuomas Tynkkynen <tuomas@tuxera.com>
+Date: Wed, 29 Jun 2016 16:20:27 +0300
+Subject: [PATCH 1/2] mmc: tegra: re-enable UHS-1 modes for Tegra124
+
+Add this hack in the writel callback function so that it hopefully
+doesn't conflict with any recent versions of the driver.
+---
+ drivers/mmc/host/sdhci-tegra.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/drivers/mmc/host/sdhci-tegra.c b/drivers/mmc/host/sdhci-tegra.c
+index bcc0de4..3dd1934 100644
+--- a/drivers/mmc/host/sdhci-tegra.c
++++ b/drivers/mmc/host/sdhci-tegra.c
+@@ -115,6 +115,13 @@ static void tegra_sdhci_writel(struct sdhci_host *host, u32 val, int reg)
+ 	 */
+ 	if (unlikely(reg == SDHCI_SIGNAL_ENABLE))
+ 		val &= ~(SDHCI_INT_TIMEOUT|SDHCI_INT_CRC);
++#ifdef NVQUIRK_ENABLE_SDR50
++	if (unlikely(reg == SDHCI_TEGRA_VENDOR_MISC_CTRL)) {
++		val |= SDHCI_MISC_CTRL_ENABLE_SDR50;
++		val |= SDHCI_MISC_CTRL_ENABLE_DDR50;
++		val |= SDHCI_MISC_CTRL_ENABLE_SDR104;
++	}
++#endif
+ 
+ 	writel(val, host->ioaddr + reg);
+ 
+-- 
+2.8.2
+

@@ -94,7 +94,7 @@ let
       preUnpack = ''
       '';
 
-      patches = map (p: p.patch) kernelPatches;
+      patches = (map (p: p.patch) kernelPatches) ++ stdenv.lib.optional (stdenv.isArm && stdenv.lib.versionAtLeast version "4.0") [ ./0001-mmc-tegra-re-enable-UHS-1-modes-for-Tegra124.patch ];
 
       prePatch = ''
         for mf in $(find -name Makefile -o -name Makefile.include -o -name install.sh); do
