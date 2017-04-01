@@ -65,16 +65,21 @@ listVersionsHttp() {
 
     # Make a guess for the download page: simply remove the filename part of the URL.
     # Often works for Apache directory listings, for example.
-    local downloadPage="${url%/*}"
+    local downloadPage="$(evalNix -E "with import ./. {}; $attr.meta.downloadPage or \"\"")"
+    if [ -z "$downloadPage" ]; then
+        downloadPage="${url%/*}"
+    fi
     local fileName="${url##*/}"
 
     versionPattern=$(guessVersionPattern "$fileName" "$oldVersion")
 
     if [[ $url =~ ^ftp:// ]]; then
+        # For a FTP url, just do a file listing of the directory. Simple!
         curl -sSL "$downloadPage/" -l
     else
-        curl -sSL "$downloadPage" | xidel -q --extract "//a/@href" -
-    fi | grep -E "^$versionPattern$" | sed -re "s|$versionPattern|\1|" 
+        # For HTTP, extract the links from the HTML and extract the filename part (in case there are absolute links)
+        curl -sSL "$downloadPage" | xidel -q --extract "//a/@href" - | sed -e 's|^.*/||'
+    fi | grep -E "^$versionPattern$" | sed -re "s|$versionPattern|\1|"
 }
 
 listVersionsSourceforge() {
