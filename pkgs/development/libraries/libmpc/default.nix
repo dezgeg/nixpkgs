@@ -30,6 +30,7 @@ stdenv.mkDerivation rec {
       '';
 
     homepage = http://mpc.multiprecision.org/;
+    downloadPage = "http://www.multiprecision.org/index.php?prog=mpc&page=download";
     license = stdenv.lib.licenses.lgpl2Plus;
 
     platforms = stdenv.lib.platforms.all;
