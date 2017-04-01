@@ -10,15 +10,21 @@ die() {
     exit 1
 }
 
+# Eval a Nix expression, with the un-escaped output going to stdout.
+evalNix() {
+    nix-instantiate --eval --strict --json "$@" | jq -r '. | tostring'
+}
+
 # Get version of a package
 getVersion() {
-    nix-instantiate --eval -E "with import ./. {}; $1.version or (builtins.parseDrvName $1.name).version" | tr -d '"'
+    evalNix -E "with import ./. {}; $1.version or (builtins.parseDrvName $1.name).version"
 }
 
 # Figure out the pattern from a git tag or a filename:
 #    guessVersionPattern "fio-2.12" "2.12" -> "fio-([0-9].*)"
 #    guessVersionPattern "read-edid-3.0.2.tar.gz" "3.0.2" -> "read-edid-([0-9].*)\.tar\.gz"
 guessVersionPattern() {
+    # '.' should be the only thing that needs escaping, as Nix refuses derivations with funny 'name' attributes
     local escapedVersion=$(echo "$2" | sed -re 's|\.|\\.|g')
     local ret=$(echo "$1" | sed -re "s|$escapedVersion|([0-9].*)|")
     if [ "$ret" = "$1" ]; then
@@ -40,7 +46,7 @@ guessVersionPattern() {
 ####################################################################################################
 listVersionsGitTag() {
     local gitUrl="$1"
-    rev=$(nix-instantiate --eval -A "$attr.src.rev" | tr -d '"' | sed -re 's|refs/tags/||')
+    rev=$(evalNix -A "$attr.src.rev" | sed -re 's|refs/tags/||')
 
     versionPattern=$(guessVersionPattern "$rev" "$oldVersion")
 
@@ -49,10 +55,11 @@ listVersionsGitTag() {
 
 listVersionsHttp() {
     # Resolve mirror:// URLs if needed
+    # FIXME: quite ugly implementation
     if [[ $url =~ mirror://([^/]+)/(.*) ]]; then
         mirror="${BASH_REMATCH[1]}"
         rest="${BASH_REMATCH[2]}"
-        base=$(nix-instantiate --eval ./pkgs/build-support/fetchurl/mirrors.nix -A "$mirror.0" | tr -d '"')
+        base=$(evalNix ./pkgs/build-support/fetchurl/mirrors.nix -A "$mirror.0")
         url="$base$rest"
     fi
 
@@ -76,6 +83,8 @@ listVersionsSourceforge() {
 
     versionPattern=$(guessVersionPattern "$fileName" "$oldVersion")
 
+    # Try to look for uploaded artifacts from the SourceForge project's RSS.
+    # Same approach that was used by monitor.nixos.org
     curl -sSL "https://sourceforge.net/projects/$project/rss" | xidel -q --extract '//rss/channel/item/link' - \
         | sed -re 's|.*/([^/]+)/download$|\1|' \
         | grep -E "^$versionPattern$" | sed -re "s|$versionPattern|\1|"
@@ -86,7 +95,7 @@ listVersionsSourceforge() {
 # Usage: list-upstream-versions <attr>
 attr=$1
 
-url=$(nix-instantiate --eval -E "with import ./. {}; $attr.src.url or (builtins.head $attr.src.urls)" | tr -d '"')
+url=$(evalNix -E "with import ./. {}; $attr.src.url or (builtins.head $attr.src.urls)")
 if [ -z "$url" ]; then
     die "couldn't evaluate URL of the source attribute of '$attr'!"
 fi
@@ -103,7 +112,7 @@ elif [[ $url =~ https?://github\.com/([^/]+)/([^/]+)/archive/(.*)\.(zip|tar\.gz|
 
    lister="listVersionsGitTag https://github.com/$owner/$repo.git"
 # FIXME: hacky way of detecting fetchgit
-elif [ "$(nix-instantiate --eval -E "with import ./. {}; builtins.hasAttr \"fetchSubmodules\" $attr.src")" = true ]; then
+elif [ "$(evalNix -E "with import ./. {}; builtins.hasAttr \"fetchSubmodules\" $attr.src")" = true ]; then
    lister="listVersionsGitTag $url"
 else
    lister=listVersionsHttp
