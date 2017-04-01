@@ -5,6 +5,10 @@ set -e
 # Helper functions
 ####################################################################################################
 
+warn() {
+    echo "$0: warning: $1" >&2
+}
+
 die() {
     echo "$0: error: $1" >&2
     exit 1
@@ -136,5 +140,5 @@ for ver in "${allVersions[@]}"; do
     fi
 done
 if [ -z "$foundCurrent" ]; then
-    die "Version lister didn't find the current version ($oldVersion) for '$attr'!"
+    warn "Version lister didn't find the current version ($oldVersion) for '$attr'!"
 fi
