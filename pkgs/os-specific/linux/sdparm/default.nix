@@ -11,6 +11,7 @@ stdenv.mkDerivation rec {
 
   meta = with stdenv.lib; {
     homepage = http://sg.danny.cz/sg/sdparm.html;
+    downloadPage = http://sg.danny.cz/sg/sdparm.html;
     description = "A utility to access SCSI device parameters";
     license = licenses.bsd3;
     maintainers = with maintainers; [ nckx ];
