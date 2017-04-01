@@ -64,7 +64,5 @@ stdenv.mkDerivation {
     description = "Tools to support Logical Volume Management (LVM) on Linux";
     platforms = stdenv.lib.platforms.linux;
     maintainers = with stdenv.lib.maintainers; [raskin];
-    inherit version;
-    downloadPage = "ftp://sources.redhat.com/pub/lvm2/";
   };
 }
