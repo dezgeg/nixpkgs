@@ -151,6 +151,6 @@ else
 fi
 
 if [ "$2" == "--commit" ]; then
-    update-source-version "$attr" "$latestVersion"
+    ./pkgs/common-updater/scripts/update-source-version "$attr" "$latestVersion"
     git commit -a -m "$attr: $oldVersion -> $latestVersion"
 fi
