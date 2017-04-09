@@ -1,4 +1,4 @@
-{ stdenv, fetchurl
+{ stdenv, fetchFromGitHub
 , libsysfs, gnutls, openssl
 , libcap, opensp, docbook_sgml_dtd_31
 , libidn, nettle
@@ -6,15 +6,15 @@
 
 assert stdenv ? glibc;
 
-let
-  time = "20161105";
-in
 stdenv.mkDerivation rec {
-  name = "iputils-${time}";
+  name = "iputils-${version}";
+  version = "20161105";
 
-  src = fetchurl {
-    url = "https://github.com/iputils/iputils/archive/s${time}.tar.gz";
-    sha256 = "12mdmh4qbf5610csaw3rkzhpzf6djndi4jsl4gyr8wni0cphj4zq";
+  src = fetchFromGitHub {
+    owner = "iputils";
+    repo = "iputils";
+    rev = "s${version}";
+    sha256 = "1a4vkgb74lizcva3k2vddyn3932idww6fkadd65cb82dmg4gqqn0";
   };
 
   prePatch = ''
