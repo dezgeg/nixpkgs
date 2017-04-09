@@ -127,7 +127,7 @@ else
    lister=listVersionsHttp
 fi
 
-readarray -t allVersions < <(eval "$lister")
+readarray -t allVersions < <(eval "$lister" | sort -Vr)
 if [ "${#allVersions[@]}" = 0 ]; then
     die "Version lister didn't find any versions for '$attr'!"
 fi
@@ -141,4 +141,16 @@ for ver in "${allVersions[@]}"; do
 done
 if [ -z "$foundCurrent" ]; then
     warn "Version lister didn't find the current version ($oldVersion) for '$attr'!"
+fi
+
+latestVersion="${allVersions[0]}"
+if [ "$latestVersion" != "$oldVersion" ]; then
+    echo "Update available for '$attr', from '$oldVersion' to '$latestVersion'!"
+else
+    exit 0
+fi
+
+if [ "$2" == "--commit" ]; then
+    update-source-version "$attr" "$latestVersion"
+    git commit -a -m "$attr: $oldVersion -> $latestVersion"
 fi
