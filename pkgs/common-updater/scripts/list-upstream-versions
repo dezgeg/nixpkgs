@@ -28,9 +28,9 @@ getVersion() {
 #    guessVersionPattern "fio-2.12" "2.12" -> "fio-([0-9].*)"
 #    guessVersionPattern "read-edid-3.0.2.tar.gz" "3.0.2" -> "read-edid-([0-9].*)\.tar\.gz"
 guessVersionPattern() {
-    # '.' should be the only thing that needs escaping, as Nix refuses derivations with funny 'name' attributes
-    local escapedVersion=$(echo "$2" | sed -re 's|\.|\\.|g')
-    local ret=$(echo "$1" | sed -re "s|$escapedVersion|([0-9].*)|")
+    # '.' and '+' should be the only things that needs escaping, as Nix refuses derivations with funny 'name' attributes
+    local escapedVersion=$(echo "$2" | sed -re 's/[.+]/\\&/g')
+    local ret=$(echo "$1" | sed -re "s|$escapedVersion|@|; s|[.+]|\\\\&|g; s|@|([0-9].*)|")
     if [ "$ret" = "$1" ]; then
         die "guessVersionPattern(): couldn't figure out version pattern from tag/filename '$1' and version '$2'"
     fi
