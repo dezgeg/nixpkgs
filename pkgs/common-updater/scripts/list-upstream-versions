@@ -37,6 +37,18 @@ guessVersionPattern() {
     echo "$ret"
 }
 
+listLinksInUrl() {
+    local url="$1"
+
+    if [[ $url =~ ^ftp:// ]]; then
+        # For a FTP url, just do a file listing of the directory. Simple!
+        curl -sSL "$downloadPage/" -l
+    else
+        # For HTTP, extract the links from the HTML and extract the filename part (in case there are absolute links)
+        curl -sSL "$downloadPage" | xidel -q --extract "//a/@href" - | sed -e 's|^.*/||'
+    fi
+}
+
 ####################################################################################################
 # Functions for listing available upstream versions
 #
@@ -77,13 +89,7 @@ listVersionsHttp() {
 
     versionPattern=$(guessVersionPattern "$fileName" "$oldVersion")
 
-    if [[ $url =~ ^ftp:// ]]; then
-        # For a FTP url, just do a file listing of the directory. Simple!
-        curl -sSL "$downloadPage/" -l
-    else
-        # For HTTP, extract the links from the HTML and extract the filename part (in case there are absolute links)
-        curl -sSL "$downloadPage" | xidel -q --extract "//a/@href" - | sed -e 's|^.*/||'
-    fi | grep -E "^$versionPattern$" | sed -re "s|$versionPattern|\1|"
+    listLinksInUrl "$downloadPage" | grep -E "^$versionPattern$" | sed -re "s|$versionPattern|\1|"
 }
 
 listVersionsSourceforge() {
