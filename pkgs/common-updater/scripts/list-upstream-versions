@@ -41,12 +41,16 @@ listLinksInUrl() {
     local url="$1"
 
     if [[ $url =~ ^ftp:// ]]; then
-        # For a FTP url, just do a file listing of the directory. Simple!
+        # For a FTP url, just do a file listing of the directory.
         curl -sSL "$downloadPage/" -l
     else
-        # For HTTP, extract the links from the HTML and extract the filename part (in case there are absolute links)
+        # For HTTP, extract the links from the HTML and extract the filename part (in case there are absolute links).
         curl -sSL "$downloadPage" | xidel -q --extract "//a/@href" - | sed -e 's|^.*/||'
     fi
+}
+
+filterCommonPrereleaseVersions() {
+    grep -v -P '(?<![a-zA-Z])(alpha|beta|rc|pre)(?![a-zA-Z])'
 }
 
 ####################################################################################################
@@ -133,7 +137,7 @@ else
    lister=listVersionsHttp
 fi
 
-readarray -t allVersions < <(eval "$lister" | sort -Vr)
+readarray -t allVersions < <(eval "$lister" | sort -Vr | filterCommonPrereleaseVersions)
 if [ "${#allVersions[@]}" = 0 ]; then
     die "Version lister didn't find any versions for '$attr'!"
 fi
