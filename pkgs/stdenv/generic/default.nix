@@ -58,6 +58,8 @@ let
 
   allowBroken = config.allowBroken or false || builtins.getEnv "NIXPKGS_ALLOW_BROKEN" == "1";
 
+  allowUnsupportedSystem = allowBroken || config.allowUnsupportedSystem or false;
+
   isUnfree = licenses: lib.lists.any (l:
     !l.free or true || l == "unfree" || l == "unfree-redistributable") licenses;
 
@@ -255,7 +257,7 @@ let
           { valid = false; reason = "blacklisted"; errormsg = "has a blacklisted license (‘${showLicense attrs.meta.license}’)"; }
         else if !allowBroken && attrs.meta.broken or false then
           { valid = false; reason = "broken"; errormsg = "is marked as broken"; }
-        else if !allowBroken && attrs.meta.platforms or null != null && !lib.lists.elem result.system attrs.meta.platforms then
+        else if !allowUnsupportedSystem && attrs.meta.platforms or null != null && !lib.lists.elem result.system attrs.meta.platforms then
           { valid = false; reason = "broken"; errormsg = "is not supported on ‘${result.system}’"; }
         else if !(hasAllowedInsecure attrs) then
           { valid = false; reason = "insecure"; errormsg = "is marked as insecure"; }
