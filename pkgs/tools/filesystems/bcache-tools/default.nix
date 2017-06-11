@@ -8,7 +8,7 @@ stdenv.mkDerivation rec {
     owner = "g2p";
     repo = "bcache-tools";
     rev = "v${version}";
-    sha256 = "1gbsh2qw0a7kgck6w0apydiy37nnz5xvdgipa0yqrfmghl86vmv4";
+    sha256 = "07hxkh9sg3dl310kx3c6gkz75wj9jms65hdd1by3fmbbfk2kdfrs";
   };
 
   nativeBuildInputs = [ pkgconfig ];
