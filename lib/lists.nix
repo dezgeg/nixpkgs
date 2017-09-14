@@ -16,6 +16,20 @@ rec {
   */
   singleton = x: [x];
 
+  /*  If `i' is a valid index of the list `list`, return the element at
+      that index. Otherwise, return `default'.
+
+      Example:
+        elemAtOrDefault ["a" "b" ] 1 null
+        => "b"
+        elemAtOrDefault ["a" "b" ] 2 null
+        => null
+  */
+  elemAtOrDefault = list: i: default:
+    if i < 0 || i >= length list
+      then default
+      else elemAt list i;
+
   /* “right fold” a binary function `op' between successive elements of
      `list' with `nul' as the starting value, i.e.,
      `foldr op nul [x_1 x_2 ... x_n] == op x_1 (op x_2 ... (op x_n nul))'.
