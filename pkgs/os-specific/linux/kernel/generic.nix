@@ -1,3 +1,14 @@
+let
+  # Sanitize two-part version numbers like '4.9' -> '4.9.0', '4.12-rc2' -> '4.12.0-rc2'
+  defaultModDirVersion = ver:
+    let m = builtins.match "^([0-9]+\\.[0-9]+)(\\.[0-9]+)?(.*)$" ver;
+    in if m == null
+      then throw "Can't deduce modDirVersion from kernel version '${ver}'"
+      else if builtins.elemAt m 1 == null
+        then "${builtins.elemAt m 0}.0${builtins.elemAt m 2}"
+        else ver;
+in
+
 { stdenv, perl, buildLinux
 
 , # The kernel source tarball.
@@ -10,7 +21,7 @@
   extraConfig ? ""
 
 , # The version number used for the module directory
-  modDirVersion ? version
+  modDirVersion ? defaultModDirVersion version
 
 , # An attribute set whose attributes express the availability of
   # certain features in this kernel.  E.g. `{iwlwifi = true;}'

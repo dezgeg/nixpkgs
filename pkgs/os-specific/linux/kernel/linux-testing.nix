@@ -2,8 +2,6 @@
 
 import ./generic.nix (args // rec {
   version = "4.13-rc7";
-  modDirVersion = "4.13.0-rc7";
-  extraMeta.branch = "4.13";
 
   src = fetchurl {
     url = "https://git.kernel.org/torvalds/t/linux-${version}.tar.gz";

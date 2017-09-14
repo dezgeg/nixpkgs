@@ -19,7 +19,6 @@ import ./generic.nix (args // {
   inherit modDirVersion;
 
   version = "${version}-${revision}";
-  extraMeta.branch = "${branchVersion}";
 
   src = fetchFromGitHub {
     inherit sha256;

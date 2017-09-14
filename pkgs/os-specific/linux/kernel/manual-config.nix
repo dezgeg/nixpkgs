@@ -208,6 +208,7 @@ let
             " (with patches: "
             + stdenv.lib.concatStrings (stdenv.lib.intersperse ", " (map (x: x.name) kernelPatches))
             + ")");
+        branch = builtins.elemAt (builtins.match "^([0-9]+\\.[0-9]+).*" modDirVersion) 0;
         license = stdenv.lib.licenses.gpl2;
         homepage = https://www.kernel.org/;
         repositories.git = https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git;
