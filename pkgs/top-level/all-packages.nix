@@ -3090,6 +3090,9 @@ with pkgs;
 
   lftp = callPackage ../tools/networking/lftp { };
 
+  libcapsule = callPackage ../development/libraries/libcapsule { };
+  libcapsule-libgl-proxy = callPackage ../development/libraries/libcapsule/libgl.nix { };
+
   libconfig = callPackage ../development/libraries/libconfig { };
 
   libcmis = callPackage ../development/libraries/libcmis { };
