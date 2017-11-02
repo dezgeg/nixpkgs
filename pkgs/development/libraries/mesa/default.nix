@@ -210,6 +210,9 @@ stdenv.mkDerivation {
     done
   '';
 
+  dontStrip = true;
+  NIX_CFLAGS_COMPILE = "-g3";
+
   passthru = { inherit libdrm version driverLink; };
 
   meta = with stdenv.lib; {

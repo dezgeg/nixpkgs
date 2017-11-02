@@ -25,6 +25,10 @@ stdenv.mkDerivation {
     cp glxinfo glxgears $out/bin/
   ";
 
+  dontStrip = true;
+  NIX_CFLAGS_COMPILE = "-g -O0";
+  hardeningDisable = [ "all" ];
+
   meta = {
     platforms = stdenv.lib.platforms.linux;
   };
