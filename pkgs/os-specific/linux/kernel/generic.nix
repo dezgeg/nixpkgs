@@ -6,6 +6,9 @@
 , # The kernel version.
   version
 
+, # Allows overriding the default defconfig
+  defconfig ? null
+
 , # Overrides to the kernel config.
   extraConfig ? ""
 
@@ -68,7 +71,7 @@ let
     nativeBuildInputs = [ perl ];
 
     platformName = stdenv.platform.name;
-    kernelBaseConfig = stdenv.platform.kernelBaseConfig;
+    kernelBaseConfig = if defconfig != null then defconfig else stdenv.platform.kernelBaseConfig;
     kernelTarget = stdenv.platform.kernelTarget;
     autoModules = stdenv.platform.kernelAutoModules;
     preferBuiltin = stdenv.platform.kernelPreferBuiltin or false;
@@ -79,7 +82,7 @@ let
       in {
         arch = cp.kernelArch;
         platformName = cp.name;
-        kernelBaseConfig = cp.kernelBaseConfig;
+        kernelBaseConfig = if defconfig != null then defconfig else cp.kernelBaseConfig;
         kernelTarget = cp.kernelTarget;
         autoModules = cp.kernelAutoModules;
 
