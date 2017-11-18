@@ -1,4 +1,4 @@
-{ stdenv, hostPlatform, fetchurl, perl, buildLinux, ... } @ args:
+{ stdenv, hostPlatform, fetchFromGitHub, perl, buildLinux, ... } @ args:
 
 with stdenv.lib;
 
@@ -11,8 +11,10 @@ import ./generic.nix (args // rec {
   # branchVersion needs to be x.y
   extraMeta.branch = concatStrings (intersperse "." (take 2 (splitString "." version)));
 
-  src = fetchurl {
-    url = "mirror://kernel/linux/kernel/v4.x/linux-${version}.tar.xz";
-    sha256 = "19wn1wswvivhlxxixnqi962jamxy9wpw13g1gj2k18chgr3mj7gq";
+  src = fetchFromGitHub {
+    owner = "dezgeg";
+    repo = "linux";
+    rev = "8b722d4f1f615bc53a48d1e08fd2d1867005744c";
+    sha256 = "0alxzr7farb8z6y7z2y267qn4p60da8ssx576gdq4kdh3kidh07i";
   };
 } // (args.argsOverride or {}))
