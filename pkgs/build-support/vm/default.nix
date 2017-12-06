@@ -8,6 +8,13 @@
 
 with pkgs;
 
+let
+  # FIXME: figure out a common place for this instead of copy pasting
+  serialDevice = if pkgs.stdenv.isi686 || pkgs.stdenv.isx86_64 then "ttyS0"
+        else if pkgs.stdenv.isArm || pkgs.stdenv.isAarch64 then "ttyAMA0"
+        else throw "Unknown QEMU serial device for system '${pkgs.stdenv.system}'";
+in
+
 rec {
 
   qemu = pkgs.qemu_kvm;
@@ -196,7 +203,7 @@ rec {
       export PATH=/bin:/usr/bin:${coreutils}/bin
       echo "Starting interactive shell..."
       echo "(To run the original builder: \$origBuilder \$origArgs)"
-      exec ${busybox}/bin/setsid ${bashInteractive}/bin/bash < /dev/ttyS0 &> /dev/ttyS0
+      exec ${busybox}/bin/setsid ${bashInteractive}/bin/bash < /dev/${serialDevice} &> /dev/${serialDevice}
     fi
   '';
 
@@ -211,7 +218,7 @@ rec {
       -drive file=$diskImage,if=virtio,cache=unsafe,werror=report \
       -kernel ${kernel}/${img} \
       -initrd ${initrd}/initrd \
-      -append "console=ttyS0 panic=1 command=${stage2Init} out=$out mountDisk=$mountDisk loglevel=4" \
+      -append "console=${serialDevice} panic=1 command=${stage2Init} out=$out mountDisk=$mountDisk loglevel=4" \
       $QEMU_OPTS
   '';
 
