@@ -28,7 +28,12 @@ rec {
     patches = [ ../../../nixos/modules/virtualisation/azure-qemu-220-no-etc-install.patch ];
   });
 
-  qemuProg = "${qemu}/bin/qemu-kvm";
+  qemuProg = {
+    "i686-linux" = "${qemu}/bin/qemu-kvm";
+    "x86_64-linux" = "${qemu}/bin/qemu-kvm -cpu kvm64";
+    "armv7l-linux" = "${qemu}/bin/qemu-system-arm -enable-kvm -machine virt -cpu host";
+    "aarch64-linux" = "${qemu}/bin/qemu-system-aarch64 -enable-kvm -machine virt,gic-version=host -cpu host";
+  }.${pkgs.stdenv.system};
 
 
   modulesClosure = makeModulesClosure {
@@ -210,7 +215,6 @@ rec {
 
   qemuCommandLinux = ''
     ${qemuProg} \
-      ${lib.optionalString (pkgs.stdenv.system == "x86_64-linux") "-cpu kvm64"} \
       -nographic -no-reboot \
       -device virtio-rng-pci \
       -virtfs local,path=${storeDir},security_model=none,mount_tag=store \
