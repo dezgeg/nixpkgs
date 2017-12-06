@@ -209,10 +209,10 @@ in
         "hid_generic" "hid_lenovo" "hid_apple" "hid_roccat"
 
         # Misc. keyboard stuff.
-        "pcips2" "atkbd" "i8042"
+        #"pcips2" "atkbd" "i8042"
 
         # Needed by the stage 2 init script.
-        "rtc_cmos"
+        # "rtc_cmos"
       ];
 
     boot.initrd.kernelModules =
