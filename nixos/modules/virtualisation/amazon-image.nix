@@ -27,6 +27,10 @@ let cfg = config.ec2; in
       device = "/dev/disk/by-label/nixos";
       autoResize = true;
     };
+    fileSystems."/boot" = {
+      device = "/dev/disk/by-label/ESP";
+      autoResize = true;
+    };
 
     boot.extraModulePackages =
       [ config.boot.kernelPackages.ixgbevf
@@ -43,10 +47,12 @@ let cfg = config.ec2; in
     boot.blacklistedKernelModules = [ "nouveau" "xen_fbfront" ];
 
     # Generate a GRUB menu.  Amazon's pv-grub uses this to boot our kernel/initrd.
-    boot.loader.grub.version = if cfg.hvm then 2 else 1;
-    boot.loader.grub.device = if cfg.hvm then "/dev/xvda" else "nodev";
-    boot.loader.grub.extraPerEntryConfig = mkIf (!cfg.hvm) "root (hd0)";
-    boot.loader.timeout = 0;
+    boot.loader.grub.version = 2;
+    boot.loader.grub.efiSupport = true;
+    boot.loader.grub.efiInstallAsRemovable = true;
+    boot.loader.grub.device = "nodev";
+    boot.loader.timeout = 5;
+    boot.loader.grub.copyKernels = true;
 
     boot.initrd.postDeviceCommands =
       ''

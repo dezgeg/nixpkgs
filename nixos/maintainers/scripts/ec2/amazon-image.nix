@@ -46,7 +46,8 @@ in {
     inherit lib config;
     inherit (cfg) contents format name;
     pkgs = import ../../../.. { inherit (pkgs) system; }; # ensure we use the regular qemu-kvm package
-    partitioned = config.ec2.hvm;
+    partitioned = true;
+    imageType = "efi";
     diskSize = cfg.sizeMB;
     configFile = pkgs.writeText "configuration.nix"
       ''
