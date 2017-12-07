@@ -18,6 +18,14 @@
   # directly.
   partitioned ? true
 
+, # Either "legacy" or "efi". For "legacy" images, a msdos partition
+  # table is created (if `partitioned` is true) and GRUB will be
+  # installed in legacy mode (if `installBootLoader` is true).
+  # For "efi" images, GPT partition table is used and an ESP partition
+  # is created (so `partitioned` MUST be true) and GRUB will be
+  # installed in EFI mode (if `installBootLoader` is true).
+  imageType ? "legacy"
+
   # Whether to invoke switch-to-configuration boot during image creation
 , installBootLoader ? true
 
@@ -37,6 +45,12 @@
   format ? "raw"
 }:
 
+assert imageType == "legacy" || imageType == "efi";
+# EFI images always need an ESP
+assert imageType == "efi" -> partitioned;
+# We use -E offset=X below, which is only supported by e2fsprogs
+assert partitioned -> fsType == "ext4";
+
 with lib;
 
 let format' = format; in let
@@ -50,6 +64,8 @@ let format' = format; in let
     vpc   = "vhd";
     raw   = "img";
   }.${format};
+
+  rootPartition = assert partitioned; if imageType == "legacy" then "1" else "2";
 
   nixpkgs = cleanSource pkgs.path;
 
@@ -81,18 +97,41 @@ let format' = format; in let
   prepareImage = ''
     export PATH=${makeSearchPathOutput "bin" "bin" prepareImageInputs}
 
+    # Yes, mkfs.ext4 takes different units in different contexts. Fun.
+    sectorsToKilobytes() {
+      echo $(( ( "$1" * 512 ) / 1024 ))
+    }
+
+    sectorsToBytes() {
+      echo $(( "$1" * 512  ))
+    }
+
     mkdir $out
     diskImage=nixos.raw
     truncate -s ${toString diskSize}M $diskImage
 
-    ${if partitioned then ''
-      parted --script $diskImage -- mklabel msdos mkpart primary ext4 1M -1s
-      offset=$((2048*512))
-    '' else ''
-      offset=0
-    ''}
+    ${optionalString partitioned (
+      if imageType == "legacy" then ''
+          parted --script $diskImage -- \
+            mklabel msdos \
+            mkpart primary ext4 1MiB -1
+        '' else ''
+          parted --script $diskImage -- \
+            mklabel gpt \
+            mkpart ESP fat32 8MiB 256MiB \
+            set 1 boot on \
+            mkpart primary ext4 256MiB -1
+        ''
+    )}
 
-    mkfs.${fsType} -F -L nixos -E offset=$offset $diskImage
+    ${if partitioned then ''
+      # Get start & length of the root partition in sectors to $START and $SECTORS.
+      eval $(partx $diskImage -o START,SECTORS --nr ${rootPartition} --pairs)
+
+      mkfs.${fsType} -F -L nixos $diskImage -E offset=$(sectorsToBytes $START) $(sectorsToKilobytes $SECTORS)K
+    '' else ''
+      mkfs.${fsType} -F -L nixos $diskImage
+    ''}
 
     root="$PWD/root"
     mkdir -p $root
@@ -130,12 +169,12 @@ let format' = format; in let
     fakeroot nixos-prepare-root $root ${channelSources} ${config.system.build.toplevel} closure
 
     echo "copying staging root to image..."
-    cptofs ${optionalString partitioned "-P 1"} -t ${fsType} -i $diskImage $root/* /
+    cptofs -p ${optionalString partitioned "-P ${rootPartition}"} -t ${fsType} -i $diskImage $root/* /
   '';
 in pkgs.vmTools.runInLinuxVM (
   pkgs.runCommand name
     { preVM = prepareImage;
-      buildInputs = with pkgs; [ utillinux e2fsprogs ];
+      buildInputs = with pkgs; [ utillinux e2fsprogs dosfstools ];
       exportReferencesGraph = [ "closure" metaClosure ];
       postVM = ''
         ${if format == "raw" then ''
@@ -149,11 +188,7 @@ in pkgs.vmTools.runInLinuxVM (
       memSize = 1024;
     }
     ''
-      ${if partitioned then ''
-        rootDisk=/dev/vda1
-      '' else ''
-        rootDisk=/dev/vda
-      ''}
+      rootDisk=${if partitioned then "/dev/vda${rootPartition}" else "/dev/vda"}
 
       # Some tools assume these exist
       ln -s vda /dev/xvda
@@ -162,6 +197,14 @@ in pkgs.vmTools.runInLinuxVM (
       mountPoint=/mnt
       mkdir $mountPoint
       mount $rootDisk $mountPoint
+
+      # Create the ESP and mount it. Unlike e2fsprogs, mkfs.vfat doesn't support an
+      # '-E offset=X' option, so we can't do this outside the VM.
+      ${optionalString (imageType == "efi") ''
+        mkdir -p /mnt/boot
+        mkfs.vfat -n ESP /dev/vda1
+        mount /dev/vda1 /mnt/boot
+      ''}
 
       # Install a configuration.nix
       mkdir -p /mnt/etc/nixos
