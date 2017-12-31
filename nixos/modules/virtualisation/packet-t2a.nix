@@ -24,5 +24,7 @@
     # at instance creation time.
     services.openssh.enable = true;
     services.openssh.permitRootLogin = "prohibit-password";
+
+    services.mingetty.autologinUser = "root";
   };
 }
