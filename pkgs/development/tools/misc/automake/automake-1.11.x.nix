@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, perl, autoconf, makeWrapper }:
+{ stdenv, fetchurl, gnu-config, perl, autoconf, makeWrapper }:
 
 stdenv.mkDerivation rec {
   name = "automake-1.11.6";
@@ -29,6 +29,11 @@ stdenv.mkDerivation rec {
 
   # Run the test suite in parallel.
   enableParallelBuilding = true;
+
+  # Update vendored GNU config scripts as they are too old to recognize AArch64.
+  postInstall = ''
+    cp -fv ${gnu-config}/config.* $out/share/automake-*/
+  '';
 
   meta = {
     branch = "1.11";
