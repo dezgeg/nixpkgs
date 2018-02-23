@@ -1,10 +1,9 @@
-{ stdenv, fetchurl, fetchpatch, bc, dtc, openssl, python2
-, hostPlatform
+{ stdenv, fetchurl, fetchpatch, bc, dtc, openssl, python2, swig
+, hostPlatform, buildPackages
 }:
 
 let
-  buildUBoot = { targetPlatforms
-            , filesToInstall
+  buildUBoot = { filesToInstall
             , installDir ? "$out"
             , defconfig
             , extraMakeFlags ? []
@@ -13,11 +12,11 @@ let
            stdenv.mkDerivation (rec {
 
     name = "uboot-${defconfig}-${version}";
-    version = "2017.11";
+    version = "2018.01";
 
     src = fetchurl {
       url = "ftp://ftp.denx.de/pub/u-boot/u-boot-${version}.tar.bz2";
-      sha256 = "01bcsah5imy6m3fbjwhqywxg0pfk5fl8ks9ylb7kv3zmrb9qy0ba";
+      sha256 = "1nidnnjprgxdhiiz7gmaj8cgcf52l5gbv64cmzjq4gmkjirmk3wk";
     };
 
     patches = [
@@ -34,8 +33,8 @@ let
         sha256 = "0bbw0q027xvzvdxxvpzjajg4rm30a8mb7z74b6ma9q0l7y7bi0c4";
       })
       (fetchpatch {
-        url = https://github.com/dezgeg/u-boot/commit/pythonpath-2017-11.patch;
-        sha256 = "162b2lglp307pzxsf9m7nnmzwxqd7xkwp5j85bm6bg1a38ngpl9v";
+        url = https://github.com/dezgeg/u-boot/commit/pythonpath-2018-03.patch;
+        sha256 = "0bhbnxhpf7x6kk5ikhy6hzf5k132mc0pvin90hn8dbw028d6cyma";
       })
     ];
 
@@ -43,11 +42,15 @@ let
       patchShebangs tools
     '';
 
-    nativeBuildInputs = [ bc dtc openssl python2 ];
+    nativeBuildInputs = [ bc dtc openssl python2 swig ];
+    depsBuildBuild = [ buildPackages.stdenv.cc ];
 
     hardeningDisable = [ "all" ];
 
-    makeFlags = [ "DTC=dtc" ] ++ extraMakeFlags;
+    makeFlags = [
+      "DTC=dtc"
+      "CROSS_COMPILE=${stdenv.cc.targetPrefix}"
+    ] ++ extraMakeFlags;
 
     configurePhase = ''
       make ${defconfig}
@@ -65,21 +68,13 @@ let
     enableParallelBuilding = true;
     dontStrip = true;
 
-    crossAttrs = {
-      makeFlags = [
-        "ARCH=${hostPlatform.platform.kernelArch}"
-        "CROSS_COMPILE=${stdenv.cc.targetPrefix}"
-      ];
-    };
-
     meta = with stdenv.lib; {
       homepage = http://www.denx.de/wiki/U-Boot/;
       description = "Boot loader for embedded systems";
       license = licenses.gpl2;
       maintainers = [ maintainers.dezgeg ];
-      platforms = targetPlatforms;
     } // extraMeta;
-  } // args);
+  } // removeAttrs args [ "extraMeta" ]);
 
 in rec {
   inherit buildUBoot;
@@ -88,8 +83,9 @@ in rec {
     defconfig = "allnoconfig";
     installDir = "$out/bin";
     buildFlags = "tools NO_SDL=1";
+    hardeningDisable = [];
     dontStrip = false;
-    targetPlatforms = stdenv.lib.platforms.linux;
+    extraMeta.platforms = stdenv.lib.platforms.linux;
     # build tools/kwboot
     extraMakeFlags = [ "CONFIG_KIRKWOOD=y" ];
     filesToInstall = [
@@ -103,86 +99,86 @@ in rec {
 
   ubootA20OlinuxinoLime = buildUBoot rec {
     defconfig = "A20-OLinuXino-Lime_defconfig";
-    targetPlatforms = ["armv7l-linux"];
+    extraMeta.platforms = ["armv7l-linux"];
     filesToInstall = ["u-boot-sunxi-with-spl.bin"];
   };
 
   ubootBananaPi = buildUBoot rec {
     defconfig = "Bananapi_defconfig";
-    targetPlatforms = ["armv7l-linux"];
+    extraMeta.platforms = ["armv7l-linux"];
     filesToInstall = ["u-boot-sunxi-with-spl.bin"];
   };
 
   ubootBeagleboneBlack = buildUBoot rec {
     defconfig = "am335x_boneblack_defconfig";
-    targetPlatforms = ["armv7l-linux"];
+    extraMeta.platforms = ["armv7l-linux"];
     filesToInstall = ["MLO" "u-boot.img"];
   };
 
   # http://git.denx.de/?p=u-boot.git;a=blob;f=board/solidrun/clearfog/README;hb=refs/heads/master
   ubootClearfog = buildUBoot rec {
     defconfig = "clearfog_defconfig";
-    targetPlatforms = ["armv7l-linux"];
+    extraMeta.platforms = ["armv7l-linux"];
     filesToInstall = ["u-boot-spl.kwb"];
   };
 
   ubootJetsonTK1 = buildUBoot rec {
     defconfig = "jetson-tk1_defconfig";
-    targetPlatforms = ["armv7l-linux"];
+    extraMeta.platforms = ["armv7l-linux"];
     filesToInstall = ["u-boot" "u-boot.dtb" "u-boot-dtb-tegra.bin" "u-boot-nodtb-tegra.bin"];
   };
 
   ubootOdroidXU3 = buildUBoot rec {
     defconfig = "odroid-xu3_defconfig";
-    targetPlatforms = ["armv7l-linux"];
+    extraMeta.platforms = ["armv7l-linux"];
     filesToInstall = ["u-boot-dtb.bin"];
   };
 
   ubootOrangePiPc = buildUBoot rec {
     defconfig = "orangepi_pc_defconfig";
-    targetPlatforms = ["armv7l-linux"];
+    extraMeta.platforms = ["armv7l-linux"];
     filesToInstall = ["u-boot-sunxi-with-spl.bin"];
   };
 
   ubootPcduino3Nano = buildUBoot rec {
     defconfig = "Linksprite_pcDuino3_Nano_defconfig";
-    targetPlatforms = ["armv7l-linux"];
+    extraMeta.platforms = ["armv7l-linux"];
     filesToInstall = ["u-boot-sunxi-with-spl.bin"];
   };
 
   ubootQemuArm = buildUBoot rec {
     defconfig = "qemu_arm_defconfig";
-    targetPlatforms = ["armv7l-linux"];
+    extraMeta.platforms = ["armv7l-linux"];
     filesToInstall = ["u-boot.bin"];
   };
 
   ubootRaspberryPi = buildUBoot rec {
     defconfig = "rpi_defconfig";
-    targetPlatforms = ["armv6l-linux"];
+    extraMeta.platforms = ["armv6l-linux"];
     filesToInstall = ["u-boot.bin"];
   };
 
   ubootRaspberryPi2 = buildUBoot rec {
     defconfig = "rpi_2_defconfig";
-    targetPlatforms = ["armv7l-linux"];
+    extraMeta.platforms = ["armv7l-linux"];
     filesToInstall = ["u-boot.bin"];
   };
 
   ubootRaspberryPi3_32bit = buildUBoot rec {
     defconfig = "rpi_3_32b_defconfig";
-    targetPlatforms = ["armv7l-linux"];
+    extraMeta.platforms = ["armv7l-linux"];
     filesToInstall = ["u-boot.bin"];
   };
 
   ubootRaspberryPi3_64bit = buildUBoot rec {
     defconfig = "rpi_3_defconfig";
-    targetPlatforms = ["aarch64-linux"];
+    extraMeta.platforms = ["aarch64-linux"];
     filesToInstall = ["u-boot.bin"];
   };
 
   ubootUtilite = buildUBoot rec {
     defconfig = "cm_fx6_defconfig";
-    targetPlatforms = ["armv7l-linux"];
+    extraMeta.platforms = ["armv7l-linux"];
     filesToInstall = ["u-boot-with-nand-spl.imx"];
     buildFlags = "u-boot-with-nand-spl.imx";
     postConfigure = ''
@@ -196,7 +192,7 @@ in rec {
 
   ubootWandboard = buildUBoot rec {
     defconfig = "wandboard_defconfig";
-    targetPlatforms = ["armv7l-linux"];
+    extraMeta.platforms = ["armv7l-linux"];
     filesToInstall = ["u-boot.img" "SPL"];
   };
 }
