@@ -13899,6 +13899,8 @@ with pkgs;
 
   ubootGuruplug = callPackage ../misc/uboot/guruplug.nix { };
 
+  ubootRock64 = callPackage ../misc/uboot/rock64.nix { };
+
   uclibc = callPackage ../os-specific/linux/uclibc { };
 
   uclibcCross = lowPrio (callPackage ../os-specific/linux/uclibc {
