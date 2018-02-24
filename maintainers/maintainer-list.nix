@@ -2027,6 +2027,11 @@
     github = "lo1tuma";
     name = "Mathias Schreck";
   };
+  lopsided98 = {
+    email = "benwolsieffer@gmail.com";
+    github = "lopsided98";
+    name = "Ben Wolsieffer";
+  };
   loskutov = {
     email = "ignat.loskutov@gmail.com";
     github = "loskutov";
