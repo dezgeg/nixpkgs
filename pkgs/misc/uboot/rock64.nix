@@ -1,4 +1,4 @@
-{ buildUBoot, fetchFromGitHub }: buildUBoot {
+{ lib, buildUBoot, fetchFromGitHub, armTrustedFirmwareRK3328 }: buildUBoot {
   src = fetchFromGitHub {
     owner = "ayufan-rock64";
     repo = "linux-u-boot";
@@ -6,7 +6,7 @@
     sha256 = "1vmv7q9yafsc0zivd0qdfmf930dvhzkf4a3j6apxxgx9g10wgwrg";
   };
 
-  extraMakeFlags = [ "u-boot.itb" "all" ];
+  extraMakeFlags = [ "BL31=${armTrustedFirmwareRK3328}/bl31.elf" "u-boot.itb" "all" ];
   postBuild = ''
     ./tools/mkimage -n rk3328 -T rksd -d tpl/u-boot-tpl.bin idbloader.img
     cat spl/u-boot-spl.bin >> idbloader.img
