@@ -86,12 +86,11 @@ in rec {
   ubootTools = buildUBoot rec {
     defconfig = "allnoconfig";
     installDir = "$out/bin";
-    buildFlags = "tools NO_SDL=1";
     hardeningDisable = [];
     dontStrip = false;
     extraMeta.platforms = stdenv.lib.platforms.linux;
     # build tools/kwboot
-    extraMakeFlags = [ "CONFIG_KIRKWOOD=y" ];
+    extraMakeFlags = [ "CONFIG_KIRKWOOD=y" "CROSS_BUILD_TOOLS=1" "NO_SDL=1" "tools" ];
     filesToInstall = [
       "tools/dumpimage"
       "tools/fdtgrep"
