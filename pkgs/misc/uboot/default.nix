@@ -12,18 +12,14 @@ let
            stdenv.mkDerivation (rec {
 
     name = "uboot-${defconfig}-${version}";
-    version = "2018.01";
+    version = "2018.03";
 
     src = fetchurl {
       url = "ftp://ftp.denx.de/pub/u-boot/u-boot-${version}.tar.bz2";
-      sha256 = "1nidnnjprgxdhiiz7gmaj8cgcf52l5gbv64cmzjq4gmkjirmk3wk";
+      sha256 = "1z9x635l5164c5hnf7qs19w7j3qghbkgs7rpn673dm898i9pfx3y";
     };
 
     patches = [
-      (fetchpatch {
-        url = https://github.com/dezgeg/u-boot/commit/cbsize-2017-11.patch;
-        sha256 = "08rqsrj78aif8vaxlpwiwwv1jwf0diihbj0h88hc0mlp0kmyqxwm";
-      })
       (fetchpatch {
         url = https://github.com/dezgeg/u-boot/commit/rpi-2017-11-patch1.patch;
         sha256 = "067yq55vv1slv4xy346px7h329pi14abdn04chg6s1s6hmf6c1x9";
@@ -34,7 +30,7 @@ let
       })
       (fetchpatch {
         url = https://github.com/dezgeg/u-boot/commit/pythonpath-2018-03.patch;
-        sha256 = "0bhbnxhpf7x6kk5ikhy6hzf5k132mc0pvin90hn8dbw028d6cyma";
+        sha256 = "1rhhlhrwhv7ic1n5i720jfh2cxwrkssrkvinllyjy3j9k9bpzcqd";
       })
       (fetchpatch {
         url = https://github.com/dezgeg/u-boot/commit/extlinux-path-length-2018-03.patch;
