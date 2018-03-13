@@ -84,7 +84,7 @@ in rec {
   inherit buildUBoot;
 
   ubootTools = buildUBoot rec {
-    defconfig = "allnoconfig";
+    defconfig = "sandbox_defconfig";
     installDir = "$out/bin";
     hardeningDisable = [];
     dontStrip = false;
