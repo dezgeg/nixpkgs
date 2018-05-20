@@ -11,10 +11,10 @@
   backports = {
     source = {
       remotes = ["https://rubygems.org"];
-      sha256 = "1agsk23kfr194s690jnrpijh9pf3hq4a9yy66j1wzzj2x19ss9y0";
+      sha256 = "1ax5sqw30vdkvc7crjj2ikw9q0ayn86q2gb6yfzrkh865174vc2p";
       type = "gem";
     };
-    version = "3.10.3";
+    version = "3.11.3";
   };
   cabin = {
     source = {
@@ -28,10 +28,10 @@
     dependencies = ["ffi"];
     source = {
       remotes = ["https://rubygems.org"];
-      sha256 = "081hxbgrqjxha0jz0p0wkncdqawdvlsxb3awsx195g0pgkpqrcms";
+      sha256 = "0a61922kmvcxyj5l70fycapr87gz1dzzlkfpq85rfqk5vdh3d28p";
       type = "gem";
     };
-    version = "0.8.0";
+    version = "0.9.0";
   };
   clamp = {
     source = {
@@ -44,27 +44,29 @@
   dotenv = {
     source = {
       remotes = ["https://rubygems.org"];
-      sha256 = "1pgzlvs0sswnqlgfm9gkz2hlhkc0zd3vnlp2vglb1wbgnx37pjjv";
+      sha256 = "1w891k0jvlw2fbwl06wq22sdmg6hb8m6p3wm4bf00zlb4zjasw1j";
       type = "gem";
     };
-    version = "2.2.1";
+    version = "2.4.0";
   };
   ffi = {
     source = {
       remotes = ["https://rubygems.org"];
-      sha256 = "034f52xf7zcqgbvwbl20jwdyjwznvqnwpbaps9nk18v9lgb1dpx0";
+      sha256 = "0zw6pbyvmj8wafdc7l5h7w20zkp1vbr2805ql5d941g2b20pk4zr";
       type = "gem";
     };
-    version = "1.9.18";
+    version = "1.9.23";
   };
   fpm = {
     dependencies = ["arr-pm" "backports" "cabin" "childprocess" "clamp" "ffi" "json" "pleaserun" "ruby-xz" "stud"];
     source = {
-      remotes = ["https://rubygems.org"];
-      sha256 = "0yvp9cifzfrxv3pr1kvcvvnyrcz8vxf6yd43hg5blaick50sbm23";
-      type = "gem";
+      fetchSubmodules = false;
+      rev = "c12678536f45b6ea564a07f9a0ff522215d476d1";
+      sha256 = "15mz86jzywqs51q3s3fv6i14b0sy7apj45aafymksp1zy0y7gggv";
+      type = "git";
+      url = "git://github.com/dezgeg/fpm.git";
     };
-    version = "1.9.3";
+    version = "1.10.0";
   };
   insist = {
     source = {
