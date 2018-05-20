@@ -35,14 +35,7 @@ let self = stdenv.mkDerivation rec {
     ++ optional stdenv.is64bit "--with-pic"
     ;
 
-  # The config.guess in GMP tries to runtime-detect various
-  # ARM optimization flags via /proc/cpuinfo (and is also
-  # broken on multicore CPUs). Avoid this impurity.
-  preConfigure = optionalString stdenv.isAarch32 ''
-      configureFlagsArray+=("--build=$(./configfsf.guess)")
-    '';
-
-  doCheck = true; # not cross;
+  doCheck = true;
 
   dontDisableStatic = withStatic;
 
