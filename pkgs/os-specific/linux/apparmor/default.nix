@@ -92,7 +92,7 @@ let
     # https://gitlab.com/apparmor/apparmor/issues/1
     configureFlags = stdenv.lib.optionalString (!stdenv.isCross) "--with-python --with-perl";
 
-    outputs = if stdenv.isCross then [ "out" ] else [ "out" "python" ];
+    outputs = if stdenv.isCross then [ "out" "dev" "man" ] else [ "out" "dev" "man" "python" ];
 
     postInstall = stdenv.lib.optionalString (!stdenv.isCross) ''
       mkdir -p $python/lib
