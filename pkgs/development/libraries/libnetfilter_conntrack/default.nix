@@ -9,6 +9,8 @@ stdenv.mkDerivation rec {
     sha256 = "1svzyf3rq9nbrcw1jsricgyhh7x1am8iqn6kjr6mzrw42810ik7g";
   };
 
+  outputs = [ "out" "dev" ];
+
   buildInputs = [ libmnl ];
   propagatedBuildInputs = [ libnfnetlink ];
   nativeBuildInputs = [ pkgconfig ];
