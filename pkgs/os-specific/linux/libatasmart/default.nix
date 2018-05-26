@@ -8,6 +8,8 @@ stdenv.mkDerivation rec {
     sha256 = "138gvgdwk6h4ljrjsr09pxk1nrki4b155hqdzyr8mlk3bwsfmw31";
   };
 
+  outputs = [ "bin" "out" "dev" "doc" ];
+
   nativeBuildInputs = [ pkgconfig ];
   buildInputs = [ udev ];
 
