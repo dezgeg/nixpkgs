@@ -98,6 +98,8 @@ fi
 init_remote(){
     local url=$1
     git init
+    # Any repacks must run single-threaded, or else we lose determinism if leaveDotGit is true.
+    git config pack.threads 1
     git remote add origin "$url"
     ( [ -n "$http_proxy" ] && git config http.proxy "$http_proxy" ) || true
 }
@@ -243,7 +245,7 @@ make_deterministic_repo(){
     # Remove files that contain timestamps or otherwise have non-deterministic
     # properties.
     rm -rf .git/logs/ .git/hooks/ .git/index .git/FETCH_HEAD .git/ORIG_HEAD \
-        .git/refs/remotes/origin/HEAD .git/config
+        .git/refs/remotes/origin/HEAD
 
     # Remove all remote branches.
     git branch -r | while read -r branch; do
@@ -259,13 +261,13 @@ make_deterministic_repo(){
         fi
     done
 
-    # Do a full repack. Must run single-threaded, or else we lose determinism.
-    git config pack.threads 1
+    # Do a full repack.
     git repack -A -d -f
-    rm -f .git/config
 
     # Garbage collect unreferenced objects.
     git gc --prune=all
+
+    rm -f .git/config
     )
 }
 
