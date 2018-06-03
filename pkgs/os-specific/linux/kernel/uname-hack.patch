@@ -1,0 +1,145 @@
+diff --git a/kernel/sys.c b/kernel/sys.c
+index 86e5ef1a5612..49444cef6c02 100644
+--- a/kernel/sys.c
++++ b/kernel/sys.c
+@@ -1190,15 +1190,134 @@ SYSCALL_DEFINE0(setsid)
+ 
+ DECLARE_RWSEM(uts_sem);
+ 
+-#ifdef COMPAT_UTS_MACHINE
+-#define override_architecture(name) \
+-	(personality(current->personality) == PER_LINUX32 && \
+-	 copy_to_user(name->machine, COMPAT_UTS_MACHINE, \
+-		      sizeof(COMPAT_UTS_MACHINE)))
++/* Read the environment variable of current process specified by @key. */
++int get_environ(const char *key, char *value, size_t *val_len)
++{
++	struct mm_struct *mm;
++	char *buffer;
++	size_t buf_len = PAGE_SIZE;
++	size_t key_len = strlen(key);
++	unsigned long addr;
++	unsigned long mm_env_start, mm_env_end;
++	int rc = 0;
++
++	buffer = kmalloc(buf_len, GFP_USER);
++	if (!buffer)
++		return -ENOMEM;
++
++	mm = get_task_mm(current);
++	if (!mm) {
++		kfree(buffer);
++		return -EINVAL;
++	}
++
++	down_read(&mm->mmap_sem);
++	mm_env_start = mm->env_start;
++	mm_env_end = mm->env_end;
++	up_read(&mm->mmap_sem);
++
++        pr_debug("mm_env_start = 0x%lx mm_env_end = 0x%lx\n", mm_env_start, mm_env_end);
++	addr = mm_env_start;
++	while (addr < mm_env_end) {
++		size_t this_len, retval, scan_len;
++		char *entry_start, *entry_end;
++
++		this_len = min_t(size_t, mm_env_end - addr, buf_len);
++                pr_debug("try addr = 0x%lx this_len = %lu\n", addr, this_len);
++#if 0
++		retval = access_process_vm(current, addr, buffer,
++					   this_len, 0);
++		if (retval != this_len) {
++		        rc = -EFAULT;
++			goto out;
++                }
+ #else
+-#define override_architecture(name)	0
++                retval = copy_from_user(buffer, (char * __user)addr, this_len);
++		if (retval) {
++		        rc = -EFAULT;
++			goto out;
++                }
+ #endif
+ 
++		addr += this_len;
++
++		/* Parse the buffer to find out the specified key/value pair.
++		 * The "key=value" entries are separated by '\0'. */
++		entry_start = buffer;
++		scan_len = this_len;
++		while (scan_len) {
++			char *entry;
++			size_t entry_len;
++
++			entry_end = memscan(entry_start, '\0', scan_len);
++
++			/* The last entry of this buffer cross the buffer
++			 * boundary, reread it in next cycle. */
++			if (unlikely(entry_end == scan_len + entry_start)) {
++				/* This entry is too large to fit in buffer */
++				if (unlikely(scan_len == this_len)) {
++					pr_err("Too long env variable pair.\n");
++					rc = -E2BIG;
++					goto out;
++				}
++				pr_debug("boundary split\n");
++				addr -= scan_len;
++				break;
++			}
++
++			entry = entry_start;
++			entry_len = entry_end - entry_start + 1;
++
++			/* Key length + length of '=' */
++			pr_debug("entry is '%s'\n", entry);
++			// print_hex_dump(KERN_ERR, "entry: ", DUMP_PREFIX_OFFSET, 16, 1, entry, entry_len, true);
++			if (entry_len > key_len + 1 && entry[key_len] == '=' && !memcmp(entry, key, key_len)) {
++				entry += key_len + 1;
++				entry_len -= key_len + 1;
++				/* The 'value' buffer passed in is too small.*/
++				if (entry_len >= *val_len) {
++                                        rc = -EOVERFLOW;
++					goto out;
++                                }
++
++				memcpy(value, entry, entry_len);
++				value[entry_len] = '\0';
++				*val_len = entry_len;
++				goto out;
++			}
++
++			scan_len -= entry_len;
++			entry_start = entry_end + 1;
++		}
++	}
++	rc = -ENOENT;
++
++out:
++	mmput(mm);
++	kfree(buffer);
++	return rc;
++}
++
++#define override_architecture(name) __override_architecture((name)->machine, sizeof((name)->machine))
++static int __override_architecture(char __user *machine, size_t sz)
++{
++	char env_var_buf[128] = {0};
++	size_t env_var_size = sizeof(env_var_buf);
++
++	if (!get_environ("system", env_var_buf, &env_var_size)) {
++	    char* dash = strchr(env_var_buf, '-');
++	    if (dash)
++	        *dash = '\0';
++	    return copy_to_user(machine, env_var_buf, min(env_var_size, sz));
++        }
++
++#ifdef COMPAT_UTS_MACHINE
++	if (personality(current->personality) == PER_LINUX32)
++	    return copy_to_user(machine, COMPAT_UTS_MACHINE, sizeof(COMPAT_UTS_MACHINE));
++#endif
++        return 0;
++}
++
+ /*
+  * Work around broken programs that cannot handle "Linux 3.0".
+  * Instead we map 3.x to 2.6.40+x, so e.g. 3.0 would be 2.6.40
