@@ -45,6 +45,7 @@ let
       DEBUG_INFO                = if (features.debug or false) then yes else no;
       DEBUG_KERNEL              = yes;
       DEBUG_DEVRES              = no;
+      DYNAMIC_DEBUG             = yes;
       TIMER_STATS               = whenOlder "4.11" yes;
       DEBUG_NX_TEST             = whenOlder "4.11" no;
       CPU_NOTIFIER_ERROR_INJECT = whenOlder "4.4" (option no);
