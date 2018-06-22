@@ -330,7 +330,7 @@ let
 
     security = {
       # Detect writes to read-only module pages
-      DEBUG_SET_MODULE_RONX            = option (whenAtLeast "4.11" yes);
+      DEBUG_SET_MODULE_RONX            = option (whenOlder "4.11" yes);
       RANDOMIZE_BASE                   = option yes;
       STRICT_DEVMEM                    = yes; # Filter access to /dev/mem
       SECURITY_SELINUX_BOOTPARAM_VALUE = "0"; # Disable SELinux by default
@@ -348,7 +348,7 @@ let
 
       # Detect buffer overflows on the stack
       CC_STACKPROTECTOR         = option (whenOlder "3.14" yes);
-      CC_STACKPROTECTOR_REGULAR = option (whenOlder "3.18" yes);
+      CC_STACKPROTECTOR_REGULAR = option (whenOlder "4.18" yes);
     };
 
     microcode = {
@@ -406,8 +406,8 @@ let
       STACK_TRACER          = yes;
       UPROBE_EVENT          = option (whenOlder "4.11" yes);
       UPROBE_EVENTS         = option (whenAtLeast "4.11" yes);
-      BPF_SYSCALL           = whenAtLeast "4.11" yes;
-      BPF_EVENTS            = whenAtLeast "4.11" yes;
+      BPF_SYSCALL           = whenAtLeast "4.4" yes;
+      BPF_EVENTS            = whenAtLeast "4.4" yes;
       FUNCTION_PROFILER     = yes;
       RING_BUFFER_BENCHMARK = no;
     };
