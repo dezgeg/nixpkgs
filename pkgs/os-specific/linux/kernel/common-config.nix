@@ -200,6 +200,8 @@ let
       DRM_AMDGPU_SI = whenAtLeast "4.9" yes;
       # (stable) amdgpu support for bonaire and newer chipsets
       DRM_AMDGPU_CIK = whenAtLeast "4.9" yes;
+      DRM_I915_GVT = whenAtLeast "4.16" yes;
+      DRM_I915_GVT_KVMGT = whenAtLeast "4.16" module;
     };
 
     sound = {
