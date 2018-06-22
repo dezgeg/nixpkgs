@@ -120,7 +120,7 @@ let
       IP_DCCP_CCID3      = no; # experimental
       CLS_U32_PERF       = yes;
       CLS_U32_MARK       = yes;
-      BPF_JIT            = if (stdenv.system == "x86_64-linux") then yes else no;
+      BPF_JIT            = when (stdenv.system == "x86_64-linux") yes;
       WAN                = yes;
       # Required by systemd per-cgroup firewalling
       CGROUP_BPF                  = option yes;
