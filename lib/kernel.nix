@@ -27,7 +27,7 @@ rec {
     else if val == yes || val == module || val == no then val
     else if all isNumber (stringToCharacters val) then val
     else if substring 0 2 val == "0x" then val
-    else "\"${val}\"";
+    else val; # FIXME: fix quoting one day
 
 
   # generate nix intermediate kernel config file of the form
