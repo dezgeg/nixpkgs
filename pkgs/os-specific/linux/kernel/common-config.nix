@@ -332,7 +332,7 @@ let
       # Detect writes to read-only module pages
       DEBUG_SET_MODULE_RONX            = option (whenOlder "4.11" yes);
       RANDOMIZE_BASE                   = option yes;
-      STRICT_DEVMEM                    = yes; # Filter access to /dev/mem
+      STRICT_DEVMEM                    = option yes; # Filter access to /dev/mem
       SECURITY_SELINUX_BOOTPARAM_VALUE = "0"; # Disable SELinux by default
       # Prevent processes from ptracing non-children processes
       SECURITY_YAMA                    = option yes;
