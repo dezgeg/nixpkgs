@@ -471,12 +471,11 @@ let
       VIDEO_STK1160_AC97       = whenOlder "4.11" yes;
     };
 
-    # hopefully this is not a problem
-    # "9p" = {
-    #   # Enable the 9P cache to speed up NixOS VM tests.
-    #   "9P_FSCACHE"      = option yes;
-    #   "9P_FS_POSIX_ACL" = option yes;
-    # };
+    "9p" = {
+      # Enable the 9P cache to speed up NixOS VM tests.
+      "9P_FSCACHE"      = option yes;
+      "9P_FS_POSIX_ACL" = option yes;
+    };
 
     huge-page = {
       TRANSPARENT_HUGEPAGE         = option yes;
@@ -596,8 +595,8 @@ let
       SPI_MASTER = yes;
 
 
-      # "8139TOO_8129" = yes;
-      # "8139TOO_PIO"  = no; # PIO is slower
+      "8139TOO_8129" = yes;
+      "8139TOO_PIO"  = no; # PIO is slower
 
       AIC79XX_DEBUG_ENABLE = no;
       AIC7XXX_DEBUG_ENABLE = no;
