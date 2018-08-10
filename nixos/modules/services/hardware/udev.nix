@@ -128,9 +128,10 @@ let
       ''}
     ''; # */
 
-  hwdbBin = pkgs.runCommand "hwdb.bin"
+  hwdbBin = pkgs.callPackage ({ runCommand, udev }: runCommand "hwdb.bin"
     { preferLocalBuild = true;
       allowSubstitutes = false;
+      nativeBuildInputs = [ udev ];
       packages = unique (map toString ([udev] ++ cfg.packages));
     }
     ''
@@ -144,11 +145,11 @@ let
 
       echo "Generating hwdb database..."
       # hwdb --update doesn't return error code even on errors!
-      res="$(${pkgs.buildPackages.udev}/bin/udevadm hwdb --update --root=$(pwd) 2>&1)"
+      res="$(udevadm hwdb --update --root=$(pwd) 2>&1)"
       echo "$res"
       [ -z "$(echo "$res" | egrep '^Error')" ]
       mv etc/udev/hwdb.bin $out
-    '';
+    '') {};
 
   # Udev has a 512-character limit for ENV{PATH}, so create a symlink
   # tree to work around this.
