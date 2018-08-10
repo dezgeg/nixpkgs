@@ -1,7 +1,5 @@
 { pkgs, options, config, version, revision, extraSources ? [] }:
 
-with pkgs;
-
 let
   lib = pkgs.lib;
 
@@ -79,7 +77,7 @@ let
   # Convert the list of options into an XML file.
   optionsXML = builtins.toFile "options.xml" (builtins.toXML optionsList);
 
-  optionsDocBook = runCommand "options-db.xml" {} ''
+  optionsDocBook = pkgs.callPackage ({ runCommand, libxslt }: runCommand "options-db.xml" { nativeBuildInputs = [ libxslt.bin ]; } ''
     optionsXML=${optionsXML}
     if grep /nixpkgs/nixos/modules $optionsXML; then
       echo "The manual appears to depend on the location of Nixpkgs, which is bad"
@@ -88,10 +86,10 @@ let
       echo "for hints about the offending path)."
       exit 1
     fi
-    ${buildPackages.libxslt.bin}/bin/xsltproc \
+    xsltproc \
       --stringparam revision '${revision}' \
       -o $out ${./options-to-docbook.xsl} $optionsXML
-  '';
+  '') {};
 
   sources = lib.sourceFilesBySuffices ./. [".xml"];
 
@@ -103,7 +101,7 @@ let
     </section>
   '';
 
-  generatedSources = runCommand "generated-docbook" {} ''
+  generatedSources = pkgs.runCommand "generated-docbook" {} ''
     mkdir $out
     ln -s ${modulesDoc} $out/modules.xml
     ln -s ${optionsDocBook} $out/options-db.xml
@@ -144,9 +142,9 @@ let
     "--stringparam chunk.toc ${toc}"
   ];
 
-  manual-combined = runCommand "nixos-manual-combined"
+  manual-combined = pkgs.callPackage ({ runCommand, libxml2, libxslt, docbook5 }: runCommand "nixos-manual-combined"
     { inherit sources;
-      nativeBuildInputs = [ buildPackages.libxml2.bin buildPackages.libxslt.bin ];
+      nativeBuildInputs = [ libxml2.bin libxslt.bin ];
       meta.description = "The NixOS manual as plain docbook XML";
     }
     ''
@@ -197,11 +195,11 @@ let
       mkdir $out
       cp manual-combined.xml $out/
       cp man-pages-combined.xml $out/
-    '';
+    '') {};
 
-  olinkDB = runCommand "manual-olinkdb"
+  olinkDB = pkgs.callPackage ({ runCommand, libxml2, libxslt, docbook_xsl_ns }: runCommand "manual-olinkdb"
     { inherit sources;
-      nativeBuildInputs = [ buildPackages.libxml2.bin buildPackages.libxslt.bin ];
+      nativeBuildInputs = [ libxml2.bin libxslt.bin ];
     }
     ''
       xsltproc \
@@ -227,13 +225,13 @@ let
         <document targetdoc="manual">&manualtargets;</document>
       </targetset>
       EOF
-    '';
+    '') {};
 
 in rec {
   inherit generatedSources;
 
   # The NixOS options in JSON format.
-  optionsJSON = runCommand "options-json"
+  optionsJSON = pkgs.runCommand "options-json"
     { meta.description = "List of NixOS options in JSON format";
     }
     ''
@@ -250,9 +248,9 @@ in rec {
     ''; # */
 
   # Generate the NixOS manual.
-  manual = runCommand "nixos-manual"
+  manual = pkgs.callPackage ({ runCommand, libxml2, libxslt, docbook_xsl_ns, documentation-highlighter }: runCommand "nixos-manual"
     { inherit sources;
-      nativeBuildInputs = [ buildPackages.libxml2.bin buildPackages.libxslt.bin ];
+      nativeBuildInputs = [ libxml2.bin libxslt.bin ];
       meta.description = "The NixOS manual in HTML format";
       allowedReferences = ["out"];
     }
@@ -268,19 +266,19 @@ in rec {
         ${manual-combined}/manual-combined.xml
 
       mkdir -p $dst/images/callouts
-      cp ${docbook_xsl_ns}/xml/xsl/docbook/images/callouts/*.svg $dst/images/callouts/
+      cp ${pkgs.docbook_xsl_ns}/xml/xsl/docbook/images/callouts/*.svg $dst/images/callouts/
 
       cp ${../../../doc/style.css} $dst/style.css
       cp ${../../../doc/overrides.css} $dst/overrides.css
-      cp -r ${pkgs.documentation-highlighter} $dst/highlightjs
+      cp -r ${documentation-highlighter} $dst/highlightjs
 
       mkdir -p $out/nix-support
       echo "nix-build out $out" >> $out/nix-support/hydra-build-products
       echo "doc manual $dst" >> $out/nix-support/hydra-build-products
-    ''; # */
+    '') {}; # */
 
 
-  manualEpub = runCommand "nixos-manual-epub"
+  manualEpub = pkgs.callPackage ({ runCommand, libxml2, libxslt, zip, docbook_xsl_ns }: runCommand "nixos-manual-epub"
     { inherit sources;
       buildInputs = [ libxml2.bin libxslt.bin zip ];
     }
@@ -306,13 +304,13 @@ in rec {
 
       mkdir -p $out/nix-support
       echo "doc-epub manual $manual" >> $out/nix-support/hydra-build-products
-    '';
+    '') {};
 
 
   # Generate the NixOS manpages.
-  manpages = runCommand "nixos-manpages"
+  manpages = pkgs.callPackage ({ runCommand, libxml2, libxslt, docbook_xsl_ns }: runCommand "nixos-manpages"
     { inherit sources;
-      nativeBuildInputs = [ buildPackages.libxml2.bin buildPackages.libxslt.bin ];
+      nativeBuildInputs = [ libxml2.bin libxslt.bin ];
       allowedReferences = ["out"];
     }
     ''
@@ -326,6 +324,6 @@ in rec {
         --stringparam target.database.document "${olinkDB}/olinkdb.xml" \
         ${docbook_xsl_ns}/xml/xsl/docbook/manpages/docbook.xsl \
         ${manual-combined}/man-pages-combined.xml
-    '';
+    '') {};
 
 }
