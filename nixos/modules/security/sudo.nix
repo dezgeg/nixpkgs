@@ -214,11 +214,11 @@ in
 
     environment.etc = singleton
       { source =
-          pkgs.runCommand "sudoers"
-          { src = pkgs.writeText "sudoers-in" cfg.configFile; }
+          pkgs.callPackage ({ runCommand, sudo }: runCommand "sudoers"
+          { nativeBuildInputs = [ sudo ]; src = pkgs.writeText "sudoers-in" cfg.configFile; }
           # Make sure that the sudoers file is syntactically valid.
           # (currently disabled - NIXOS-66)
-          "${pkgs.buildPackages.sudo}/sbin/visudo -f $src -c && cp $src $out";
+          "visudo -f $src -c && cp $src $out") {};
         target = "sudoers";
         mode = "0440";
       };
