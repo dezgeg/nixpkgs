@@ -30,18 +30,18 @@ let
   fileSystems = filter utils.fsNeededForBoot config.system.build.fileSystems;
 
   # A utility for enumerating the shared-library dependencies of a program
-  findLibs = pkgs.writeShellScriptBin "find-libs" ''
+  findLibs = pkgs.callPackage ({ writeShellScriptBin, buildPackages }: writeShellScriptBin "find-libs" ''
     set -euo pipefail
 
     declare -A seen
     declare -a left
 
-    patchelf="${pkgs.buildPackages.patchelf}/bin/patchelf"
+    export PATH=$PATH:${makeBinPath [ buildPackages.patchelf ]}
 
     function add_needed {
-      rpath="$($patchelf --print-rpath $1)"
+      rpath="$(patchelf --print-rpath $1)"
       dir="$(dirname $1)"
-      for lib in $($patchelf --print-needed $1); do
+      for lib in $(patchelf --print-needed $1); do
         left+=("$lib" "$rpath" "$dir")
       done
     }
@@ -78,15 +78,15 @@ let
         fi
       fi
     done
-  '';
+  '') {};
 
   # Some additional utilities needed in stage 1, like mount, lvm, fsck
   # etc.  We don't want to bring in all of those packages, so we just
   # copy what we need.  Instead of using statically linked binaries,
   # we just copy what we need from Glibc and use patchelf to make it
   # work.
-  extraUtils = pkgs.runCommandCC "extra-utils"
-    { nativeBuildInputs = [pkgs.buildPackages.nukeReferences];
+  extraUtils = pkgs.callPackage ({ runCommandCC, nukeReferences, busybox, glibc, kmod, lvm2, mdadm, utillinux }: runCommandCC "extra-utils"
+    { nativeBuildInputs = [ nukeReferences ];
       allowedReferences = [ "out" ]; # prevent accidents like glibc being included in the initrd
     }
     ''
@@ -101,20 +101,20 @@ let
       }
 
       # Copy BusyBox.
-      for BIN in ${pkgs.busybox}/{s,}bin/*; do
+      for BIN in ${busybox}/{s,}bin/*; do
         copy_bin_and_libs $BIN
       done
 
       # Copy some utillinux stuff.
-      copy_bin_and_libs ${pkgs.utillinux}/sbin/blkid
+      copy_bin_and_libs ${utillinux}/sbin/blkid
 
       # Copy dmsetup and lvm.
-      copy_bin_and_libs ${pkgs.lvm2}/sbin/dmsetup
-      copy_bin_and_libs ${pkgs.lvm2}/sbin/lvm
+      copy_bin_and_libs ${lvm2}/sbin/dmsetup
+      copy_bin_and_libs ${lvm2}/sbin/lvm
 
       # Add RAID mdadm tool.
-      copy_bin_and_libs ${pkgs.mdadm}/sbin/mdadm
-      copy_bin_and_libs ${pkgs.mdadm}/sbin/mdmon
+      copy_bin_and_libs ${mdadm}/sbin/mdadm
+      copy_bin_and_libs ${mdadm}/sbin/mdmon
 
       # Copy udev.
       copy_bin_and_libs ${udev}/lib/systemd/systemd-udevd
@@ -124,7 +124,7 @@ let
       done
 
       # Copy modprobe.
-      copy_bin_and_libs ${pkgs.kmod}/bin/kmod
+      copy_bin_and_libs ${kmod}/bin/kmod
       ln -sf kmod $out/bin/modprobe
 
       # Copy resize2fs if needed.
@@ -147,7 +147,7 @@ let
       ${config.boot.initrd.extraUtilsCommands}
 
       # Copy ld manually since it isn't detected correctly
-      cp -pv ${pkgs.glibc.out}/lib/ld*.so.? $out/lib
+      cp -pv ${glibc.out}/lib/ld*.so.? $out/lib
 
       # Copy all of the needed libraries
       find $out/bin $out/lib -type f | while read BIN; do
@@ -193,10 +193,10 @@ let
 
       ${config.boot.initrd.extraUtilsCommandsTest}
       fi
-    ''; # */
+    '') {}; # */
 
 
-  udevRules = pkgs.runCommand "udev-rules"
+  udevRules = pkgs.callPackage ({ runCommand, lvm2, bash, utillinux }: runCommand "udev-rules"
     { allowedReferences = [ extraUtils ]; }
     ''
       mkdir -p $out
@@ -206,7 +206,7 @@ let
       cp -v ${udev}/lib/udev/rules.d/60-cdrom_id.rules $out/
       cp -v ${udev}/lib/udev/rules.d/60-persistent-storage.rules $out/
       cp -v ${udev}/lib/udev/rules.d/80-drivers.rules $out/
-      cp -v ${pkgs.lvm2}/lib/udev/rules.d/*.rules $out/
+      cp -v ${lvm2}/lib/udev/rules.d/*.rules $out/
       ${config.boot.initrd.extraUdevRulesCommands}
 
       for i in $out/*.rules; do
@@ -214,11 +214,11 @@ let
             --replace ata_id ${extraUtils}/bin/ata_id \
             --replace scsi_id ${extraUtils}/bin/scsi_id \
             --replace cdrom_id ${extraUtils}/bin/cdrom_id \
-            --replace ${pkgs.utillinux}/sbin/blkid ${extraUtils}/bin/blkid \
+            --replace ${utillinux}/sbin/blkid ${extraUtils}/bin/blkid \
             --replace /sbin/blkid ${extraUtils}/bin/blkid \
-            --replace ${pkgs.lvm2}/sbin ${extraUtils}/bin \
+            --replace ${lvm2}/sbin ${extraUtils}/bin \
             --replace /sbin/mdadm ${extraUtils}/bin/mdadm \
-            --replace ${pkgs.bash}/bin/sh ${extraUtils}/bin/sh \
+            --replace ${bash}/bin/sh ${extraUtils}/bin/sh \
             --replace /usr/bin/readlink ${extraUtils}/bin/readlink \
             --replace /usr/bin/basename ${extraUtils}/bin/basename \
             --replace ${udev}/bin/udevadm ${extraUtils}/bin/udevadm
@@ -236,7 +236,7 @@ let
       #   http://www.spinics.net/lists/hotplug/msg03935.html
       substituteInPlace $out/60-persistent-storage.rules \
         --replace ID_CDROM_MEDIA_TRACK_COUNT_DATA ID_CDROM_MEDIA
-    ''; # */
+    '') {}; # */
 
 
   # The init script of boot stage 1 (loading kernel modules for
@@ -298,12 +298,12 @@ let
         { object = pkgs.writeText "mdadm.conf" config.boot.initrd.mdadmConf;
           symlink = "/etc/mdadm.conf";
         }
-        { object = pkgs.runCommand "initrd-kmod-blacklist-ubuntu"
-            { src = "${pkgs.kmod-blacklist-ubuntu}/modprobe.conf"; }
+        { object = pkgs.callPackage ({ runCommand, kmod-blacklist-ubuntu, perl }: runCommand "initrd-kmod-blacklist-ubuntu"
+            { src = "${kmod-blacklist-ubuntu}/modprobe.conf"; nativeBuildInputs = [ perl ]; }
             ''
               target=$out
-              ${pkgs.buildPackages.perl}/bin/perl -0pe 's/## file: iwlwifi.conf(.+?)##/##/s;' $src > $out
-            '';
+              perl -0pe 's/## file: iwlwifi.conf(.+?)##/##/s;' $src > $out
+            '') {};
           symlink = "/etc/modprobe.d/ubuntu.conf";
         }
         { object = pkgs.kmod-debian-aliases;
