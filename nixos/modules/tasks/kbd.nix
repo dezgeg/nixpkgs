@@ -12,12 +12,12 @@ let
 
   isUnicode = hasSuffix "UTF-8" (toUpper config.i18n.defaultLocale);
 
-  optimizedKeymap = pkgs.runCommand "keymap" {
-    nativeBuildInputs = [ pkgs.buildPackages.kbd ];
+  optimizedKeymap = pkgs.callPackage ({ runCommand, kbd }: runCommand "keymap" {
+    nativeBuildInputs = [ kbd ];
     LOADKEYS_KEYMAP_PATH = "${kbdEnv}/share/keymaps/**";
   } ''
     loadkeys -b ${optionalString isUnicode "-u"} "${config.i18n.consoleKeyMap}" > $out
-  '';
+  '') {};
 
   # Sadly, systemd-vconsole-setup doesn't support binary keymaps.
   vconsoleConf = pkgs.writeText "vconsole.conf" ''
