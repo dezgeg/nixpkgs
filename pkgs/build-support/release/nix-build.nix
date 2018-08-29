@@ -109,6 +109,14 @@ stdenv.mkDerivation (
         alias make="scan-build -o _clang_analyze_$name --html-title='Scan results for $name' make"
       fi
 
+      initPhase() {
+        commonPhaseImpl initPhase
+      }
+
+      finalPhase() {
+        commonPhaseImpl finalPhase
+      }
+
       ${preHook}
     '';
 

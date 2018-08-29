@@ -25,11 +25,23 @@ stdenv.mkDerivation (
     inherit jre ant;
     showBuildStats = true;
 
-    postPhases =
-      ["generateWrappersPhase" "finalPhase"];
+    preHook = ''
+      antSetupPhase() {
+        commonPhaseImpl antSetupPhase
+      }
 
-    prePhases =
-      ["antSetupPhase"];
+      generateWrappersPhase() {
+        commonPhaseImpl generateWrappersPhase
+      }
+
+      finalPhase() {
+        commonPhaseImpl finalPhase
+      }
+    '';
+
+    postPhases = ["generateWrappersPhase" "finalPhase"];
+
+    prePhases = ["antSetupPhase"];
 
     antSetupPhase = with stdenv.lib; ''
       if test "$hydraAntLogger" != "" ; then

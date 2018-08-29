@@ -117,7 +117,7 @@ stdenv.mkDerivation ((builtins.removeAttrs attrs ["source"]) // {
     else
       # Fall back to the original thing for everything else.
       dontBuild=""
-      preUnpack="" postUnpack="" unpackPhase
+      preUnpack="" postUnpack="" defaultUnpackPhase
     fi
 
     runHook postUnpack

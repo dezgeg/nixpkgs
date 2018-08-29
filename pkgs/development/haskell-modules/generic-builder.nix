@@ -237,6 +237,20 @@ stdenv.mkDerivation ({
 
   LANG = "en_US.UTF-8";         # GHC needs the locale configured during the Haddock phase.
 
+  preHook = ''
+    setupCompilerEnvironmentPhase() {
+      commonPhaseImpl setupCompilerEnvironmentPhase --pre-hook preSetupCompilerEnvironment --post-hook postSetupCompilerEnvironment
+    }
+
+    compileBuildDriverPhase() {
+      commonPhaseImpl compileBuildDriverPhase --pre-hook preCompileBuildDriver --post-hook postCompileBuildDriver
+    }
+
+    haddockPhase() {
+      commonPhaseImpl haddockPhase --pre-hook preHaddock --post-hook postHaddock
+    }
+  '';
+
   prePatch = optionalString (editedCabalFile != null) ''
     echo "Replace Cabal file with edited version from ${newCabalFileUrl}."
     cp ${newCabalFile} ${pname}.cabal

@@ -28,6 +28,16 @@ vmTools.runInLinuxImage (stdenv.mkDerivation (
   {
     name = name + "-" + diskImage.name + (if src ? version then "-" + src.version else "");
 
+    preHook = ''
+      installExtraDebsPhase() {
+        commonPhaseImpl installExtraDebsPhase
+      }
+
+      sysInfoPhase() {
+        commonPhaseImpl sysInfoPhase
+      }
+    '';
+
     # !!! cut&paste from rpm-build.nix
     postHook = ''
       . ${./functions.sh}

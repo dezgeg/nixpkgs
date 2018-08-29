@@ -1,7 +1,9 @@
 preConfigurePhases+=" autoreconfPhase"
 
 autoreconfPhase() {
-    runHook preAutoreconf
+    commonPhaseImpl autoreconfPhase --default defaultAutoreconfPhase --pre-hook preAutoreconf --post-hook postAutoreconf
+}
+
+defaultAutoreconfPhase() {
     autoreconf ${autoreconfFlags:---install --force --verbose}
-    runHook postAutoreconf
 }

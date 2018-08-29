@@ -107,6 +107,105 @@ _eval() {
 }
 
 
+phaseCallsInProgress=""
+# Implementation of common parts of a phase in the generic builder.
+# Each phase should be implemented based on the following template:
+#
+# fooPhase() {
+#    commonPhaseImpl fooPhase --default defaultFooPhase --pre-hook preFoo --post-hook postFoo
+# }
+#
+# defaultFooPhase() {
+#     # default implementation of fooPhase here
+# }
+#
+# What this does is:
+#  - call the preFoo hook.
+#  - if the user has overidden the fooPhase variable, eval it. Otherwise execute defaultFooPhase.
+#  - call the postFoo hook.
+commonPhaseImpl() {
+    local phaseName="$1"
+    shift
+
+    local defaultPhaseAction=""
+    local preHookVariable=""
+    local postHookVariable=""
+    while [ "$#" -gt 0 ]; do
+        local arg="$1"
+        shift
+        case "$arg" in
+        --default) defaultPhaseAction="$1";;
+        --pre-hook) preHookVariable="$1";;
+        --post-hook) postHookVariable="$1";;
+        *)
+            echo "commonPhaseImpl(): Bad argument '$1'." >&2
+            return 1
+        esac
+        shift
+    done
+
+    # In Nixpkgs 18.09, user-written phases could call the default phase function like this:
+    # buildPhase = ''
+    #   export foo=bar
+    #   buildPhase
+    #   # etc...
+    # '';
+    #
+    # However, now that would cause infinite recursion and needs to be replaced with `defaultBuildPhase`.
+    local phase
+    for phase in $phaseCallsInProgress; do
+        if [[ "$phase" = "$phaseName" ]]; then
+            echo "commonPhaseImpl(): Phase '$phaseName' called $phaseName() recursively." >&2
+            echo "As of Nixpkgs 18.09, calling the default action of the '$phaseName' phase should be done by a a call to $defaultPhaseAction() instead." >&2
+            echo "TODO: provide some pointer to the docs here" >&2
+            return 1
+        fi
+    done
+
+    if [[ -n "$preHookVariable" ]]; then
+        runHook "$preHookVariable"
+    fi
+
+    # Also in Nixpkgs 18.09, user-written phases would often call the pre/post hooks themselves like this:
+    # buildPhase = ''
+    #   runHook preBuild
+    #   # ... custom build code here ...
+    #   runHook postBuild
+    # '';
+    # So we need to temporarily override the hooks with a call to warnRedundantHookCall() to print out a warning.
+    # As far as I can tell, using eval is the only way here.
+
+    local varAssignments="phaseCallsInProgress='$phaseCallsInProgress $phaseName' "
+    if [[ -n "$preHookVariable" ]]; then
+          varAssignments+="$preHookVariable='warnRedundantHookCall $phaseName $preHookVariable' "
+    fi
+    if [[ -n "$postHookVariable" ]]; then
+          varAssignments+="$postHookVariable='warnRedundantHookCall $phaseName $postHookVariable' "
+    fi
+    eval "$varAssignments runPhaseOrDefault $phaseName $defaultPhaseAction"
+
+    if [[ -n "$postHookVariable" ]]; then
+        runHook "$postHookVariable"
+    fi
+}
+
+runPhaseOrDefault() {
+    # Evaluate the variable named $phaseName if it exists, otherwise the
+    # function named $defaultPhaseAction.
+    local phaseName="$1"
+    local defaultPhaseAction="$2"
+    eval "${!phaseName:-$defaultPhaseAction}"
+}
+
+warnRedundantHookCall() {
+    local phase="$1"
+    local hook="$2"
+
+    echo "Note: The overridden phase '$phase' has an explicit call to hook '$hook'." >&2
+    echo "As of Nixpkgs 18.09, the pre/post hooks are run even when a phase is overridden." >&2
+    echo "FIXME: write a proper message here" >&2
+}
+
 ######################################################################
 # Logging.
 
@@ -823,8 +922,10 @@ unpackFile() {
 
 
 unpackPhase() {
-    runHook preUnpack
+    commonPhaseImpl unpackPhase --default defaultUnpackPhase --pre-hook preUnpack --post-hook postUnpack
+}
 
+defaultUnpackPhase() {
     if [ -z "${srcs:-}" ]; then
         if [ -z "${src:-}" ]; then
             # shellcheck disable=SC2016
@@ -888,14 +989,14 @@ unpackPhase() {
     if [ "${dontMakeSourcesWritable:-0}" != 1 ]; then
         chmod -R u+w -- "$sourceRoot"
     fi
-
-    runHook postUnpack
 }
 
 
 patchPhase() {
-    runHook prePatch
+    commonPhaseImpl patchPhase --default defaultPatchPhase --pre-hook prePatch --post-hook postPatch
+}
 
+defaultPatchPhase() {
     for i in ${patches:-}; do
         header "applying patch $i" 3
         local uncompress=cat
@@ -917,8 +1018,6 @@ patchPhase() {
         # shellcheck disable=SC2086
         $uncompress < "$i" 2>&1 | patch ${patchFlags:--p1}
     done
-
-    runHook postPatch
 }
 
 
@@ -928,8 +1027,10 @@ fixLibtool() {
 
 
 configurePhase() {
-    runHook preConfigure
+    commonPhaseImpl configurePhase --default defaultConfigurePhase --pre-hook preConfigure --post-hook postConfigure
+}
 
+defaultConfigurePhase() {
     # set to empty if unset
     : ${configureScript=}
     : ${configureFlags=}
@@ -977,14 +1078,14 @@ configurePhase() {
     else
         echo "no configure script, doing nothing"
     fi
-
-    runHook postConfigure
 }
 
 
 buildPhase() {
-    runHook preBuild
+    commonPhaseImpl buildPhase --default defaultBuildPhase --pre-hook preBuild --post-hook postBuild
+}
 
+defaultBuildPhase() {
     # set to empty if unset
     : ${makeFlags=}
 
@@ -1008,14 +1109,14 @@ buildPhase() {
         make ${makefile:+-f $makefile} "${flagsArray[@]}"
         unset flagsArray
     fi
-
-    runHook postBuild
 }
 
 
 checkPhase() {
-    runHook preCheck
+    commonPhaseImpl checkPhase --default defaultCheckPhase --pre-hook preCheck --post-hook postCheck
+}
 
+defaultCheckPhase() {
     if [[ -z "${foundMakefile:-}" ]]; then
         echo "no Makefile or custom buildPhase, doing nothing"
         runHook postCheck
@@ -1048,14 +1149,14 @@ checkPhase() {
 
         unset flagsArray
     fi
-
-    runHook postCheck
 }
 
 
 installPhase() {
-    runHook preInstall
+    commonPhaseImpl installPhase --default defaultInstallPhase --pre-hook preInstall --post-hook postInstall
+}
 
+defaultInstallPhase() {
     if [ -n "$prefix" ]; then
         mkdir -p "$prefix"
     fi
@@ -1071,8 +1172,6 @@ installPhase() {
     echoCmd 'install flags' "${flagsArray[@]}"
     make ${makefile:+-f $makefile} "${flagsArray[@]}"
     unset flagsArray
-
-    runHook postInstall
 }
 
 
@@ -1081,13 +1180,17 @@ installPhase() {
 # propagated-build-inputs.
 fixupPhase() {
     # Make sure everything is writable so "strip" et al. work.
+    # FIXME: it's a bit unconventional that this is done outside defaultFixupPhase,
+    # but something in preFixup might depend on this.
     local output
     for output in $outputs; do
         if [ -e "${!output}" ]; then chmod -R u+w "${!output}"; fi
     done
 
-    runHook preFixup
+    commonPhaseImpl fixupPhase --default defaultFixupPhase --pre-hook preFixup --post-hook postFixup
+}
 
+defaultFixupPhase() {
     # Apply fixup to each output.
     local output
     for output in $outputs; do
@@ -1151,14 +1254,14 @@ fixupPhase() {
         # shellcheck disable=SC2086
         printWords $propagatedUserEnvPkgs > "${!outputBin}/nix-support/propagated-user-env-packages"
     fi
-
-    runHook postFixup
 }
 
 
 installCheckPhase() {
-    runHook preInstallCheck
+    commonPhaseImpl installCheckPhase --default defaultInstallCheckPhase --pre-hook preInstallCheck --post-hook postInstallCheck
+}
 
+defaultInstallCheckPhase() {
     if [[ -z "${foundMakefile:-}" ]]; then
         echo "no Makefile or custom buildPhase, doing nothing"
     #TODO(@oxij): should flagsArray influence make -n?
@@ -1179,14 +1282,14 @@ installCheckPhase() {
         make ${makefile:+-f $makefile} "${flagsArray[@]}"
         unset flagsArray
     fi
-
-    runHook postInstallCheck
 }
 
 
 distPhase() {
-    runHook preDist
+    commonPhaseImpl distPhase --default defaultDistPhase --pre-hook preDist --post-hook postDist
+}
 
+defaultDistPhase() {
     # Old bash empty array hack
     # shellcheck disable=SC2086
     local flagsArray=(
@@ -1204,8 +1307,6 @@ distPhase() {
         # shellcheck disable=SC2086
         cp -pvd ${tarballs:-*.tar.gz} "$out/tarballs"
     fi
-
-    runHook postDist
 }
 
 
@@ -1263,11 +1364,22 @@ genericBuild() {
         showPhaseHeader "$curPhase"
         dumpVars
 
-        # Evaluate the variable named $curPhase if it exists, otherwise the
-        # function named $curPhase.
         local oldOpts="$(shopt -po nounset)"
         set +u
-        eval "${!curPhase:-$curPhase}"
+
+        # In Nixpkgs 18.09, the logic here used to be: Evaluate the variable named $curPhase if it
+        # exists, otherwise the function named $curPhase.  But that logic was awful for user experience
+        # when running the build phases manually in a nix-shell. So nowadays phases should *always* be
+        # functions that call commonPhaseImpl to do the "eval the shell variable named after the phase if
+        # defined, otherwise do some default action" logic. But for backwards compatibility, support the
+        # old logic as well.
+        if [ "$(type -t "$curPhase")" = function ] && declare -f "$curPhase" | grep -q commonPhaseImpl; then
+            "$curPhase"
+        else
+            echo "Note: FIXME: write some clever note here about how to fix this code in the future" >&2
+            eval "${!curPhase:-$curPhase}"
+        fi
+
         eval "$oldOpts"
 
         if [ "$curPhase" = unpackPhase ]; then
