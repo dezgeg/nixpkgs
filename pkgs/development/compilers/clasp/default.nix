@@ -33,8 +33,6 @@ stdenv.mkDerivation rec {
   NIX_CFLAGS_COMPILE = " -frtti ";
 
   configurePhase = ''
-    runHook preConfigure
-
     export CXX=clang++
     export CC=clang
 
@@ -43,24 +41,14 @@ stdenv.mkDerivation rec {
     " | sed -e 's/^ *//' > wscript.config
 
     python ./waf configure update_submodules
-
-    runHook postConfigure
   '';
 
   buildPhase = ''
-    runHook preBuild
-
     python ./waf build_cboehm
-
-    runHook postBuild
   '';
 
   installPhase = ''
-    runHook preInstall
-
     python ./waf install_cboehm
-
-    runHook postInstall
   '';
 
   meta = {

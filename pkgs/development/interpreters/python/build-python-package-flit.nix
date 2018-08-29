@@ -9,9 +9,7 @@
 attrs // {
   buildInputs = [ flit ];
   buildPhase = attrs.buildPhase or ''
-    runHook preBuild
     flit build --format wheel
-    runHook postBuild
   '';
 
   # Flit packages, like setuptools packages, might have tests.

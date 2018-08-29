@@ -22,13 +22,9 @@ stdenv.mkDerivation rec {
     sed -i -e '21,23d' qwt/qwtconfig.pri # Removed forced installation to /usr/local
   '';
   installPhase = ''
-    runHook preInstall
-
     mkdir -p $out/bin
     cp src/GoldenCheetah $out/bin
     wrapProgram $out/bin/GoldenCheetah --set LD_LIBRARY_PATH "${zlib.out}/lib"
-
-    runHook postInstall
   '';
 
   # RCC: Error in 'Resources/application.qrc': Cannot find file 'translations/gc_fr.qm'

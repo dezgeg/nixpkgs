@@ -66,12 +66,8 @@ See the `zlib` example:
       configurePhase = ''
         # FIXME: Some tests require writing at $HOME
         HOME=$TMPDIR
-        runHook preConfigure
-
         #export EMCC_DEBUG=2
         emconfigure ./configure --prefix=$out --shared
-
-        runHook postConfigure
       '';
       dontStrip = true;
       outputs = [ "out" ];

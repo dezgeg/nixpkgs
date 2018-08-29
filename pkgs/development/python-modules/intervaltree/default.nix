@@ -15,10 +15,8 @@ buildPythonPackage rec {
   propagatedBuildInputs = [ sortedcontainers ];
 
   checkPhase = ''
-    runHook preCheck
-    rm build -rf
+    rm -rf build
     ${python.interpreter} nix_run_setup test
-    runHook postCheck
   '';
 
   meta = with stdenv.lib; {

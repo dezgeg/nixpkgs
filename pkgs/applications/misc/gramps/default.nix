@@ -28,8 +28,6 @@ in buildPythonApplication rec {
   # Same installPhase as in buildPythonApplication but without --old-and-unmanageble
   # install flag.
   installPhase = ''
-    runHook preInstall
-
     mkdir -p "$out/lib/${python.libPrefix}/site-packages"
 
     export PYTHONPATH="$out/lib/${python.libPrefix}/site-packages:$PYTHONPATH"
@@ -45,8 +43,6 @@ in buildPythonApplication rec {
     fi
 
     rm -f "$out/lib/${python.libPrefix}"/site-packages/site.py*
-
-    runHook postInstall
   '';
 
   meta = with stdenv.lib; {

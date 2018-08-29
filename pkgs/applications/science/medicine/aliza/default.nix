@@ -21,8 +21,6 @@ stdenv.mkDerivation {
   installPhase = ''
     mkdir -p $out
     cp -r bin share $out
-
-    runHook postInstall
   '';
 
   postInstall = let

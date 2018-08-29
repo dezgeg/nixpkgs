@@ -80,9 +80,7 @@ buildPythonPackage rec {
   '';
 
   checkPhase = ''
-    runHook preCheck
     ${python.interpreter} -m pytest tests
-    runHook postCheck
   '';
 
   meta = with lib; {

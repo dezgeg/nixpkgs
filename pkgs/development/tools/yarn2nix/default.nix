@@ -84,8 +84,6 @@ let
       '';
 
       buildPhase = ''
-        runHook preBuild
-
         cp ${packageJSON} ./package.json
         cp ${yarnLock} ./yarn.lock
         chmod +w ./yarn.lock
@@ -149,8 +147,6 @@ let
       node_modules = deps + "/node_modules";
 
       configurePhase = attrs.configurePhase or ''
-        runHook preConfigure
-
         if [ -d npm-packages-offline-cache ]; then
           echo "npm-pacakges-offline-cache dir present. Removing."
           rm -rf npm-packages-offline-cache
@@ -169,15 +165,11 @@ let
           echo "Error! There is already an ${pname} package in the top level node_modules dir!"
           exit 1
         fi
-
-        runHook postConfigure
       '';
 
       # Replace this phase on frontend packages where only the generated
       # files are an interesting output.
       installPhase = attrs.installPhase or ''
-        runHook preInstall
-
         mkdir -p $out
         cp -r node_modules $out/node_modules
         cp -r . $out/node_modules/${pname}
@@ -185,8 +177,6 @@ let
 
         mkdir $out/bin
         node ${./fixup_bin.js} $out ${lib.concatStringsSep " " publishBinsFor_}
-
-        runHook postInstall
       '';
 
       passthru = {

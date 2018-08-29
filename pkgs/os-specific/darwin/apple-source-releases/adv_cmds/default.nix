@@ -57,8 +57,6 @@ in appleDerivation {
   '';
 
   buildPhase = ''
-    runHook preBuild
-
     bsdmake -C usr-share-locale.tproj
 
     clang ${recentAdvCmds}/ps/*.c -o ps

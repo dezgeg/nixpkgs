@@ -23,9 +23,7 @@ buildPythonPackage rec {
     ++ (stdenv.lib.optional isPy26 argparse);
 
   checkPhase = ''
-    runHook preCheck
     $out/bin/py.test -x testing/
-    runHook postCheck
   '';
 
   meta = with stdenv.lib; {

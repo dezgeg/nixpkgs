@@ -56,9 +56,7 @@ in pythonPackages.buildPythonApplication rec {
   '';
 
   checkPhase = ''
-    runHook preCheck
     make DETERMINISTIC_TESTS=true test
-    runHook postCheck
   '';
 
   meta = with stdenv.lib; {

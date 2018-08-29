@@ -21,7 +21,6 @@ in
     '';
 
     installPhase = ''
-      runHook preInstall
       make install TARGETS='autorandr' PREFIX=$out
 
       make install TARGETS='bash_completion' DESTDIR=$out
@@ -40,8 +39,6 @@ in
         make install TARGETS='udev' PREFIX=$out DESTDIR=$out \
           UDEV_RULES_DIR=/etc/udev/rules.d
       ''}
-
-      runHook postInstall
     '';
 
     src = fetchFromGitHub {

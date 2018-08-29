@@ -20,7 +20,6 @@ pythonPackages.buildPythonApplication rec {
     sed -i 's/test_thread_run_try_again/noop/' test_devpi_server/test_replica.py
   '';
   checkPhase = ''
-    runHook preCheck
     cd test_devpi_server/
     PATH=$PATH:$out/bin pytest --slow -rfsxX
   '';

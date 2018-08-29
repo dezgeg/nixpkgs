@@ -57,9 +57,7 @@ stdenv.mkDerivation rec {
   checkPhase = let excludedTestsRegex = if (excludedTests != [])
     then "(" + (stdenv.lib.concatStringsSep "|" excludedTests) + ")"
     else ""; in ''
-    runHook preCheck
     ctest -E "${excludedTestsRegex}" --output-on-failure
-    runHook postCheck
   '';
 
   outputs = [ "bin" "dev" "out" ];

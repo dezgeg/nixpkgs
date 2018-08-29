@@ -196,8 +196,6 @@ in pythonPackages.buildPythonApplication rec {
   '';
 
   checkPhase = ''
-    runHook preCheck
-
     LANG=en_US.UTF-8 \
     LOCALE_ARCHIVE=${assert stdenv.isLinux; glibcLocales}/lib/locale/locale-archive \
     BEETS_TEST_SHELL="${testShell}" \
@@ -205,15 +203,11 @@ in pythonPackages.buildPythonApplication rec {
     HOME="$(mktemp -d)" \
       # Exclude failing test https://github.com/beetbox/beets/issues/2652
       nosetests -v --exclude=test_single_month_nonmatch_ --exclude=test_asciify_variable --exclude=test_asciify_character_expanding_to_slash
-
-    runHook postCheck
   '';
 
   doInstallCheck = true;
 
   installCheckPhase = ''
-    runHook preInstallCheck
-
     tmphome="$(mktemp -d)"
 
     EDITOR="${writeScript "beetconfig.sh" ''
@@ -223,8 +217,6 @@ in pythonPackages.buildPythonApplication rec {
       CFG
     ''}" HOME="$tmphome" "$out/bin/beet" config -e
     EDITOR=true HOME="$tmphome" "$out/bin/beet" config -e
-
-    runHook postInstallCheck
   '';
 
   makeWrapperArgs = [ "--set GI_TYPELIB_PATH \"$GI_TYPELIB_PATH\"" "--set GST_PLUGIN_SYSTEM_PATH_1_0 \"$GST_PLUGIN_SYSTEM_PATH_1_0\"" ];

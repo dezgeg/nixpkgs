@@ -19,7 +19,6 @@ stdenv.mkDerivation rec {
     cp -r ./ $out
     mkdir $out/oldbin
     mv $out/bin/IceSL-slicer $out/oldbin/IceSL-slicer
-    runHook postInstall
   '';
 
   postInstall = ''

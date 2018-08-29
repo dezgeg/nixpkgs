@@ -31,8 +31,6 @@ buildRebar3 rec {
     enableDebugInfo = true;
 
     installPhase = ''
-      runHook preInstall
       make PREFIX=$out install
-      runHook postInstall
     '';
  }

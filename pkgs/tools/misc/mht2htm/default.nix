@@ -21,16 +21,12 @@ in stdenv.mkDerivation rec {
   nativeBuildInputs = [ unzip ];
 
   buildPhase = ''
-    runHook preBuild
     lazbuild --lazarusdir=${lazarus}/share/lazarus mht2htmcl.lpi
-    runHook postBuild
   '';
 
   installPhase = ''
-    runHook preInstall
     install -Dm755 -t $out/bin               mht2htmcl
     install -Dm644 -t $out/share/doc/mht2htm CHANGELOG COPYING README
-    runHook postInstall
   '';
 
   meta = with stdenv.lib; {

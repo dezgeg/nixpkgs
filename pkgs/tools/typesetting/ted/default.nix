@@ -39,8 +39,6 @@ stdenv.mkDerivation rec {
   makeFlags = [ "CONFIGURE_OPTIONS=--with-GTK" "CONFIGURE_OPTIONS+=--prefix=$(out)" "compile.shared" ];
 
   installPhase = ''
-    runHook preInstall
-
     make tedPackage/makefile
     pushd tedPackage
     substituteInPlace makefile --replace /usr ""
@@ -55,8 +53,6 @@ stdenv.mkDerivation rec {
     popd
 
     cp -v Ted/Ted $out/bin
-
-    runHook postInstall
   '';
 
   buildInputs = [ pkgconfig zlib pcre xorg.xlibsWrapper xorg.libXpm libjpeg libtiff libpng gtk2 libpaper makeWrapper ];

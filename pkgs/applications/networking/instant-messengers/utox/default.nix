@@ -32,9 +32,7 @@ stdenv.mkDerivation rec {
   doCheck = stdenv.isLinux;
 
   checkPhase = ''
-    runHook preCheck
     ctest -VV
-    runHook postCheck
   '';
 
   meta = with stdenv.lib; {

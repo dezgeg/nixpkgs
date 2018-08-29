@@ -14,7 +14,6 @@ python.pkgs.buildPythonPackage
         zcat gurobi*mac64tar.pkg/Payload | cpio -i
         tar xf gurobi*_mac64.tar.gz
         sourceRoot=$(echo gurobi*/*64)
-        runHook postUnpack
       '';
     patches = [ ./no-clever-setup.patch ];
     postInstall = "mv lib/lib*.so $out/lib";

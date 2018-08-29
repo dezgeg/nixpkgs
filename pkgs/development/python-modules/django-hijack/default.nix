@@ -18,8 +18,6 @@ buildPythonPackage rec {
   propagatedBuildInputs = [ django django_compat ];
 
   checkPhase = ''
-    runHook preCheck
-
     # we have to do a little bit of tinkering to convince the tests to run against the installed package, not the
     # source directory
     mkdir testbase
@@ -27,8 +25,6 @@ buildPythonPackage rec {
     cp ../runtests.py .
     ${python.interpreter} runtests.py hijack
     popd
-
-    runHook postCheck
   '';
 
   meta = with stdenv.lib; {

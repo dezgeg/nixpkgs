@@ -36,8 +36,6 @@ stdenv.mkDerivation rec {
   installPhase = let
     qtVersion = "5.${stdenv.lib.versions.minor qtbase.version}";
   in ''
-    runHook preInstall
-
     d=$out/share/nifskope
     mkdir -p $out/bin $out/share/applications $out/share/pixmaps $d/{shaders,lang}
     cp release/NifSkope $out/bin/
@@ -54,8 +52,6 @@ stdenv.mkDerivation rec {
     find $out/share -type f -exec chmod -x {} \;
 
     wrapProgram $out/bin/NifSkope --prefix QT_PLUGIN_PATH : "${qtbase}/lib/qt-${qtVersion}/plugins"
-
-    runHook postInstall
   '';
 
   meta = with stdenv.lib; {

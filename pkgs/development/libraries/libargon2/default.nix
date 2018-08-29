@@ -12,7 +12,6 @@ stdenv.mkDerivation rec {
   };
 
   installPhase = ''
-    runHook preInstall
     mkdir -p $out/lib/pkgconfig
     substitute libargon2.pc $out/lib/pkgconfig/libargon2.pc \
       --replace @UPSTREAM_VER@ "${version}"                 \
@@ -21,7 +20,6 @@ stdenv.mkDerivation rec {
 
     make install PREFIX=$out
     ln -s $out/lib/libargon2.so $out/lib/libargon2.so.0
-    runHook postInstall
   '';
 
   meta = with stdenv.lib; {

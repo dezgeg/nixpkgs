@@ -143,21 +143,13 @@ let
       ${make.postPatch}
     '';
     buildPhase = ''
-      runHook preBuild
-
       sh ./buildmake.sh
-
-      runHook postBuild
     '';
     installPhase = ''
-      runHook preInstall
-
       install -D nbmake $out/bin/nbmake
       ln -s $out/bin/nbmake $out/bin/make
       mkdir -p $out/share
       cp -r $NETBSDSRCDIR/share/mk $out/share/mk
-
-      runHook postInstall
     '';
     extraPaths = [ make.src ] ++ make.extraPaths;
   };
@@ -243,14 +235,10 @@ let
     nativeBuildInputs = [ makeMinimal mandoc groff ];
     buildInputs = [ compat fts ];
     installPhase = ''
-      runHook preInstall
-
       install -D install.1 $out/share/man/man1/install.1
       install -D xinstall $out/bin/xinstall
       install -D -m 0550 ${binstall} $out/bin/binstall
       ln -s $out/bin/binstall $out/bin/install
-
-      runHook postInstall
     '';
   };
 
@@ -272,14 +260,10 @@ let
       ar -rsc libfts.a lib/libc/gen/fts.o
     '';
     installPhase = ''
-      runHook preInstall
-
       install -D lib/libc/gen/fts.3 $out/share/man/man3/fts.3
       install -D include/fts.h $out/include/fts.h
       install -D lib/libc/include/namespace.h $out/include/namespace.h
       install -D libfts.a $out/lib/libfts.a
-
-      runHook postInstall
     '';
     setupHooks = [
       ../../../build-support/setup-hooks/role.bash

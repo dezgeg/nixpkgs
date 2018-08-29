@@ -27,16 +27,12 @@ stdenv.mkDerivation  rec {
   '';
 
   installPhase = ''
-    runHook preInstall
-
     install -Dm755 RockboxUtility $out/bin/rockboxutility
     ln -s $out/bin/rockboxutility $out/bin/RockboxUtility
     wrapProgram $out/bin/rockboxutility \
     ${stdenv.lib.optionalString withEspeak ''
       --prefix PATH : ${espeak}/bin
     ''}
-
-    runHook postInstall
   '';
 
   # `make build/rcc/qrc_rbutilqt-lang.cpp` fails with

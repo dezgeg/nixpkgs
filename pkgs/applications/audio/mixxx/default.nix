@@ -38,18 +38,14 @@ stdenv.mkDerivation rec {
   ];
 
   buildPhase = ''
-    runHook preBuild
     mkdir -p "$out"
     scons \
       -j$NIX_BUILD_CORES -l$NIX_BUILD_CORES \
       $sconsFlags "prefix=$out"
-    runHook postBuild
   '';
 
   installPhase = ''
-    runHook preInstall
     scons $sconsFlags "prefix=$out" install
-    runHook postInstall
   '';
 
   meta = with stdenv.lib; {

@@ -20,9 +20,7 @@ stdenv.mkDerivation rec {
 
   # $out is not known until the build has started.
   configurePhase = ''
-    runHook preConfigure
     makeFlags="$makeFlags PREFIX=$out"
-    runHook postConfigure
   '';
 
   postFixup = ''

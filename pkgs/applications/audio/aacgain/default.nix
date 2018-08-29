@@ -24,7 +24,6 @@ stdenv.mkDerivation {
   '';
 
   configurePhase = ''
-    runHook preConfigure
     cd mp4v2
     ./configure
 
@@ -33,11 +32,9 @@ stdenv.mkDerivation {
 
     cd ..
     ./configure
-    runHook postConfigure
   '';
 
   buildPhase = ''
-    runHook preBuild
     cd mp4v2
     make libmp4v2.la
 
@@ -46,7 +43,6 @@ stdenv.mkDerivation {
 
     cd ..
     make
-    runHook postBuild
   '';
 
   installPhase = ''

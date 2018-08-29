@@ -16,18 +16,14 @@ buildGoPackage rec {
 
   buildInputs = [ libtool ];
   buildPhase = ''
-    runHook preBuild
     cd go/src/github.com/theupdateframework/notary
     make client GITCOMMIT=${gitcommit}
-    runHook postBuild
   '';
 
   goPackagePath = "github.com/theupdateframework/notary";
 
   installPhase = ''
-    runHook preInstall
     install -D bin/notary $bin/bin/notary
-    runHook postInstall
   '';
 
   doCheck = true;

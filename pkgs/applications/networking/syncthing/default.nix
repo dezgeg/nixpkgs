@@ -27,7 +27,6 @@ let
 
       installPhase = ''
         install -Dm755 ${target} $out/bin/${target}
-        runHook postInstall
       '';
 
       inherit postInstall;

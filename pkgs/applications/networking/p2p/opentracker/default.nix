@@ -15,7 +15,6 @@ stdenv.mkDerivation {
     mkdir -p $out/bin $out/share/doc
     cp opentracker $out/bin
     cp opentracker.conf.sample $out/share/doc
-    runHook postInstall
   '';
 
   meta = with stdenv.lib; {

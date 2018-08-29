@@ -1,6 +1,4 @@
 qmakeConfigurePhase() {
-    runHook preConfigure
-
     qmake PREFIX=$out \
           NIX_OUTPUT_OUT=$out \
           NIX_OUTPUT_DEV=${!outputDev} \
@@ -14,8 +12,6 @@ qmakeConfigurePhase() {
         enableParallelBuilding=1
         echo "qmake: enabled parallel building"
     fi
-
-    runHook postConfigure
 }
 
 if [ -z "$dontUseQmakeConfigure" -a -z "$configurePhase" ]; then

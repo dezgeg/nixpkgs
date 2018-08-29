@@ -24,11 +24,7 @@ in stdenv.mkDerivation rec {
   enableParallelBuilding = true;
 
   installPhase = ''
-    runHook preInstall
-
     DESTDIR=$out PREFIX= pkgconfigdir=lib/pkgconfig make install $installFlags
-
-    runHook postInstall
   '';
 
   FONTCONFIG_FILE="${fontconfig.out}/etc/fonts/fonts.conf";

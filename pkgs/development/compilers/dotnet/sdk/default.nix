@@ -24,23 +24,19 @@ in
     unpackPhase = "tar xvzf $src";
 
     buildPhase = ''
-      runHook preBuild
       patchelf --set-interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" ./dotnet
       patchelf --set-rpath "${rpath}" ./dotnet
       find -type f -name "*.so" -exec patchelf --set-rpath "${rpath}" {} \;
       echo -n "dotnet-sdk version: "
       ./dotnet --version
-      runHook postBuild
     '';
 
     dontPatchELF = true;
 
     installPhase = ''
-      runHook preInstall
       mkdir -p $out/bin
       cp -r ./ $out
       ln -s $out/dotnet $out/bin/dotnet
-      runHook postInstall
     '';
 
     meta = with stdenv.lib; {

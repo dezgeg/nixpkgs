@@ -62,15 +62,11 @@ stdenv.mkDerivation {
   dontPatchELF = true;
 
   unpackPhase = ''
-    runHook preUnpack
     dpkg-deb -x $src .
-    runHook postUnpack
   '';
 
   installPhase =
     ''
-      runHook preInstall
-
       libdir=$out/lib/spotify
       mkdir -p $libdir
       mv ./usr/* $out/
@@ -105,8 +101,6 @@ stdenv.mkDerivation {
         ln -s "$out/share/spotify/icons/spotify-linux-$i.png" \
           "$out/share/icons/hicolor/$ixi/apps/spotify-client.png"
       done
-
-      runHook postInstall
     '';
 
   meta = with stdenv.lib; {

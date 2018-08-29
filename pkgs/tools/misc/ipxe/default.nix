@@ -33,10 +33,8 @@ stdenv.mkDerivation {
   enabledOptions = [ "DOWNLOAD_PROTO_HTTPS" ];
 
   configurePhase = ''
-    runHook preConfigure
     for opt in $enabledOptions; do echo "#define $opt" >> src/config/general.h; done
     sed -i '/cp \''${ISOLINUX_BIN}/s/$/ --no-preserve=mode/' src/util/geniso
-    runHook postConfigure
   '';
 
   preBuild = "cd src";

@@ -27,18 +27,12 @@ attrsOrig @
       ] ++ buildInputs;
 
       configurePhase = ''
-        runHook preConfigure
-
         [ -z "$dontPlacateNuget" ] && placate-nuget.sh
         [ -z "$dontPlacatePaket" ] && placate-paket.sh
         [ -z "$dontPatchFSharpTargets" ] && patch-fsharp-targets.sh
-
-        runHook postConfigure
       '';
 
       buildPhase = ''
-        runHook preBuild
-
         echo Building dotNET packages...
 
         # Probably needs to be moved to fsharp
@@ -55,15 +49,11 @@ attrsOrig @
         done
 
         [ -z "$ran" ] && xbuild ${arrayToShell xBuildFlags} ''${xBuildFlagsArray}
-
-        runHook postBuild
       '';
 
       dontStrip = true;
 
       installPhase = ''
-        runHook preInstall
-
         target="$out/lib/dotnet/${baseName}"
         mkdir -p "$target"
 
@@ -108,8 +98,6 @@ attrsOrig @
               ''${makeWrapperArgs}
           done
         done
-
-        runHook postInstall
       '';
     };
   in

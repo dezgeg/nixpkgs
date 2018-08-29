@@ -49,11 +49,9 @@ buildPythonPackage rec {
   postPatch = ''
     # Remove selenium tests
     rm -rf notebook/tests/selenium
-
   '';
 
   checkPhase = ''
-    runHook preCheck
     mkdir tmp
     HOME=tmp nosetests -v ${if (stdenv.isDarwin) then ''
       --exclude test_delete \

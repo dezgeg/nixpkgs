@@ -18,8 +18,6 @@ stdenv.mkDerivation rec {
   ];
 
   patchPhase = ''
-    runHook prePatch
-
     configureImakefiles() {
         local sedcmd=$1
 
@@ -41,8 +39,6 @@ stdenv.mkDerivation rec {
 
     configureImakefiles "s:__PREFIX_PNG:${libpng}:"
     configureImakefiles "s:__PREFIX:$out:"
-
-    runHook postPatch
   '';
 
   preBuild = ''

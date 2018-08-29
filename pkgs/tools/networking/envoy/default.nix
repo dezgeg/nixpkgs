@@ -257,8 +257,6 @@ stdenv.mkDerivation rec {
   '';
 
   buildPhase = ''
-    runHook preBuild
-
     mkdir .home
     export HOME=$PWD/.home
 
@@ -284,8 +282,6 @@ stdenv.mkDerivation rec {
     exe=bazel-bin/source/exe/envoy-static
     chmod +w $exe
     patchelf --set-rpath ${rpath} $exe
-
-    runHook postBuild
   '';
 
   installPhase = ''

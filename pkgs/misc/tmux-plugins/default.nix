@@ -28,16 +28,12 @@ let
       inherit pluginName unpackPhase configurePhase buildPhase addonInfo preInstall postInstall;
 
       installPhase = ''
-        runHook preInstall
-
         target=$out/${rtpPath}/${path}
         mkdir -p $out/${rtpPath}
         cp -r . $target
         if [ -n "$addonInfo" ]; then
           echo "$addonInfo" > $target/addon-info.json
         fi
-
-        runHook postInstall
       '';
 
       dependencies = [ pkgs.bash ] ++ dependencies;

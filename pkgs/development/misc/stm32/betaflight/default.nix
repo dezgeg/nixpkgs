@@ -46,12 +46,8 @@ in stdenv.mkDerivation rec {
   '';
 
   installPhase = ''
-    runHook preInstall
-
     mkdir -p $out
     cp obj/*.hex $out
-
-    runHook postInstall
   '';
 
   meta = with stdenv.lib; {

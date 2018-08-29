@@ -1,6 +1,4 @@
 mesonConfigurePhase() {
-    runHook preConfigure
-
     if [ -z "$dontAddPrefix" ]; then
         mesonFlags="--prefix=$prefix $mesonFlags"
     fi
@@ -30,8 +28,6 @@ mesonConfigurePhase() {
         enableParallelBuilding=1
         echo "meson: enabled parallel building"
     fi
-
-    runHook postConfigure
 }
 
 if [ -z "$dontUseMesonConfigure" -a -z "$configurePhase" ]; then
@@ -40,11 +36,7 @@ if [ -z "$dontUseMesonConfigure" -a -z "$configurePhase" ]; then
 fi
 
 mesonCheckPhase() {
-    runHook preCheck
-
     meson test --print-errorlogs
-
-    runHook postCheck
 }
 
 if [ -z "$dontUseMesonCheck" -a -z "$checkPhase" ]; then

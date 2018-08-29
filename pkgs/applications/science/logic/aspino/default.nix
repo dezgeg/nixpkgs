@@ -32,10 +32,8 @@ stdenv.mkDerivation rec {
   '';
 
   installPhase = ''
-    runHook preInstall
     mkdir -p $out/bin
     install -m0755 build/release/{aspino,fairino-{bs,ls,ps},maxino-2015-{k16,kdyn}} $out/bin
-    runHook postInstall
   '';
 
   meta = with stdenv.lib; {

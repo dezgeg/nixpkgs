@@ -45,8 +45,6 @@ in stdenv.mkDerivation {
         "zopen"
       ];
     in ''
-      runHook preInstall
-
       packagePath=$out/share/zoom-us
       mkdir -p $packagePath $out/bin
 
@@ -54,8 +52,6 @@ in stdenv.mkDerivation {
 
       makeWrapper $packagePath/zoom $out/bin/zoom-us \
         --prefix PATH : "${procps}/bin"
-
-      runHook postInstall
     '';
 
   postInstall = (makeDesktopItem {

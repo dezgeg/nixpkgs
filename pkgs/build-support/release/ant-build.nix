@@ -53,8 +53,6 @@ stdenv.mkDerivation (
     '';
 
     installPhase = ''
-      runHook preInstall
-
       mkdir -p $out/share/java
       ${ if jars == [] then ''
            find . -name "*.jar" | xargs -I{} cp -v {} $out/share/java
@@ -67,8 +65,6 @@ stdenv.mkDerivation (
         canonicalizeJar $j
         echo file jar $j >> $out/nix-support/hydra-build-products
       done
-
-      runHook postInstall
     '';
 
     generateWrappersPhase =
@@ -91,9 +87,7 @@ stdenv.mkDerivation (
       closeNest
     '';
 
-    buildPhase = ''
-      runHook preBuild
-    '' + (if antTargets == [] then ''
+    buildPhase = (if antTargets == [] then ''
       header "Building default ant target"
       ant ${antFlags}
       closeNest
@@ -101,9 +95,7 @@ stdenv.mkDerivation (
       header "Building '${t}' target"
       ant ${antFlags} ${t}
       closeNest
-    '') antTargets) + ''
-      runHook postBuild
-    '';
+    '') antTargets);
 
     finalPhase =
       ''

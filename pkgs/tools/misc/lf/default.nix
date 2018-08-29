@@ -21,11 +21,9 @@ buildGoPackage rec {
 
   # Override the build phase (to set buildFlags):
   buildPhase = ''
-    runHook preBuild
     runHook renameImports
     cd go/src/${goPackagePath}
     go install -ldflags="-s -w -X main.gVersion=r${version}"
-    runHook postBuild
   '';
 
   meta = with stdenv.lib; {

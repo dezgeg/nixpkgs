@@ -27,12 +27,8 @@ let
     ] ++ extraMakeFlags;
 
     installPhase = ''
-      runHook preInstall
-
       mkdir -p ${installDir}
       cp ${stdenv.lib.concatStringsSep " " filesToInstall} ${installDir}
-
-      runHook postInstall
     '';
 
     hardeningDisable = [ "all" ];

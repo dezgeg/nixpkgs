@@ -47,9 +47,7 @@ in stdenv.mkDerivation (args // {
   buildInputs = [ cacert git rust.cargo rust.rustc ] ++ buildInputs;
 
   configurePhase = args.configurePhase or ''
-    runHook preConfigure
     # noop
-    runHook postConfigure
   '';
 
   postUnpack = ''
@@ -73,26 +71,20 @@ in stdenv.mkDerivation (args // {
   '' + (args.postUnpack or "");
 
   buildPhase = with builtins; args.buildPhase or ''
-    runHook preBuild
     echo "Running cargo build --release ${concatStringsSep " " cargoBuildFlags}"
     cargo build --release --frozen ${concatStringsSep " " cargoBuildFlags}
-    runHook postBuild
   '';
 
   checkPhase = args.checkPhase or ''
-    runHook preCheck
     echo "Running cargo test"
     cargo test
-    runHook postCheck
   '';
 
   doCheck = args.doCheck or true;
 
   installPhase = args.installPhase or ''
-    runHook preInstall
     mkdir -p $out/bin
     find target/release -maxdepth 1 -executable -type f -exec cp "{}" $out/bin \;
-    runHook postInstall
   '';
 
   passthru = { inherit cargoDeps; } // (args.passthru or {});

@@ -109,14 +109,10 @@ let
       dontBuild = true;
 
       installPhase = ''
-        runHook preInstall
-
         mkdir -p "$out/bin"
         for script in ${concatStringsSep " " scripts}; do
           cp "${dir}/$script" "$out/bin/"
         done
-
-        runHook postInstall
       '';
 
       postInstall = ''

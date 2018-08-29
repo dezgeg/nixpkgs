@@ -69,23 +69,15 @@ stdenv.mkDerivation {
   '';
 
   configurePhase = ''
-    runHook preConfigure
-
     ${optionalString custom ''make custom-config set=${set} ${config}''}
-
-    runHook postConfigure
   '';
 
   makeFlags = lib.optionals custom [ "custom" "set=${set}" ];
 
   installPhase = ''
-    runHook preInstall
-
     fontdir="$out/share/fonts/$pname"
     install -d "$fontdir"
     install "dist/$pname/ttf"/* "$fontdir"
-
-    runHook postInstall
   '';
 
   enableParallelBuilding = true;

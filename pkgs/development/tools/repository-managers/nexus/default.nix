@@ -22,8 +22,6 @@ stdenv.mkDerivation rec {
   '';
 
   installPhase = ''
-    runHook preInstall
-
     mkdir -p $out
     cp -rfv * .install4j $out
     rm -fv $out/bin/nexus.bat
@@ -32,8 +30,6 @@ stdenv.mkDerivation rec {
       --set JAVA_HOME ${jre} \
       --set ALTERNATIVE_NAME "nexus" \
       --prefix PATH "${stdenv.lib.makeBinPath [ gawk ]}"
-
-    runHook postInstall
   '';
 
   meta = with stdenv.lib; {

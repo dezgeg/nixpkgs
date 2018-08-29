@@ -32,9 +32,7 @@ stdenv.mkDerivation rec {
     '';
   installPhase =
     ''
-      runHook preInstall
       ${stdenv.shell} libinput-gestures-setup -d "$out" install
-      runHook postInstall
     '';
   postFixup =
     ''

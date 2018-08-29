@@ -14,9 +14,7 @@ stdenv.mkDerivation rec {
   unpackPhase = "true";
 
   installPhase = ''
-    runHook preInstall
     makeWrapper ${jre}/bin/java $out/bin/youtrack --add-flags "\$YOUTRACK_JVM_OPTS -jar $jar"
-    runHook postInstall
   '';
 
   meta = with stdenv.lib; {

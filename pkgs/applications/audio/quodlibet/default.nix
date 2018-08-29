@@ -38,7 +38,6 @@ python3.pkgs.buildPythonApplication rec {
   LC_ALL = "en_US.UTF-8";
 
   checkPhase = ''
-    runHook preCheck
     checkHomeDir=$(mktemp -d)
     mkdir -p $checkHomeDir/.cache/thumbnails/normal # Required by TThumb.test_recreate_broken_cache_file
     env XDG_DATA_DIRS="$out/share:${gtk3}/share/gsettings-schemas/${gtk3.name}:$XDG_DATA_DIRS" \
@@ -46,7 +45,6 @@ python3.pkgs.buildPythonApplication rec {
       xvfb-run -s '-screen 0 800x600x24' dbus-run-session \
         --config-file=${dbus.daemon}/share/dbus-1/session.conf \
         py.test
-    runHook postCheck
   '';
 
   preFixup = stdenv.lib.optionalString (kakasi != null) "gappsWrapperArgs+=(--prefix PATH : ${kakasi}/bin)";

@@ -79,14 +79,10 @@ in stdenv.mkDerivation rec {
   '';
 
   installPhase = ''
-    runHook preInstall
-
     cp -r . $out
     wrapProgram $out/bin/sonic-pi \
       --prefix PATH : ${ruby}/bin:${bash}/bin:${supercollider}/bin:${jack2Full}/bin \
       --set AUBIO_LIB "${aubio}/lib/libaubio.so"
-
-    runHook postInstall
   '';
 
   meta = {

@@ -16,9 +16,7 @@ buildPythonPackage rec {
   propagatedBuildInputs = [ django_hijack ];
 
   checkPhase = ''
-    runHook preCheck
     ${python.interpreter} runtests.py hijack_admin
-    runHook postCheck
   '';
 
   meta = with stdenv.lib; {

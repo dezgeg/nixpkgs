@@ -54,19 +54,15 @@ let
     agdaWithArgs = "${Agda}/bin/agda ${self.buildFlags}";
 
     buildPhase = ''
-      runHook preBuild
       ${self.agdaWithArgs} ${self.everythingFile}
-      runHook postBuild
     '';
 
     installPhase = let
       srcFiles = self.sourceDirectories
                  ++ map (x: x + "/*") self.topSourceDirectories;
     in ''
-      runHook preInstall
       mkdir -p $out/share/agda
       cp -pR ${concatStringsSep " " srcFiles} $out/share/agda
-      runHook postInstall
     '';
 
     passthru = {

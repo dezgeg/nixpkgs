@@ -14,16 +14,12 @@ stdenv.mkDerivation rec {
   buildInputs = [ makeWrapper ];
 
   installPhase = ''
-    runHook preInstall
-
     install -Dm755 xscast.sh $out/bin/xscast
     install -Dm644 xscast.1 $out/share/man/man1/xscast.1
     patchShebangs $out/bin
 
     wrapProgram "$out/bin/xscast" \
       --prefix PATH : ${stdenv.lib.makeBinPath [ ffmpeg dzen2 xorg.xwininfo xorg.xinput xorg.xmodmap imagemagick ]}
-
-    runHook postInstall
   '';
 
   meta = with stdenv.lib; {

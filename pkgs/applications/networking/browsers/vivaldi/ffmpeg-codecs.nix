@@ -27,13 +27,9 @@ stdenv.mkDerivation rec {
   ];
 
   configurePhase = ''
-    runHook preConfigure
-
     local args="ffmpeg_branding=\"ChromeOS\" proprietary_codecs=true enable_hevc_demuxing=true use_gconf=false use_gio=false use_gnome_keyring=false use_kerberos=false use_cups=false use_sysroot=false use_gold=false linux_use_bundled_binutils=false fatal_linker_warnings=false treat_warnings_as_errors=false is_clang=false is_component_build=true is_debug=false symbol_level=0"
     python tools/gn/bootstrap/bootstrap.py -v -s --no-clean --gn-gen-args "$args"
     out/Release/gn gen out/Release -v --args="$args"
-
-    runHook postConfigure
   '';
 
   buildPhase = ''

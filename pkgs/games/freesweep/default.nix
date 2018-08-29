@@ -18,11 +18,9 @@ stdenv.mkDerivation rec {
   '';
 
   installPhase = ''
-    runHook preInstall
     install -D -m 0555 freesweep $out/bin/freesweep
     install -D -m 0444 sweeprc $out/share/sweeprc
     install -D -m 0444 freesweep.6 $out/share/man/man6/freesweep.6
-    runHook postInstall
   '';
 
   meta = with stdenv.lib; {

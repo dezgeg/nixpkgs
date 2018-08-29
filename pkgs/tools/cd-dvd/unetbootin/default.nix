@@ -44,8 +44,6 @@ stdenv.mkDerivation rec {
   '';
 
   installPhase = ''
-    runHook preInstall
-
     install -Dm755 -t $out/bin                unetbootin
     install -Dm644 -t $out/share/unetbootin   unetbootin_*.qm
     install -Dm644 -t $out/share/applications unetbootin.desktop
@@ -53,8 +51,6 @@ stdenv.mkDerivation rec {
     wrapProgram $out/bin/unetbootin \
       --prefix PATH : ${stdenv.lib.makeBinPath [ mtools p7zip which ]} \
       --set QT_X11_NO_MITSHM 1
-
-    runHook postInstall
   '';
 
   meta = with stdenv.lib; {

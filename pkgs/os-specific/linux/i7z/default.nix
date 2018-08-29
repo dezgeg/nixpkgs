@@ -14,8 +14,6 @@ stdenv.mkDerivation rec {
   enableParallelBuilding = true;
 
   buildPhase = ''
-    runHook preBuild
-
     make
     ${lib.optionalString withGui ''
       cd GUI
@@ -24,13 +22,9 @@ stdenv.mkDerivation rec {
       make
       cd ..
     ''}
-
-    runHook postBuild
   '';
 
   installPhase = ''
-    runHook preInstall
-
     mkdir -p $out/{bin,sbin}
     make install prefix=$out
     ${lib.optionalString withGui ''
@@ -38,8 +32,6 @@ stdenv.mkDerivation rec {
     ''}
     mv $out/sbin/* $out/bin/
     rmdir $out/sbin
-
-    runHook postInstall
   '';
 
   meta = with lib; {

@@ -13,21 +13,15 @@ let
     nativeBuildInputs = [ dpkg ];
 
     unpackPhase = ''
-      runHook preUnpack
       dpkg-deb -x $src ./
-      runHook postUnpack
     '';
 
     doConfigure = false;
 
     installPhase = ''
-      runHook preInstall
-
       mkdir -p $out
       cd ./usr/lib/unifi
       cp -ar dl lib webapps $out
-
-      runHook postInstall
     '';
 
     meta = with stdenv.lib; {

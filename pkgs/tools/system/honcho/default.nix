@@ -35,9 +35,7 @@ pythonPackages.buildPythonApplication rec {
   '';
 
   checkPhase = ''
-    runHook preCheck
     PATH=$out/bin:$PATH coverage run -m pytest
-    runHook postCheck
   '';
 
   meta = with stdenv.lib; {

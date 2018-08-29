@@ -14,8 +14,6 @@ stdenv.mkDerivation rec {
   buildInputs = with python3Packages; [ wrapPython makeWrapper ];
 
   installPhase = ''
-    runHook preInstall
-
     ./install.sh "$out" "$out"
 
     for f in $out/bin/* ; do
@@ -27,8 +25,6 @@ stdenv.mkDerivation rec {
       wrapProgram $f \
         --prefix PATH : $out/bin
     done
-
-    runHook postInstall
   '';
 
   meta = with stdenv.lib; {

@@ -44,30 +44,20 @@ let
 
     configurePhase = if configurePhase == null
     then ''
-      runHook preConfigure
-
       # We shouldnt need to do this, but it seems at times there is a *.app in
       # the repo/package. This ensures we start from a clean slate
       make SKIP_DEPS=1 clean
-
-      runHook postConfigure
     ''
     else configurePhase;
 
     buildPhase = if buildPhase == null
     then ''
-        runHook preBuild
-
         make SKIP_DEPS=1 ERL_OPTS="$ERL_OPTS ${debugInfoFlag}"
-
-        runHook postBuild
     ''
     else buildPhase;
 
     installPhase =  if installPhase == null
     then ''
-        runHook preInstall
-
         mkdir -p $out/lib/erlang/lib/${name}
         cp -r ebin $out/lib/erlang/lib/${name}/
         cp -r src $out/lib/erlang/lib/${name}/
@@ -83,8 +73,6 @@ let
         if [ -d doc ]; then
           cp -r doc $out/lib/erlang/lib/${name}/
         fi
-
-        runHook postInstall
     ''
     else installPhase;
 

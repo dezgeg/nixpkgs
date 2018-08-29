@@ -19,12 +19,10 @@ stdenv.mkDerivation rec {
   enableParallelBuilding = false;
 
   installPhase = ''
-      runHook preInstall
       mkdir -p "$out/bin"
       mkdir -p "$out/share/applications"
       cp -pr release/chessx "$out/bin"
       cp -pr unix/chessx.desktop "$out/share/applications"
-      runHook postInstall
   '';
 
   meta = with stdenv.lib; {

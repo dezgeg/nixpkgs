@@ -42,11 +42,9 @@ stdenv.mkDerivation rec {
   '';
 
   installPhase = ''
-    runHook preInstall
     mkdir -p $out/bin
     make install
     install -D -m 755 scripts/{pon,poff,plog} $out/bin
-    runHook postInstall
   '';
 
   postFixup = ''

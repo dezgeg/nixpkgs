@@ -34,8 +34,6 @@ stdenv.mkDerivation rec {
   #       See https://forum.matomo.org/t/bootstrap-php/5926/10 and
   #       https://github.com/matomo-org/matomo/issues/11654#issuecomment-297730843
   installPhase = ''
-    runHook preInstall
-
     # copy evertything to share/, used as webroot folder, and then remove what's known to be not needed
     mkdir -p $out/share
     cp -ra * $out/share/
@@ -46,8 +44,6 @@ stdenv.mkDerivation rec {
 
     makeWrapper ${php}/bin/php $out/bin/matomo-console \
       --add-flags "$out/share/console"
-
-    runHook postInstall
   '';
 
   meta = with stdenv.lib; {

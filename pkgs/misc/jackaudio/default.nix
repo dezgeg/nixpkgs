@@ -57,16 +57,12 @@ stdenv.mkDerivation rec {
   '';
 
   configurePhase = ''
-    runHook preConfigure
-
     python waf configure --prefix=$out \
       ${optionalString (optDbus != null) "--dbus"} \
       --classic \
       ${optionalString (optLibffado != null) "--firewire"} \
       ${optionalString (optAlsaLib != null) "--alsa"} \
       --autostart=${if (optDbus != null) then "dbus" else "classic"} \
-
-    runHook postConfigure
   '';
 
   buildPhase = ''

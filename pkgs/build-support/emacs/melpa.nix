@@ -42,32 +42,20 @@ import ./generic.nix { inherit lib stdenv emacs texinfo; } ({
   buildPhase =
     if recipeFile == null
       then ''
-        runHook preBuild
-
         export archive=$(emacs --batch -Q -l $packageBuild -l ${./melpa2nix.el} \
             -f melpa2nix-build-package \
             ${pname} ${version} ${targets})
-
-        runHook postBuild
       ''
       else ''
-        runHook preBuild
-
         export archive=$(emacs --batch -Q -l $packageBuild -l ${./melpa2nix.el} \
             -f melpa2nix-build-package-from-recipe \
             ${recipeFile} ${version})
-
-        runHook postBuild
       '';
 
   installPhase = ''
-    runHook preInstall
-
     emacs --batch -Q -l ${./elpa2nix.el} \
         -f elpa2nix-install-package \
         "$archive" "$out/share/emacs/site-lisp/elpa"
-
-    runHook postInstall
   '';
 
   meta = defaultMeta // meta;

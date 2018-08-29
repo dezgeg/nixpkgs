@@ -95,8 +95,6 @@ stdenv.mkDerivation ((builtins.removeAttrs attrs ["source"]) // {
   inherit src;
 
   unpackPhase = attrs.unpackPhase or ''
-    runHook preUnpack
-
     if [[ -f $src && $src == *.gem ]]; then
       if [[ -z "$dontBuild" ]]; then
         # we won't know the name of the directory that RubyGems creates,
@@ -119,13 +117,9 @@ stdenv.mkDerivation ((builtins.removeAttrs attrs ["source"]) // {
       dontBuild=""
       preUnpack="" postUnpack="" defaultUnpackPhase
     fi
-
-    runHook postUnpack
   '';
 
   buildPhase = attrs.buildPhase or ''
-    runHook preBuild
-
     if [[ "$type" == "gem" ]]; then
       if [[ -z "$gemspec" ]]; then
         gemspec="$(find . -name '*.gemspec')"
@@ -142,8 +136,6 @@ stdenv.mkDerivation ((builtins.removeAttrs attrs ["source"]) // {
 
       echo "gem package built: $gempkg"
     fi
-
-    runHook postBuild
   '';
 
   # Note:
@@ -151,8 +143,6 @@ stdenv.mkDerivation ((builtins.removeAttrs attrs ["source"]) // {
   #   This is very important in order for many parts of RubyGems/Bundler to not blow up.
   #   See https://github.com/bundler/bundler/issues/3327
   installPhase = attrs.installPhase or ''
-    runHook preInstall
-
     export GEM_HOME=$out/${ruby.gemPath}
     mkdir -p $GEM_HOME
 
@@ -205,8 +195,6 @@ stdenv.mkDerivation ((builtins.removeAttrs attrs ["source"]) // {
     spec=$(echo $out/${ruby.gemPath}/specifications/*.gemspec)
     ruby ${./gem-post-build.rb} "$spec"
     ''}
-
-    runHook postInstall
   '';
 
   propagatedBuildInputs = gemPath ++ propagatedBuildInputs;

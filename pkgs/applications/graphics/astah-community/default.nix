@@ -40,8 +40,6 @@ stdenv.mkDerivation {
   nativeBuildInputs = [ unzip makeWrapper ];
 
   installPhase = ''
-    runHook preInstall
-
     mkdir -p $out/{bin,share}
     cp -r . $out/share/astah
     cp -r ${desktopItem}/share/applications $out/share/applications
@@ -51,8 +49,6 @@ stdenv.mkDerivation {
 
     makeWrapper ${jre}/bin/java $out/bin/astah \
       --add-flags "-jar $out/share/astah/astah-community.jar"
-
-    runHook postInstall
   '';
 
   meta = with stdenv.lib; {

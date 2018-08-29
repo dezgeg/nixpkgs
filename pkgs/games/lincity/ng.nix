@@ -30,20 +30,12 @@ stdenv.mkDerivation rec {
   '';
 
   buildPhase = ''
-    runHook preBuild
-
     AR='ar r' jam -j $NIX_BUILD_CORES
-
-    runHook postBuild
   '';
 
   installPhase = ''
-    runHook preInstall
-
     touch CREDITS
     AR='ar r' jam install
-
-    runHook postInstall
   '';
 
   meta = with stdenv.lib; {

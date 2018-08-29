@@ -32,15 +32,11 @@ buildPythonApplication rec {
   propagatedBuildInputs = [ pygobject3 gtk3 pyxdg dbus-python pycairo ];
 
   configurePhase = ''
-    runHook preConfigure
     python ./waf configure --prefix=$prefix
-    runHook postConfigure
   '';
 
   buildPhase = ''
-    runHook preBuild
     python ./waf
-    runHook postBuild
   '';
 
   installPhase = let
@@ -48,15 +44,12 @@ buildPythonApplication rec {
       (m: "${m}/lib/${python.libPrefix}/site-packages")
       propagatedBuildInputs);
   in ''
-    runHook preInstall
     python ./waf install
 
     gappsWrapperArgs+=(
       "--prefix" "PYTHONPATH" : "${pythonPath}"
       "--set" "PYTHONNOUSERSITE" "1"
     )
-
-    runHook postInstall
   '';
 
   doCheck = false; # no tests

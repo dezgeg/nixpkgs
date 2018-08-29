@@ -245,8 +245,6 @@ let
     } // (extraAttrs.gnFlags or {}));
 
     configurePhase = ''
-      runHook preConfigure
-
       # Build gn
       python tools/gn/bootstrap/bootstrap.py -v -s --no-clean
       PATH="$PWD/out/Release:$PATH"
@@ -259,8 +257,6 @@ let
 
       # Fail if `gn gen` contains a WARNING.
       grep -o WARNING gn-gen-outputs.txt && echo "Found gn WARNING, exiting nix build" && exit 1
-
-      runHook postConfigure
     '';
 
     buildPhase = let

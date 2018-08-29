@@ -42,8 +42,6 @@ EOF
   '';
 
   buildPhase = ''
-    runHook preBuild
-
     # Enable all optional libraries
     substituteInPlace "src/std/build-features.ss" --replace '#f' '#t'
 
@@ -52,12 +50,9 @@ EOF
 
     # Build, replacing make by build.sh
     ( cd src && sh build.sh )
-
-    runHook postBuild
   '';
 
   installPhase = ''
-    runHook preInstall
     mkdir -p $out/
     cp -fa bin lib etc doc $out/
 
@@ -71,7 +66,6 @@ else
   exec ${GAMBIT}/bin/gsi \$GSIOPTIONS \$GERBIL_HOME/lib/gxi-init "\$@"
 fi
 EOF
-    runHook postInstall
   '';
 
   dontStrip = true;

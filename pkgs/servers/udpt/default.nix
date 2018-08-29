@@ -19,11 +19,7 @@ stdenv.mkDerivation rec {
   doCheck = true;
 
   checkPhase = ''
-    runHook preCheck
-
     make test
-
-    runHook postCheck
   '';
 
   buildInputs = [ boost sqlite cmake gtest ];
@@ -38,8 +34,6 @@ stdenv.mkDerivation rec {
     mkdir -p $out/bin $out/etc/
     cp udpt $out/bin
     cp ../udpt.conf $out/etc/
-    # without this, the resulting binary is unstripped.
-    runHook postInstall
   '';
 
   meta = {

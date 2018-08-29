@@ -40,7 +40,6 @@ let
         };
 
         installPhase = attrs.installPhase or ''
-          runHook preInstall
           (
             if [ $(ls $src | wc -l) == 1 ]; then
               cd $src/* || cd $src
@@ -49,7 +48,6 @@ let
             fi
             ${installLibHaxe { inherit libname version; }}
           )
-          runHook postInstall
         '';
 
         meta = {

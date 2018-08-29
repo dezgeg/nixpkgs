@@ -49,8 +49,6 @@ stdenv.mkDerivation rec {
   ]);
 
   installPhase = ''
-    runHook preInstall
-
     export HOME=$TMPDIR/fakehome
     export POPPLER_INC_DIR=${poppler_utils.dev}/include/poppler
     export POPPLER_LIB_DIR=${poppler_utils.out}/lib
@@ -84,8 +82,6 @@ stdenv.mkDerivation rec {
 
     mkdir -p $out/share
     cp -a man-pages $out/share/man
-
-    runHook postInstall
   '';
 
   calibreDesktopItem = makeDesktopItem {

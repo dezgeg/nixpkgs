@@ -54,22 +54,17 @@ let
     '' + postPatch;
 
     configurePhase = ''
-      runHook preConfigure
       ${erlang}/bin/escript ${rebar3.bootstrapper} ${debugInfoFlag}
-      runHook postConfigure
     '';
 
     buildPhase = ''
-      runHook preBuild
       HOME=. rebar3 compile
       ${if compilePorts then ''
         HOME=. rebar3 pc compile
       '' else ''''}
-      runHook postBuild
     '';
 
     installPhase = ''
-      runHook preInstall
       mkdir -p "$out/lib/erlang/lib/${name}-${version}"
       for reldir in src ebin priv include; do
         fd="_build/default/lib/${name}/$reldir"
@@ -77,7 +72,6 @@ let
         cp -Hrt "$out/lib/erlang/lib/${name}-${version}" "$fd"
         success=1
       done
-      runHook postInstall
     '';
 
     meta = {

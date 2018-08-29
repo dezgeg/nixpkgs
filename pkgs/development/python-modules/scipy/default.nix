@@ -35,11 +35,9 @@ buildPythonPackage rec {
   enableParallelBuilding = true;
 
   checkPhase = ''
-    runHook preCheck
     pushd dist
     ${python.interpreter} -c 'import scipy; scipy.test("fast", verbose=10)'
     popd
-    runHook postCheck
   '';
 
   passthru = {

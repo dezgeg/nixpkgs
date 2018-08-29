@@ -19,12 +19,8 @@ in python2Packages.buildPythonApplication rec {
   doCheck = false;
 
   installPhase = ''
-    runHook preInstall
-
     install -Dm755 -t $out/bin                ${bName}.py
     install -Dm644 -t $out/share/doc/${pName} README.md
-
-    runHook postInstall
   '';
 
   propagatedBuildInputs = with python2Packages; [ pywbem ];

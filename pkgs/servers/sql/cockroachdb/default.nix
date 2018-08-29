@@ -15,7 +15,6 @@ buildGoPackage rec {
   nativeBuildInputs = [ cmake xz which autoconf ];
 
   buildPhase = ''
-    runHook preBuild
     cd $NIX_BUILD_TOP/go/src/${goPackagePath}
     patchShebangs .
     make buildoss
@@ -23,15 +22,12 @@ buildGoPackage rec {
     for asset in man autocomplete; do
       ./cockroach gen $asset
     done
-    runHook postBuild
   '';
 
   installPhase = ''
-    runHook preInstall
     install -D cockroach $bin/bin/cockroach
     install -D cockroach.bash $bin/share/bash-completion/completions/cockroach.bash
     cp -r man $bin/share/man
-    runHook postInstall
   '';
 
   meta = with stdenv.lib; {

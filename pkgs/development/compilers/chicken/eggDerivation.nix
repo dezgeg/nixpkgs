@@ -28,8 +28,6 @@ stdenv.mkDerivation ({
   CHICKEN_INSTALL_PREFIX = "$out";
 
   installPhase = ''
-    runHook preInstall
-
     chicken-install -p $out ${stdenv.lib.concatStringsSep " " chickenInstallFlags}
 
     for f in $out/bin/*
@@ -40,7 +38,5 @@ stdenv.mkDerivation ({
         --prefix CHICKEN_INCLUDE_PATH \; "$CHICKEN_INCLUDE_PATH;$out/share/" \
         --prefix PATH : "$out/bin:${chicken}/bin:$CHICKEN_REPOSITORY_EXTRA:$CHICKEN_REPOSITORY"
     done
-
-    runHook postInstall
   '';
 } // (builtins.removeAttrs args ["name" "buildInputs"]) // override)

@@ -84,8 +84,6 @@ stdenv.mkDerivation rec {
     EOF
 
     make oldconfig
-
-    runHook postConfigure
   '';
 
   postConfigure = lib.optionalString useMusl ''

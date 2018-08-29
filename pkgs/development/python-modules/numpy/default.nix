@@ -49,11 +49,9 @@ buildPythonPackage rec {
   enableParallelBuilding = true;
 
   checkPhase = ''
-    runHook preCheck
     pushd dist
     ${python.interpreter} -c 'import numpy; numpy.test("fast", verbose=10)'
     popd
-    runHook postCheck
   '';
 
   postInstall = ''

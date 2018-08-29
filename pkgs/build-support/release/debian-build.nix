@@ -61,7 +61,6 @@ vmTools.runInLinuxImage (stdenv.mkDerivation (
     '';
 
     installPhase = ''
-      eval "$preInstall"
       export LOGNAME=root
 
       # otherwise build hangs when it wants to display
@@ -96,8 +95,6 @@ vmTools.runInLinuxImage (stdenv.mkDerivation (
       for i in $extraDebs; do
         echo "file deb-extra $(ls $i/debs/*.deb | sort | head -1)" >> $out/nix-support/hydra-build-products
       done
-
-      eval "$postInstall"
     ''; # */
 
     meta = (if args ? meta then args.meta else {}) // {

@@ -19,13 +19,10 @@ stdenv.mkDerivation rec {
   ];
 
   configurePhase = ''
-    runHook preConfigure
     ./Configure # doesn't take any options
-    runHook postConfigure
   '';
 
   installPhase = ''
-    runHook preInstall
     install -D datafiles/* --target-directory "$out/share/sympow/datafiles/"
     install *.gp "$out/share/sympow/"
     install -Dm755 sympow "$out/share/sympow/sympow"
@@ -40,8 +37,6 @@ stdenv.mkDerivation rec {
     fi' \
       --run 'cd "$SYMPOW_LOCAL"'
     substituteInPlace $out/bin/sympow --subst-var out
-
-    runHook postInstall
   '';
 
   patches = [

@@ -22,16 +22,10 @@ in stdenv.mkDerivation (fBuildAttrs // {
     '';
 
     buildPhase = fFetchAttrs.buildPhase or ''
-      runHook preBuild
-
       bazel --output_base="$bazelOut" fetch $bazelFlags $bazelTarget
-
-      runHook postBuild
     '';
 
     installPhase = fFetchAttrs.installPhase or ''
-      runHook preInstall
-
       # Patching markers to make them deterministic
       for i in $bazelOut/external/\@*.marker; do
         sed -i 's, -\?[0-9][0-9]*$, 1,' "$i"
@@ -42,8 +36,6 @@ in stdenv.mkDerivation (fBuildAttrs // {
       done
 
       cp -r $bazelOut/external $out
-
-      runHook postInstall
     '';
 
     dontFixup = true;
@@ -69,10 +61,6 @@ in stdenv.mkDerivation (fBuildAttrs // {
   '' + fBuildAttrs.preConfigure or "";
 
   buildPhase = fBuildAttrs.buildPhase or ''
-    runHook preBuild
-
     bazel --output_base="$bazelOut" build -j $NIX_BUILD_CORES $bazelFlags $bazelTarget
-
-    runHook postBuild
   '';
 })

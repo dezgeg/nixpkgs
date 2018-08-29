@@ -56,8 +56,6 @@ in stdenv.mkDerivation rec {
   # the game asset root directory is faulty.
 
   installPhase = ''
-    runHook preInstall
-
     dir=$out/share/${pname}
 
     install -Dm755 t-engine $dir/t-engine
@@ -73,8 +71,6 @@ in stdenv.mkDerivation rec {
     install -Dm644 te4-icon.png $out/share/icons/hicolor/64x64/${pname}.png
 
     install -Dm644 -t $out/share/doc/${pname} CONTRIBUTING COPYING COPYING-MEDIA CREDITS
-
-    runHook postInstall
   '';
 
   meta = with stdenv.lib; {

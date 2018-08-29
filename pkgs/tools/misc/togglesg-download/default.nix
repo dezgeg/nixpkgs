@@ -19,16 +19,12 @@ pythonPackages.buildPythonApplication rec {
   dontStrip = true;
 
   installPhase = ''
-    runHook preInstall
-
     mkdir -p $out/{bin,share/doc/togglesg-download}
     substitute $src/download_toggle_video2.py $out/bin/download_toggle_video2.py \
       --replace "ffmpeg_download_cmd = 'ffmpeg" "ffmpeg_download_cmd = '${lib.getBin ffmpeg_3}/bin/ffmpeg"
     chmod 0755 $out/bin/download_toggle_video2.py
 
     cp LICENSE README.md $out/share/doc/togglesg-download
-
-    runHook postInstall
   '';
 
   meta = with stdenv.lib; {

@@ -29,10 +29,8 @@ buildPythonPackage rec {
   '';
 
   checkPhase = ''
-    runHook preCheck
     export LANG="en_US.UTF-8"
     py.test
-    runHook postCheck
   '';
 
   # Seems to fail unpredictably on Darwin. See http://hydra.nixos.org/build/49877419/nixlog/1

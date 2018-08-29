@@ -31,8 +31,6 @@ stdenv.mkDerivation rec {
   };
 
   installPhase = ''
-    runHook preInstall
-
     install -Dm755 tensor $out/bin/tensor
     install -Dm644 client/logo.png \
                    $out/share/icons/hicolor/512x512/apps/tensor.png
@@ -41,8 +39,6 @@ stdenv.mkDerivation rec {
 
     substituteInPlace $out/share/applications/tensor.desktop \
       --subst-var-by bin $out/bin/tensor
-
-    runHook postInstall
   '';
 
   meta = with stdenv.lib; {

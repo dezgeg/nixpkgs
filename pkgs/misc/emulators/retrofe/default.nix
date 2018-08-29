@@ -54,8 +54,6 @@ stdenv.mkDerivation rec {
     EOF
 
     chmod +x $out/bin/retrofe-init
-
-    runHook postInstall
   '';
 
   # retrofe will look for config files in its install path ($out/bin).

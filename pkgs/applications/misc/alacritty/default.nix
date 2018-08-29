@@ -80,8 +80,6 @@ in buildRustPackage rec {
   postBuild = lib.optionalString stdenv.isDarwin "make app";
 
   installPhase = ''
-    runHook preInstall
-
     install -D target/release/alacritty $out/bin/alacritty
 
   '' + (if stdenv.isDarwin then ''
@@ -90,10 +88,7 @@ in buildRustPackage rec {
   '' else ''
     install -D Alacritty.desktop $out/share/applications/alacritty.desktop
     patchelf --set-rpath "${stdenv.lib.makeLibraryPath rpathLibs}" $out/bin/alacritty
-  '') + ''
-
-    runHook postInstall
-  '';
+  '');
 
   dontPatchELF = true;
 

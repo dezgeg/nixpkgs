@@ -13,8 +13,6 @@ fixCmakeFiles() {
 }
 
 cmakeConfigurePhase() {
-    runHook preConfigure
-
     if [ -z "$dontFixCmake" ]; then
         fixCmakeFiles .
     fi
@@ -82,8 +80,6 @@ cmakeConfigurePhase() {
         enableParallelBuilding=1
         echo "cmake: enabled parallel building"
     fi
-
-    runHook postConfigure
 }
 
 if [ -z "$dontUseCmakeConfigure" -a -z "$configurePhase" ]; then

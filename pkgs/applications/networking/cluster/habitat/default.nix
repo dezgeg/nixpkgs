@@ -23,10 +23,8 @@ buildRustPackage rec {
   cargoBuildFlags = ["--package hab"];
 
   checkPhase = ''
-    runHook preCheck
     echo "Running cargo test"
     cargo test --package hab
-    runHook postCheck
   '';
 
   meta = with lib; {

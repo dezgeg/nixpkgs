@@ -14,7 +14,6 @@ stdenv.mkDerivation {
 
   installPhase = ''
     find . -type f -exec chmod -x {} \;
-    runHook postInstall
   '';
 
   meta = meta // {

@@ -59,7 +59,6 @@ let makeDeps = dependencies:
           completeBuildDepsDir = lib.concatStringsSep " " completeBuildDeps;
       in ''
       cd ${workspace_member}
-      runHook preConfigure
       ${echo_build_heading colors}
       ${noisily colors verbose}
       symlink_dependency() {
@@ -172,7 +171,6 @@ let makeDeps = dependencies:
             fi
          fi
       fi
-      runHook postConfigure
     '';
 
     buildCrate = { crateName, crateVersion, crateAuthors,
@@ -196,7 +194,6 @@ let makeDeps = dependencies:
           version = lib.splitString "." (lib.head version_);
           authors = lib.concatStringsSep ":" crateAuthors;
       in ''
-      runHook preBuild
       norm=""
       bold=""
       green=""
@@ -302,12 +299,9 @@ let makeDeps = dependencies:
       ''}
       # Remove object files to avoid "wrong ELF type"
       find target -type f -name "*.o" -print0 | xargs -0 rm -f
-    '' + finalBins + ''
-      runHook postBuild
-    '';
+    '' + finalBins;
 
     installCrate = crateName: metadata: ''
-      runHook preInstall
       mkdir -p $out
       if [[ -s target/env ]]; then
         cp target/env $out/env
@@ -331,7 +325,6 @@ let makeDeps = dependencies:
         mkdir -p $out/bin
         cp -P target/bin/* $out/bin # */
       fi
-      runHook postInstall
     '';
 in
 

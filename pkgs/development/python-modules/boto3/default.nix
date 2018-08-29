@@ -26,12 +26,10 @@ buildPythonPackage rec {
   checkInputs = [ docutils nose mock ];
 
   checkPhase = ''
-    runHook preCheck
     # This method is not in mock. It might have appeared in some versions.
     sed -i 's/action.assert_called_once()/self.assertEqual(action.call_count, 1)/' \
       tests/unit/resources/test_factory.py
     nosetests -d tests/unit --verbose
-    runHook postCheck
   '';
 
   # Network access

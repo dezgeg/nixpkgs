@@ -16,7 +16,6 @@ buildGoPackage rec {
   buildInputs = [ go-bindata bash ];
 
   buildPhase = ''
-    runHook preBuild
     (
       cd go/src/github.com/containous/traefik
       bash ./script/make.sh generate
@@ -27,7 +26,6 @@ buildGoPackage rec {
         -X github.com/containous/traefik/version.Codename=$CODENAME \
       " -a -o $bin/bin/traefik ./cmd/traefik
     )
-    runHook postBuild
   '';
 
   meta = with stdenv.lib; {

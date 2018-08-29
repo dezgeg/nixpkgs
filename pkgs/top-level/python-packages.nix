@@ -10737,8 +10737,6 @@ in {
 
     # Same as in buildPythonPackage except that it does not pass --old-and-unmanageable
     installPhase = ''
-      runHook preInstall
-
       mkdir -p "$out/lib/${python.libPrefix}/site-packages"
 
       export PYTHONPATH="$out/lib/${python.libPrefix}/site-packages:$PYTHONPATH"
@@ -10753,8 +10751,6 @@ in {
       fi
 
       rm -f "$out/lib/${python.libPrefix}"/site-packages/site.py*
-
-      runHook postInstall
     '';
 
     meta = {
@@ -10777,8 +10773,6 @@ in {
 
     # Same as in buildPythonPackage except that it does not pass --old-and-unmanageable
     installPhase = ''
-      runHook preInstall
-
       mkdir -p "$out/lib/${python.libPrefix}/site-packages"
 
       export PYTHONPATH="$out/lib/${python.libPrefix}/site-packages:$PYTHONPATH"
@@ -10793,8 +10787,6 @@ in {
       fi
 
       rm -f "$out/lib/${python.libPrefix}"/site-packages/site.py*
-
-      runHook postInstall
     '';
 
     src = pkgs.fetchurl {

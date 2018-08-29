@@ -35,7 +35,6 @@ python3Packages.buildPythonApplication {
   installPhase = ''
     python setup.py install --home=$out
     cp -r ${desktopItem}/share/ $out/
-    runHook postInstall
   '';
 
   postInstall = with python3Packages; ''

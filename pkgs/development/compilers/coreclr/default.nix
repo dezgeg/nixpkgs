@@ -75,20 +75,16 @@ stdenv.mkDerivation rec {
   ];
 
   buildPhase = ''
-    runHook preBuild
     # disable -Werror which can potentially breaks with every compiler upgrade
     ./build.sh $BuildArch $BuildType cmakeargs "-DCLR_CMAKE_WARNINGS_ARE_ERRORS=OFF"
-    runHook postBuild
   '';
 
   installPhase = ''
-    runHook preInstall
     mkdir -p $out/share/dotnet $out/bin
     cp -r bin/Product/Linux.$BuildArch.$BuildType/* $out/share/dotnet
     for cmd in coreconsole corerun createdump crossgen ilasm ildasm mcs superpmi; do
       ln -s $out/share/dotnet/$cmd $out/bin/$cmd
     done
-    runHook postInstall
   '';
 
   meta = with stdenv.lib; {

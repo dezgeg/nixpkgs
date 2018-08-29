@@ -123,8 +123,6 @@ let
     inherit src;
 
     configurePhase = ''
-      runHook preConfigure
-
       ${patchShebangs "./"}
 
       # Some version specifiers (latest, unstable, URLs, file paths) force NPM
@@ -223,12 +221,9 @@ let
       )
 
       export HOME=$PWD/../build-dir
-      runHook postConfigure
     '';
 
     buildPhase = ''
-      runHook preBuild
-
       # If source was a file, repackage it, so npm pre/post publish hooks are not triggered,
       if [[ -f $src ]]; then
         GZIP=-1 tar -czf ../build-dir/package.tgz ./
@@ -239,13 +234,9 @@ let
 
       # Install package
       (cd $HOME && npm --registry http://www.example.com --nodedir=${sources} install $src --fetch-retries 0 ${flags})
-
-      runHook postBuild
     '';
 
     installPhase = ''
-      runHook preInstall
-
       (
         cd $HOME
 
@@ -284,8 +275,6 @@ let
           ${patchShebangs "$out/lib/node_modules/.bin/*"}
         fi
       )
-
-      runHook postInstall
     '';
 
     preFixup = ''

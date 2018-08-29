@@ -83,13 +83,11 @@ stdenv.mkDerivation rec {
   '';
 
   doCheck = true;
-  
+
   checkPhase = ''
-    runHook preCheck
     ctest --output-on-failure -E smpi-replay-multiple
-    runHook postCheck
   '';
-    
+
   enableParallelBuilding = true;
 
   meta = {

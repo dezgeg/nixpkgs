@@ -82,8 +82,6 @@ go.stdenv.mkDerivation (
   buildInputs = [ go ] ++ buildInputs;
 
   configurePhase = args.configurePhase or ''
-    runHook preConfigure
-
     # Extract the source
     cd "$NIX_BUILD_TOP"
     mkdir -p "go/src/$(dirname "$goPackagePath")"
@@ -102,8 +100,6 @@ go.stdenv.mkDerivation (
 
   '') + ''
     export GOPATH=$NIX_BUILD_TOP/go:$GOPATH
-
-    runHook postConfigure
   '';
 
   renameImports = args.renameImports or (
@@ -115,8 +111,6 @@ go.stdenv.mkDerivation (
     in lib.concatMapStringsSep "\n" renames inputsWithAliases);
 
   buildPhase = args.buildPhase or ''
-    runHook preBuild
-
     runHook renameImports
 
     buildGoDir() {
@@ -161,21 +155,13 @@ go.stdenv.mkDerivation (
         export NIX_BUILD_CORES=1
     fi
     getGoDirs "" | parallel -j $NIX_BUILD_CORES buildGoDir install
-
-    runHook postBuild
   '';
 
   checkPhase = args.checkPhase or ''
-    runHook preCheck
-
     getGoDirs test | parallel -j $NIX_BUILD_CORES buildGoDir test
-
-    runHook postCheck
   '';
 
   installPhase = args.installPhase or ''
-    runHook preInstall
-
     mkdir -p $out
     pushd "$NIX_BUILD_TOP/go"
     while read f; do
@@ -188,8 +174,6 @@ go.stdenv.mkDerivation (
     mkdir -p $bin
     dir="$NIX_BUILD_TOP/go/bin"
     [ -e "$dir" ] && cp -r $dir $bin
-
-    runHook postInstall
   '';
 
   preFixup = preFixup + ''

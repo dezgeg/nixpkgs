@@ -33,11 +33,9 @@ buildPythonApplication rec {
   '';
 
   installPhase = ''
-    runHook preInstall
     mkdir -p $out
     cp -r linux-package/{bin,share,lib} $out
     wrapProgram "$out/bin/kitty" --prefix PATH : "$out/bin:${stdenv.lib.makeBinPath [ imagemagick xsel ]}"
-    runHook postInstall
   '';
 
   meta = with stdenv.lib; {

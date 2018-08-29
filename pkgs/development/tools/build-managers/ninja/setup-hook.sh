@@ -1,6 +1,4 @@
 ninjaBuildPhase() {
-    runHook preBuild
-
     if [[ -z "$ninjaFlags" && ! ( -e build.ninja ) ]]; then
         echo "no build.ninja, doing nothing"
     else
@@ -21,8 +19,6 @@ ninjaBuildPhase() {
         ninja "${flagsArray[@]}"
         unset flagsArray
     fi
-
-    runHook postBuild
 }
 
 if [ -z "$dontUseNinjaBuild" -a -z "$buildPhase" ]; then
@@ -30,8 +26,6 @@ if [ -z "$dontUseNinjaBuild" -a -z "$buildPhase" ]; then
 fi
 
 ninjaInstallPhase() {
-    runHook preInstall
-
     installTargets="${installTargets:-install}"
 
     # shellcheck disable=SC2086
@@ -41,8 +35,6 @@ ninjaInstallPhase() {
     echoCmd 'install flags' "${flagsArray[@]}"
     ninja "${flagsArray[@]}"
     unset flagsArray
-
-    runHook postInstall
 }
 
 if [ -z "$dontUseNinjaInstall" -a -z "$installPhase" ]; then

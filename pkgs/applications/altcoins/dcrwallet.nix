@@ -24,7 +24,6 @@ buildGoPackage rec {
   '';
 
   buildPhase = ''
-    runHook preBuild
     go build
   '';
 

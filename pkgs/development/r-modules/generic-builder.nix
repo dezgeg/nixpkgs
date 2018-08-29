@@ -11,15 +11,10 @@ stdenv.mkDerivation ({
     stdenv.lib.optionalString stdenv.isDarwin "-I${libcxx}/include/c++/v1";
 
   configurePhase = ''
-    runHook preConfigure
     export R_LIBS_SITE="$R_LIBS_SITE''${R_LIBS_SITE:+:}$out/library"
-    runHook postConfigure
   '';
 
-  buildPhase = ''
-    runHook preBuild
-    runHook postBuild
-  '';
+  buildPhase = ":";
 
   installFlags = if attrs.doCheck or true then
     []
@@ -34,10 +29,8 @@ stdenv.mkDerivation ({
     "R";
 
   installPhase = ''
-    runHook preInstall
     mkdir -p $out/library
     $rCommand CMD INSTALL $installFlags --configure-args="$configureFlags" -l $out/library .
-    runHook postInstall
   '';
 
   postFixup = ''

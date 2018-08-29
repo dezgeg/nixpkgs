@@ -14,8 +14,6 @@ buildPythonPackage rec {
   };
 
   checkPhase = ''
-    runHook preCheck
-
     # we have to do a little bit of tinkering to convince the tests to run against the installed package, not the
     # source directory
     mkdir -p testbase/compat
@@ -26,8 +24,6 @@ buildPythonPackage rec {
     cp ../runtests.py .
     ${python.interpreter} runtests.py compat/tests
     popd
-
-    runHook postCheck
   '';
 
   checkInputs = [ django_nose ];

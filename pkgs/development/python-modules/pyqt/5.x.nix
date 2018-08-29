@@ -39,8 +39,6 @@ in buildPythonPackage {
   ] ++ lib.optional withWebSockets qtwebsockets ++ lib.optional withConnectivity qtconnectivity;
 
   configurePhase = ''
-    runHook preConfigure
-
     mkdir -p $out
     lndir ${dbus-python} $out
     rm -rf "$out/nix-support"
@@ -60,8 +58,6 @@ in buildPythonPackage {
       --stubsdir=$out/${python.sitePackages}/PyQt5 \
       --sipdir=$out/share/sip/PyQt5 \
       --designer-plugindir=$out/plugins/designer
-
-    runHook postConfigure
   '';
 
   patches = [

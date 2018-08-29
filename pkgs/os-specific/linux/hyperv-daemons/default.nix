@@ -15,8 +15,6 @@ let
     '';
 
     installPhase = ''
-      runHook preInstall
-
       for f in fcopy kvp vss ; do
         install -Dm755 hv_''${f}_daemon -t $out/bin
       done
@@ -26,8 +24,6 @@ let
       # I don't know why this isn't being handled automatically by fixupPhase
       substituteInPlace $out/bin/lsvmbus \
         --replace '/usr/bin/env python' ${python.interpreter}
-
-      runHook postInstall
     '';
 
     postFixup = ''

@@ -32,19 +32,13 @@ stdenv.mkDerivation rec {
   '';
 
   buildPhase = ''
-    runHook preBuild
-
     make locked-deps
     make rel
-
-    runHook postBuild
   '';
 
   doCheck = false;
 
   installPhase = ''
-    runHook preInstall
-
     mkdir $out
     mv rel/riak-cs/etc rel/riak-cs/riak-etc
     mkdir -p rel/riak-cs/etc
@@ -56,8 +50,6 @@ stdenv.mkDerivation rec {
         --replace '. "`cd \`dirname $0\` && /bin/pwd`/../lib/env.sh"' \
                   ". $out/lib/env.sh"
     done
-
-    runHook postInstall
   '';
 
   meta = with lib; {

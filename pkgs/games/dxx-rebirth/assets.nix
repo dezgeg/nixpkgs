@@ -28,16 +28,12 @@ let
     dontFixup = true;
 
     installPhase = ''
-      runHook preInstall
-
       mkdir -p $out/share/{games/${pname},doc/${pname}/examples}
       pushd "app/${source}"
       mv dosbox*.conf $out/share/doc/${pname}/examples
       mv *.txt *.pdf  $out/share/doc/${pname}
       cp -r * $out/share/games/descent${toString ver}
       popd
-
-      runHook postInstall
     '';
 
     meta = with stdenv.lib; {

@@ -55,8 +55,6 @@ in buildPythonApplication rec {
   doCheck = false;
 
   installPhase = ''
-    runHook preInstall
-
     mkdir -p $out/{bin,share/doc/pykms} $siteDir
 
     mv * $siteDir
@@ -71,8 +69,6 @@ in buildPythonApplication rec {
     mv $siteDir/README.md $out/share/doc/pykms/
 
     ${python.interpreter} -m compileall $siteDir
-
-    runHook postInstall
   '';
 
   meta = with stdenv.lib; {

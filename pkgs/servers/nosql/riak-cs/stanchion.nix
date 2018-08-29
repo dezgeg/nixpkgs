@@ -29,18 +29,12 @@ stdenv.mkDerivation rec {
   '';
 
   buildPhase = ''
-    runHook preBuild
-
     make rel
-
-    runHook postBuild
   '';
 
   doCheck = false;
 
   installPhase = ''
-    runHook preInstall
-
     mkdir $out
     mv rel/stanchion/etc rel/stanchion/riak-etc
     mkdir -p rel/stanchion/etc
@@ -52,8 +46,6 @@ stdenv.mkDerivation rec {
         --replace '. "`cd \`dirname $0\` && /bin/pwd`/../lib/env.sh"' \
                   ". $out/lib/env.sh"
     done
-
-    runHook postInstall
   '';
 
   meta = with lib; {

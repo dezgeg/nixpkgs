@@ -14,15 +14,11 @@ stdenv.mkDerivation rec {
   unpackPhase = ":";
   dontBuild = true;
   installPhase = ''
-    runHook preInstall
-
     mkdir -p $out/{bin,share/man/man1}
     substitute ${src} $out/bin/vcal \
       --replace /usr/bin/perl ${perl}/bin/perl
     chmod 0755 $out/bin/*
     pod2man --name=vcal --release=${version} ${src} > $out/share/man/man1/vcal.1
-
-    runHook postInstall
   '';
 
   # There are no tests

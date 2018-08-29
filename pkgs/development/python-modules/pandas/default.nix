@@ -86,20 +86,19 @@ in buildPythonPackage rec {
     "test_clipboard"
   ]);
 
-  checkPhase = ''
-    runHook preCheck
-  ''
-  # TODO: Get locale and clipboard support working on darwin.
-  #       Until then we disable the tests.
-  + optionalString isDarwin ''
+  preCheck = optionalString isDarwin ''
+    # TODO: Get locale and clipboard support working on darwin.
+    #       Until then we disable the tests.
+
     # Fake the impure dependencies pbpaste and pbcopy
     echo "#!/bin/sh" > pbcopy
     echo "#!/bin/sh" > pbpaste
     chmod a+x pbcopy pbpaste
     export PATH=$(pwd):$PATH
-  '' + ''
+  '';
+
+  checkPhase = ''
     py.test $out/${python.sitePackages}/pandas --skip-slow --skip-network -k "$disabledTests"
-    runHook postCheck
   '';
 
   meta = {

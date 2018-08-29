@@ -14,11 +14,9 @@ let
 
   kernel = origKernel // (derivation (origKernel.drvAttrs // {
     configurePhase = ''
-      runHook preConfigure
       mkdir ../build
       make $makeFlags "''${makeFlagsArray[@]}" mrproper
       make $makeFlags "''${makeFlagsArray[@]}" KCONFIG_ALLCONFIG=${configfile} allnoconfig
-      runHook postConfigure
     '';
   }));
 

@@ -38,9 +38,7 @@ buildPythonPackage rec {
   ];
   # ignore tests on the nix wrapped setup.py and don't flake .eggs directory
   checkPhase = ''
-    runHook preCheck
     ${python.interpreter} setup.py test --addopts "--ignore=.eggs"
-    runHook postCheck
   '';
 
   meta = with stdenv.lib; {

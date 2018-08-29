@@ -262,8 +262,6 @@ stdenv.mkDerivation ({
   '' + postPatch;
 
   setupCompilerEnvironmentPhase = ''
-    runHook preSetupCompilerEnvironment
-
     echo "Build with ${ghc}."
     ${optionalString (hasActiveLibrary && hyperlinkSource) "export PATH=${hscolour}/bin:$PATH"}
 
@@ -324,21 +322,15 @@ stdenv.mkDerivation ({
     done
   '') + ''
     ${ghcCommand}-pkg --${packageDbFlag}="$packageConfDir" recache
-
-    runHook postSetupCompilerEnvironment
   '';
 
   compileBuildDriverPhase = ''
-    runHook preCompileBuildDriver
-
     for i in Setup.hs Setup.lhs ${defaultSetupHs}; do
       test -f $i && break
     done
 
     echo setupCompileFlags: $setupCompileFlags
     ${nativeGhcCommand} $setupCompileFlags --make -o Setup -odir $TMPDIR -hidir $TMPDIR $i
-
-    runHook postCompileBuildDriver
   '';
 
   # Cabal takes flags like `--configure-option=--host=...` instead
@@ -346,8 +338,6 @@ stdenv.mkDerivation ({
   inherit configureFlags;
 
   configurePhase = ''
-    runHook preConfigure
-
     unset GHC_PACKAGE_PATH      # Cabal complains if this variable is set during configure.
 
     echo configureFlags: $configureFlags
@@ -358,37 +348,27 @@ stdenv.mkDerivation ({
     fi
 
     export GHC_PACKAGE_PATH="$packageConfDir:"
-
-    runHook postConfigure
   '';
 
   buildPhase = ''
-    runHook preBuild
     ${setupCommand} build ${buildTarget}${crossCabalFlagsString}${buildFlagsString}
-    runHook postBuild
   '';
 
   inherit doCheck;
 
   checkPhase = ''
-    runHook preCheck
     ${setupCommand} test ${testTarget}
-    runHook postCheck
   '';
 
   haddockPhase = ''
-    runHook preHaddock
     ${optionalString (doHaddock && hasActiveLibrary) ''
       ${setupCommand} haddock --html \
         ${optionalString doHoogle "--hoogle"} \
         ${optionalString (hasActiveLibrary && hyperlinkSource) "--hyperlink-source"}
     ''}
-    runHook postHaddock
   '';
 
   installPhase = ''
-    runHook preInstall
-
     ${if !hasActiveLibrary then "${setupCommand} install" else ''
       ${setupCommand} copy
       local packageConfDir="$out/lib/${ghc.name}/package.conf.d"
@@ -427,8 +407,6 @@ stdenv.mkDerivation ({
     mkdir -p $doc
     ''}
     ${optionalString enableSeparateDataOutput "mkdir -p $data"}
-
-    runHook postInstall
   '';
 
   passthru = passthru // {

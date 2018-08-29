@@ -12,9 +12,7 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [ qmake ];
 
   configurePhase = ''
-    runHook preConfigure
     ./configure --prefix $out --qmakepath $QMAKE
-    runHook postConfigure
   '';
 
   meta = with stdenv.lib; {

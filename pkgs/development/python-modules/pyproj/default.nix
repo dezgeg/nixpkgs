@@ -18,11 +18,9 @@ buildPythonPackage (rec {
   buildInputs = [ nose2 ];
 
   checkPhase = ''
-    runHook preCheck
     pushd unittest  # changing directory should ensure we're importing the global pyproj
     ${python.interpreter} test.py && ${python.interpreter} -c "import doctest, pyproj, sys; sys.exit(doctest.testmod(pyproj)[0])"
     popd
-    runHook postCheck
   '';
 
   meta = {

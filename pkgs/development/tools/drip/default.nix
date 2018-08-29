@@ -21,13 +21,11 @@ stdenv.mkDerivation rec {
   '';
 
   installPhase = ''
-    runHook preInstall
     mkdir $out
     cp ./* $out -r
     wrapProgram $out/bin/drip \
       --prefix PATH : "${which}/bin"
     $out/bin/drip version
-    runHook postInstall
   '';
 
   meta = with stdenv.lib; {

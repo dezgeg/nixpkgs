@@ -33,11 +33,9 @@ buildGoPackage rec {
     # move vendored codes so nixpkgs go builder could find it
     mv go/src/github.com/mongodb/mongo-tools/vendor/src/* go/src/github.com/mongodb/mongo-tools/vendor/
 
-    runHook preBuild
     ${stdenv.lib.concatMapStrings (t: ''
       go build -o "$bin/bin/${t}" -tags ssl -ldflags "-s -w" $goPackagePath/${t}/main
     '') tools}
-    runHook postBuild
   '';
 
   meta = {

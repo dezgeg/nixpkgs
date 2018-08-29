@@ -33,16 +33,12 @@ in stdenv.mkDerivation rec {
   sourceRoot = "./The Unarchiver/XADMaster";
 
   installPhase = ''
-    runHook preInstall
-
     install -Dm755 -t $out/bin lsar unar
     install -Dm644 -t $out/share/man/man1 ../Extra/{lsar,unar}.1
 
     mkdir -p $out/etc/bash_completion.d
     cp ../Extra/lsar.bash_completion $out/etc/bash_completion.d/lsar
     cp ../Extra/unar.bash_completion $out/etc/bash_completion.d/unar
-
-    runHook postInstall
   '';
 
   meta = with stdenv.lib; {
