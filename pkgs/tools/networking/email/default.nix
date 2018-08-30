@@ -25,8 +25,7 @@ stdenv.mkDerivation {
 
   buildInputs = [ openssl ];
 
-  unpackPhase = ''
-    unpackPhase;
+  postUnpack = ''
     cp -Rp ${dlibSrc}/* ${srcRoot}/dlib;
     chmod -R +w ${srcRoot}/dlib;
   '';

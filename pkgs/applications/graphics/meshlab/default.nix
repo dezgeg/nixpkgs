@@ -40,10 +40,10 @@ in stdenv.mkDerivation {
 
     pushd external
     qmake -recursive external.pro
-    buildPhase
+    defaultBuildPhase
     popd
     qmake -recursive meshlab_full.pro
-    buildPhase
+    defaultBuildPhase
   '';
 
   installPhase = ''

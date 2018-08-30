@@ -90,7 +90,7 @@ in stdenv.mkDerivation rec {
     mkdir -p $out
 
     cd $out
-    runHook unpackPhase
+    unpackPhase
     runHook commonPhase
     cd $home
 

@@ -44,4 +44,4 @@ buildDir() {
   done
 }
 
-eval "$installPhase"
+installPhase

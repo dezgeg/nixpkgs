@@ -31,9 +31,7 @@ else stdenv.mkDerivation {
 
   dontBuild = true;
 
-  installPhase = if (isLinux)
-    then "installPhase"
-    else ''
+  installPhase = stdenv.lib.optionalString (!isLinux) ''
       mkdir -p "$out"/include/libspotify
       mv -v libspotify.framework/Versions/Current/Headers/api.h \
         "$out"/include/libspotify
