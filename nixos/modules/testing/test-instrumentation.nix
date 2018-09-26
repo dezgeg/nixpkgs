@@ -55,7 +55,7 @@ with import ../../lib/qemu-flags.nix { inherit pkgs; };
     systemd.services."serial-getty@hvc0".enable = false;
 
     # Only use a serial console, no TTY.
-    virtualisation.qemu.consoles = [ qemuSerialDevice ];
+    virtualisation.qemu.consoles = [ "hvc1" qemuSerialDevice ];
 
     boot.initrd.preDeviceCommands =
       ''
